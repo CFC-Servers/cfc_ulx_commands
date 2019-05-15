@@ -1,8 +1,8 @@
 CATEGORY_NAME = "CFC"
 
-local function ropeClean( calling_ply, target_plys)
+local function ropeClean( callingPlayer, targetPlayers)
     local plyCounts = {}
-    for _, ply in pairs(target_plys) do
+    for _, ply in pairs(targetPlayers) do
         plyCounts[ply] = 0
     end
     
@@ -19,11 +19,11 @@ local function ropeClean( calling_ply, target_plys)
         end
     end
     
-    ulx.fancyLogAdmin( calling_ply, "#A removed "..ropeCount.." ropes owned by #T", target_plys )
+    ulx.fancyLogAdmin( callingPlayer, "#A removed "..ropeCount.." ropes owned by #T", targetPlayers )
     
     for ply, count in pairs(plyCounts) do
         if count > 0 then
-            calling_ply:ChatPrint(string.format("%s had %u ropes", ply:GetName(), count)) 
+            callingPlayer:ChatPrint(string.format("%s owned %u ropes", ply:GetName(), count)) 
         end
     end
     
