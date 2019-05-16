@@ -1,15 +1,15 @@
 CATEGORY_NAME = "CFC"
 
-local function ropeClean( callingPlayer, targetPlayers)
+local function ropeClean( callingPlayer, targetPlayers )
     local plyCounts = {}
-    for _, ply in pairs(targetPlayers) do
+    for _, ply in pairs( targetPlayers ) do
         plyCounts[ply] = 0
     end
     
     local ropes = ents.FindByClass( "keyframe_rope" )
     local ropeCount = 0
     
-    for _, rope in pairs(ropes) do
+    for _, rope in pairs( ropes ) do
         local owner = rope:CPPIGetOwner()
         
         if plyCounts[owner] ~= nil then 
@@ -18,15 +18,14 @@ local function ropeClean( callingPlayer, targetPlayers)
             plyCounts[owner] = plyCounts[owner] + 1
         end
     end
-    
+
     ulx.fancyLogAdmin( callingPlayer, "#A removed "..ropeCount.." ropes owned by #T", targetPlayers )
-    
-    for ply, count in pairs(plyCounts) do
+
+    for ply, count in pairs( plyCounts ) do
         if count > 0 then
-            callingPlayer:ChatPrint(string.format("%s owned %u ropes", ply:GetName(), count)) 
+            callingPlayer:ChatPrint( string.format( "%s owned %u ropes", ply:GetName(), count ) ) 
         end
     end
-    
 end
 
 local ropes = ulx.command( CATEGORY_NAME, "ulx ropeclean", ropeClean, "!ropeclean" )
