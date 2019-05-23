@@ -1,4 +1,5 @@
 CATEGORY_NAME = "CFC"
+
 SQL_TABLE = "cfc_timed_gags"
 
 local GaggedPlayers = {}
@@ -12,7 +13,7 @@ local function createTable()
 end
 
 
-GET_PLAYER_QUERY = "SELECT expiration FROM %s WHERE steam_id=%s"
+GET_PLAYER_QUERY = "SELECT expiration FROM %s WHERE steam_id='%s'"
 local function initializeGaggedPlayers()
     for _, ply in player.GetHumans() do
         local query = string.format( GET_PLAYER_QUERY, SQL_TABLE, ply:SteamID() )
@@ -25,7 +26,7 @@ local function initializeGaggedPlayers()
 end
 
 
-REMOVE_GAG_QUERY = "REMOVE FROM %s WHERE steam_id=%s"
+REMOVE_GAG_QUERY = "REMOVE FROM %s WHERE steam_id='%s'"
 local function removeExpiredGag(ply)
     GaggedPlayers[ply] = nil
 
@@ -101,6 +102,8 @@ end
 local function gagPlayerForTime(ply, timeToGag)
     local expirationTime = getExpirationTime( timeToGag )
 
+    gagPlayer(ply)
+
     if GaggedPlayers[ply] == nil then
         newPlayerGag(ply:SteamID(), expirationTime)
     else
@@ -111,7 +114,9 @@ local function gagPlayerForTime(ply, timeToGag)
 end
 
 
-local function timeGag( callingPlayer, timeToGag, targetPlayers )
+local function timeGag( callingPlayer, targetPlayers, timeToGag )
+	ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i seconds!", targetPlayers, timeToGag * 60 )
+
     for _, ply in pairs( targetPlayers ) do
         gagPlayerForTime(ply, timeToGag)    
     end
@@ -126,7 +131,7 @@ timegag:help( "Gags a user for a set amount of time" )
 
 function updateGags()
     for ply, expiration in pairs( GaggedPlayers ) do
-        if gagIsExpired( expiration ) then
+        if gagIsExpired( expiration ) or ply:GetNWBool("ulx_gagged", false) == false then
             removeExpiredGag( ply )
             ungagPlayer( ply )
         end
@@ -142,9 +147,9 @@ local function getPlayerGagFromDatabase(ply)
 
     local playerSteamId = ply:SteamID()
 
-    local query = string.format( GET_PLAYER_QUERY, playerSteamId )
+    local query = string.format( GET_PLAYER_QUERY, SQL_TABLE, playerSteamId )
 
-    local expiration = sql.Query( GET_PLAYER_QUERY )
+    local expiration = sql.Query( query )
     
     if expiration == nil then return end
 
@@ -180,5 +185,5 @@ local function init()
     end)
 end
 
-hook.Remove( "Initialize", "CFC_GagInit")
-hook.Add( "Initialize", "CFC_GagInit", init)
+hook.Remove( "OnGamemodeLoaded", "CFC_GagInit" )
+hook.Add( "OnGamemodeLoaded", "CFC_GagInit", init)
