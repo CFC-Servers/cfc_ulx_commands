@@ -37,7 +37,9 @@ local function updatePlayerGag(ply, expirationTime, reason)
                                 expirationTime,
                                 reason,
                                 ply:SteamID())
-                                
+ 
+    BRAIDSPRINT(query)
+
     local succeeded = sql.Query( query )
     if succeeded == false then
         print( "Failed to update time gag for "..ply:Nick().."!" )
@@ -71,7 +73,7 @@ end
 local function createTable()
     if sql.TableExists( SQL_TABLE ) then return end
 
-    local createTableQuery = string.format( "CREATE TABLE %s(steam_id TEXT, expiration BIGINT, reason TEXT)", SQL_TABLE )
+    local createTableQuery = string.format( "CREATE TABLE %s(steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT)", SQL_TABLE )
 
     sql.Query( createTableQuery )
 end
@@ -100,7 +102,7 @@ local function getGagReasonFromDatabase(ply)
 end
 
 
-REMOVE_GAG_QUERY = "REMOVE FROM %s WHERE steam_id='%s'"
+REMOVE_GAG_QUERY = "DELETE FROM %s WHERE steam_id='%s'"
 local function removeExpiredGagFromDatabase(ply)
     if not isValidPlayer( ply ) then return end
 
@@ -199,7 +201,7 @@ end
 local function initializeGags()
     createTable()
 
-    BRAIDSPRINT("INITITALIZING")
+    BRAIDSPRINT("INITIALIZING")
 
     -- Wait a second before initializing players
     timer.Simple( INIT_WAIT_TIME, initializeGaggedPlayers )
@@ -263,7 +265,7 @@ timer.Create("CFC_GagTimer", 1, 0, updateGags)
 hook.Remove( "PlayerInitialSpawn", "CFC_GagCheck" )
 hook.Add( "PlayerInitialSpawn", "CFC_GagCheck", function( ply )
     -- Timer because the steamId isn't available yet
-    timer.Simple(1, function()
+    timer.Simple(2, function( ply )
         getPlayerGagFromDatabase( ply )
     end)
 end)
@@ -272,13 +274,13 @@ end)
 local function removeDisconnectedPlayer(ply)
     if not GaggedPlayers[ply] then return end
 
-    GaggedPlayers[steamId] = nil
+    GaggedPlayers[ply] = nil
 end
 
 hook.Remove( "PlayerDisconnected", "CFC_GagRemove" )
 hook.Add( "PlayerDisconnected", "CFC_GagRemove", removeDisconnectedPlayer )
 
-hook.Remove( "Initialize", "CFC_GagInit" )
-hook.Add( "Initialize", "CFC_GagInit", initializeGags)
+--hook.Remove( "Initialize", "CFC_GagInit" )
+--hook.Add( "Initialize", "CFC_GagInit", initializeGags)
 
 -- END HOOKS --
