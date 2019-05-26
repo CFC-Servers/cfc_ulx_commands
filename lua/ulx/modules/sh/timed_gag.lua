@@ -11,6 +11,7 @@ local gagsInitialized = false
 local function BRAIDSPRINT(msg)
     for _, ply in pairs( player.GetHumans()) do
         if ply:Nick() == "iLikeYoBraids" then ply:ChatPrint(msg) end
+        PrintTable(GaggedPlayers)
     end
 end
 
@@ -22,16 +23,22 @@ local function isValidPlayer(ply)
 end
 
 local function createTable()
+    BRAIDSPRINT("conditionally creating gags table...")
+
     if sql.TableExists( SQL_TABLE ) then return end
+
+    BRAIDSPRINT("creating gags table because it wasn't found...")
 
     local createTableQuery = string.format( "CREATE TABLE %s(steam_id TEXT, expiration BIGINT, reason TEXT)", SQL_TABLE )
 
     sql.Query( createTableQuery )
 end
 
+GET_PLAYER_QUERY = "SELECT %s FROM %s WHERE steam_id='%s'"
 local function getColumnFromDatabase(ply, column)
-    local query = string.format( GET_PLAYER_QUERY, column, SQL_TABLE, playerSteamId )
-    
+    local query = string.format( GET_PLAYER_QUERY, column, SQL_TABLE, ply:SteamID() )
+    BRAIDSPRINT(query)
+
     value = sql.QueryValue( query )
 
     return value
@@ -49,13 +56,13 @@ local function getGagReasonFromDatabase(ply)
     return reason
 end
 
-GET_PLAYER_QUERY = "SELECT %s FROM %s WHERE steam_id='%s'"
 local function getPlayerGagFromDatabase(ply)
     if not isValidPlayer( ply ) then return end
 
     local playerSteamId = ply:SteamID()
 
     local expiration = tonumber( getGagExpirationFromDatabase( ply ) )
+    BRAIDSPRINT(ply:Nick().." gag expiration from db: "..tostring(expiration))
     if expiration == nil then return end
 
     if gagIsExpired( expiration ) then return removeExpiredGag( ply ) end
@@ -77,10 +84,10 @@ end
 local function init()
     createTable()
 
+    BRAIDSPRINT("INITITALIZING")
+
     -- Wait a second before initializing players
-    timer.Simple(INIT_WAIT_TIME, function()
-        initializeGaggedPlayers()
-    end)
+    timer.Simple( INIT_WAIT_TIME, initializeGaggedPlayers )
 end
 
 
@@ -105,7 +112,7 @@ local function playerIsAlreadyGagged(ply)
 end
 
 
-local UPDATE_QUERY = "UPDATE %s SET expiration=%d WHERE steam_id='%s'"
+local UPDATE_QUERY = "UPDATE %s SET expiration=%d,reason='%s' WHERE steam_id='%s'"
 local function updatePlayerGag(steamId, expirationTime, reason)
     local query = string.format(UPDATE_QUERY,
                                 SQL_TABLE,
@@ -116,6 +123,7 @@ local function updatePlayerGag(steamId, expirationTime, reason)
     local succeeded = sql.Query( query )
     if succeeded == false then
         print( "Failed to update time gag for SteamID "..steamId.."!" )
+        BRAIDSPRINT( "Failed to update time gag for SteamID "..steamId.."!" )
         return false
     end
 
@@ -123,7 +131,7 @@ local function updatePlayerGag(steamId, expirationTime, reason)
 end
 
 
-local NEW_GAG_QUERY = "INSERT INTO %s(steam_id, expiration) VALUES('%s', %d)"
+local NEW_GAG_QUERY = "INSERT INTO %s(steam_id, expiration, reason) VALUES('%s', %d, '%s')"
 local function newPlayerGag(steamId, expirationTime, reason)
     local query = string.format(NEW_GAG_QUERY,
                                 SQL_TABLE,
@@ -134,6 +142,7 @@ local function newPlayerGag(steamId, expirationTime, reason)
     local succeeded = sql.Query( query )
     if succeeded == false then
         print("Failed to create time gag for SteamID "..steamId.."!")
+        BRAIDSPRINT("Failed to create time gag for SteamID "..steamId.."!")
         return false
     end
 
@@ -165,21 +174,21 @@ local function gagPlayerUntil(ply, expirationTime, reason)
     
     ulxGagPlayer( ply )
     
-    if GaggedPlayers[ply] == nil then
-        newPlayerGag(ply:SteamID(), expirationTime, reason)
-    else
+    if playerIsAlreadyGagged( ply ) then
         updatePlayerGag(ply:SteamID(), expirationTime, reason)
+    else
+        newPlayerGag(ply:SteamID(), expirationTime, reason)
     end
     
-    secondsLeftInGag = expirationTime - os.time()
-    minutesLeftInGag = round( secondsLeftInGag / 60, 2 )
+    secondsLeftInGag = tonumber( expirationTime ) - os.time()
+    minutesLeftInGag = math.ceil( secondsLeftInGag / 60 )
 
-    message = "You have a time gag that expires in " .. minutesLeftInGag .. " minutes." 
+    message = "You have a time gag that expires in " .. tostring(minutesLeftInGag) .. " minutes." 
 
     if reason then message = message .. " Reason: " .. reason end
     ply:ChatPrint(message)
 
-    GaggedPlayers[ply] = tonumber( expirationTime )
+    GaggedPlayers[ply] = expirationTime
 end
 
 local function gagPlayerForTime(ply, timeToGag, reason)
@@ -215,6 +224,8 @@ timegag:help( "Gags a user for a set amount of time" )
 
 
 function updateGags()
+    BRAIDSPRINT("UPDATING GAGS!")
+
     if not gagsInitialized then init() end
 
     for ply, expiration in pairs( GaggedPlayers ) do
