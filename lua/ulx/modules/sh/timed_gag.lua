@@ -59,14 +59,11 @@ end
 local function getPlayerGagFromDatabase(ply)
     if not isValidPlayer( ply ) then return end
 
-    local playerSteamId = ply:SteamID()
-
     local expiration = tonumber( getGagExpirationFromDatabase( ply ) )
     BRAIDSPRINT(ply:Nick().." gag expiration from db: "..tostring(expiration))
     if expiration == nil then return end
 
-    if gagIsExpired( expiration ) then return removeExpiredGag( ply ) end
-
+    if gagIsExpired( expiration ) then return removeExpiredGagFromDatabase( ply ) end
 
     reason = getGagReasonFromDatabase( ply )
 
@@ -92,10 +89,8 @@ end
 
 
 REMOVE_GAG_QUERY = "REMOVE FROM %s WHERE steam_id='%s'"
-local function removeExpiredGag(ply)
+local function removeExpiredGagFromDatabase(ply)
     if not isValidPlayer( ply ) then return end
-
-    GaggedPlayers[ply] = nil
 
     local query = string.format( REMOVE_GAG_QUERY, SQL_TABLE, ply:SteamID() )
     sql.Query( query )
@@ -117,8 +112,8 @@ local function updatePlayerGag(steamId, expirationTime, reason)
     local query = string.format(UPDATE_QUERY,
                                 SQL_TABLE,
                                 expirationTime,
-                                steamId,
-                                reason)
+                                reason,
+                                steamId)
                                 
     local succeeded = sql.Query( query )
     if succeeded == false then
