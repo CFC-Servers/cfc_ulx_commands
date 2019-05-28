@@ -1,10 +1,10 @@
 -- Constants
 local ULX_CATEGORY_NAME = "CFC"
-local SQL_TABLE = "cfc_timed_gags"
+local GAGS_SQL_TABLE = "cfc_timed_gags"
 local INIT_WAIT_TIME = 1
 local GAG_CHECK_INTERVAL = 1
 
-GaggedPlayers = {}
+local GaggedPlayers = {}
 
 local gagsInitialized = false
 
@@ -66,16 +66,16 @@ local function SQLRead(action, query, ply)
 end
 
 local function createTable()
-    if sql.TableExists( SQL_TABLE ) then return GagPrint(SQL_TABLE .. " already exists!") end
+    if sql.TableExists( GAGS_SQL_TABLE ) then return GagPrint( GAGS_SQL_TABLE .. " already exists!" ) end
 
-    local query = string.format( GAG_QUERIES['create_table'], SQL_TABLE )
+    local query = string.format( GAG_QUERIES['create_table'], GAGS_SQL_TABLE )
 
-    return SQLAction( "Creating table " .. SQL_TABLE, query )
+    return SQLAction( "Creating table " .. GAGS_SQL_TABLE, query )
 end
 
 local function updatePlayerGagInDatabase(ply, expirationTime, reason)
     local query = string.format(GAG_QUERIES['update_gag'],
-                                SQL_TABLE,
+                                GAGS_SQL_TABLE,
                                 expirationTime,
                                 sql.SQLStr( reason, true ),
                                 ply:SteamID())
@@ -85,7 +85,7 @@ end
 
 local function createPlayerGagInDatabase(ply, expirationTime, reason)
     local query = string.format(GAG_QUERIES['create_gag'],
-                                SQL_TABLE,
+                                GAGS_SQL_TABLE,
                                 ply:SteamID(),
                                 expirationTime,
                                 sql.SQLStr( reason, true ))
@@ -94,7 +94,7 @@ local function createPlayerGagInDatabase(ply, expirationTime, reason)
 end
 
 local function getColumnFromDatabase(ply, column)
-    local query = string.format( GAG_QUERIES['retrieve_gag'], column, SQL_TABLE, ply:SteamID() )
+    local query = string.format( GAG_QUERIES['retrieve_gag'], column, GAGS_SQL_TABLE, ply:SteamID() )
 
     return SQLRead( "Retrieving time gag " .. column, query, ply )
 end
@@ -114,7 +114,7 @@ end
 local function removeExpiredGagFromDatabase(ply)
     if not IsValidPlayer( ply ) then return end
 
-    local query = string.format( GAG_QUERIES['delete_gag'], SQL_TABLE, ply:SteamID() )
+    local query = string.format( GAG_QUERIES['delete_gag'], GAGS_SQL_TABLE, ply:SteamID() )
     
     return SQLAction( "Deleting expired time gag", query, ply )
 end
