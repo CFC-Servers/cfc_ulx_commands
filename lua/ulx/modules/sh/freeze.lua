@@ -22,7 +22,7 @@ local function freezeProps( callingPlayer, targetPlayers )
     ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T", targetPlayers )
 end
 
-local entities = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
-entities:addParam{ type=ULib.cmds.PlayersArg }
-entities:defaultAccess( ULib.ACCESS_ADMIN )
-entities:help( "Freezes target(s) props" )
+local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
+freezeCMD:addParam{ type=ULib.cmds.PlayersArg }
+freezeCMD:defaultAccess( ULib.ACCESS_ADMIN )
+freezeCMD:help( "Freezes target(s) props" )
