@@ -22,11 +22,12 @@ local function freezeProps( callingPlayer, targetPlayers )
         end
     end
     local concatVal = ""
-    for _, num in pairs( entCounts ) do
-        concatVal = concatVal .. num .. ", "
+    for nam, num in pairs( entCounts ) do
+        concatVal = concatVal .. nam:Nick() .. " - " .. num .. ", "
     end
     concatVal = string.sub( concatVal, 1, #concatVal - 2 )
-    ulx.fancyLogAdmin( callingPlayer, "#A froze "..concatVal.." props owned by #T, respectively. " .. entCount .. " props in total.", targetPlayers )
+    timer.Simple( engine.TickInterval() +0.001 + callingPlayer:Ping()/(1000), function() callingPlayer:ChatPrint( concatVal ) end )
+    ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T, in total. ", targetPlayers )
 end
 
 local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
