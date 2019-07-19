@@ -19,7 +19,7 @@ local function freezeProps( callingPlayer, targetPlayers )
         end
     end
 
-    ulx.fancyLogAdmin( callingPlayer, "#A froze all "..entCount.." props owned by #T", targetPlayers )
+    ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T", targetPlayers )
 end
 
 local entities = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
