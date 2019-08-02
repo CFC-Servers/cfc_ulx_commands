@@ -1,4 +1,4 @@
-CATEGORY_NAME = "CFC"
+CATEGORY_NAME = "Cleanup"
 
 local function ropeClean( callingPlayer, targetPlayers )
     local plyCounts = {}
@@ -32,3 +32,23 @@ local ropes = ulx.command( CATEGORY_NAME, "ulx ropeclean", ropeClean, "!ropeclea
 ropes:addParam{ type=ULib.cmds.PlayersArg }
 ropes:defaultAccess( ULib.ACCESS_ADMIN )
 ropes:help( "Remove target(s) ropes" )
+
+
+local function cleanupPlayerEnts( callingPlayer, targetPlayer )
+    local count = 0
+    for _, ent in ipairs( ents.GetAll() ) do
+        local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
+        if owner == targetPlayer and not ent:IsWeapon() then
+            ent:Remove()
+            count = count + 1
+        end
+    end
+
+    ulx.fancyLogAdmin( callingPlayer,  "#A remo`ved "..count.." entities owned by #T", targetPlayer )
+
+end
+
+local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cleanupPlayerEnts, "!cleanup" )
+cleanup:addParam{ type=ULib.cmds.PlayerArg }
+cleanup:defaultAccess( ULib.ACCESS_ADMIN )
+cleanup:help( "Remove targets entities" )
