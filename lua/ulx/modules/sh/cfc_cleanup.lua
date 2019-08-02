@@ -44,7 +44,7 @@ local function cleanupPlayerEnts( callingPlayer, targetPlayer )
         end
     end
 
-    ulx.fancyLogAdmin( callingPlayer,  "#A remo`ved "..count.." entities owned by #T", targetPlayer )
+    ulx.fancyLogAdmin( callingPlayer,  "#A removed "..count.." entities owned by #T", targetPlayer )
 
 end
 
