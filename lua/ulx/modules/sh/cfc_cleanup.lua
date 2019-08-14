@@ -34,21 +34,26 @@ ropes:defaultAccess( ULib.ACCESS_ADMIN )
 ropes:help( "Remove target(s) ropes" )
 
 
-local function cleanupPlayerEnts( callingPlayer, targetPlayer )
+local function cleanupPlayerEnts( callingPlayer, targetPlayers )
+    local isTarget = {}
+    for _, ply in pairs( targetPlayers ) do
+        isTarget[ply] = true
+    end
+    
     local count = 0
     for _, ent in ipairs( ents.GetAll() ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-        if owner == targetPlayer and not ent:IsWeapon() then
+        if isTarget[owner] and not ent:IsWeapon() then
             ent:Remove()
             count = count + 1
         end
     end
 
-    ulx.fancyLogAdmin( callingPlayer,  "#A removed "..count.." entities owned by #T", targetPlayer )
+    ulx.fancyLogAdmin( callingPlayer,  "#A removed "..count.." entities owned by #T", targetPlayers )
 
 end
 
 local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cleanupPlayerEnts, "!cleanup" )
-cleanup:addParam{ type=ULib.cmds.PlayerArg }
+cleanup:addParam{ type=ULib.cmds.PlayersArg }
 cleanup:defaultAccess( ULib.ACCESS_ADMIN )
 cleanup:help( "Remove targets entities" )
