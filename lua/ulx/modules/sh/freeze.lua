@@ -11,7 +11,8 @@ local function freezeProps( callingPlayer, targetPlayers )
     for _, ent in pairs( entities ) do
         local owner = ent:CPPIGetOwner()
         if entCounts[owner] then
-            local canFreeze = not (ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer())
+            local cantFreezeIf = ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer()
+            local canFreeze = not cantFreezeIf
             local physicsObj = ent:GetPhysicsObject()
             if IsValid( physicsObj ) and canFreeze then
                 physicsObj:EnableMotion( false )
@@ -21,12 +22,10 @@ local function freezeProps( callingPlayer, targetPlayers )
             end
         end
     end
-    timer.Simple( engine.TickInterval() + callingPlayer:Ping()/(999), function()
-        for ply, num in pairs( entCounts ) do
-            callingPlayer:ChatPrint( ply:Nick() .. " has " .. num .. " props." ) 
-        end
-    end )
     ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T, in total. ", targetPlayers )
+    for ply, num in pairs( entCounts ) do
+        ULib.tsay( ply, ply:Nick() .. " has " .. num .. " props.", true )
+    end
 end
 
 local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
