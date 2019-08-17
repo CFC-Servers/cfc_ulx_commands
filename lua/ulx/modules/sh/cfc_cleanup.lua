@@ -49,8 +49,9 @@ local function cleanupPlayerEnts( callingPlayer, targetEntities, targetPlayers )
 
         local isModelMatch = targetEntities == ent:GetModel()
         local isClassMatch = targetEntities == ent:GetClass()
+        local isMatch = isWildcardMatch or isModelMatch or isClassMatch
 
-        if not isWildcardMatch or isModelMatch or isClassMatch then continue end
+        if not isMatch then continue end
 
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
 
