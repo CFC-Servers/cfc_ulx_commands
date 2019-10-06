@@ -19,7 +19,7 @@ local function ropeClean( callingPlayer, targetPlayers )
         end
     end
 
-    ulx.fancyLogAdmin( callingPlayer, "#A removed "..ropeCount.." ropes owned by #T", targetPlayers )
+    ulx.fancyLogAdmin( callingPlayer, "#A removed " .. ropeCount .. " ropes owned by #T", targetPlayers )
 
     for ply, count in pairs( plyCounts ) do
         if count > 0 then
@@ -49,7 +49,7 @@ local function cleanupPlayerEnts( callingPlayer, targetPlayers )
         end
     end
 
-    ulx.fancyLogAdmin( callingPlayer,  "#A removed "..count.." entities owned by #T", targetPlayers )
+    ulx.fancyLogAdmin( callingPlayer,  "#A removed " .. count .. " entities owned by #T", targetPlayers )
 
 end
 
