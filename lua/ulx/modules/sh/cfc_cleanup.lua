@@ -45,20 +45,18 @@ local function cleanupPlayerEnts( callingPlayer, targetEntities, targetPlayers )
     local isWildcardMatch = targetEntities == "*"
 
     for _, ent in ipairs( ents.GetAll() ) do
-        if ent:IsWeapon() then continue end
-
-        local isModelMatch = targetEntities == ent:GetModel()
-        local isClassMatch = targetEntities == ent:GetClass()
-        local isMatch = isWildcardMatch or isModelMatch or isClassMatch
-
-        if not isMatch then continue end
-
-        local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-
-        if not isTarget[owner] then continue end
-
-        ent:Remove()
-        count = count + 1
+        if not ent:IsWeapon() then
+            local isModelMatch = targetEntities == ent:GetModel()
+            local isClassMatch = targetEntities == ent:GetClass()
+            local isMatch = isWildcardMatch or isModelMatch or isClassMatch
+            if isMatch then
+                local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
+                if isTarget[owner] then
+                    ent:Remove()
+                    count = count + 1
+                end
+            end
+        end
     end
 
     ulx.fancyLogAdmin( callingPlayer,  "#A removed " .. count .. " entities owned by #T", targetPlayers )
