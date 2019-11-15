@@ -14,7 +14,7 @@ local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
 
     local isWildcardMatch = targetEntities == "*"
 
-    for ent, _ in ipairs( ents.GetAll() ) do
+    for _, ent in ipairs( ents.GetAll() ) do
         if not ent:IsWeapon() then
             local isModelMatch = targetEntities == ent:GetModel()
             local isClassMatch = targetEntities == ent:GetClass()
