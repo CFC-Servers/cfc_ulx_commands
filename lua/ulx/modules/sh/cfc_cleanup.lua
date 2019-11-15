@@ -1,7 +1,7 @@
 CATEGORY_NAME = "Cleanup"
 
 local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
-    if targetEntities == nil then
+    targetEntities = targetEntities or "*"
         targetEntities = "*"
     end
 
