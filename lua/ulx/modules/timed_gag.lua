@@ -19,7 +19,7 @@ local GAG_QUERIES = {
 
 -- HELPERS --
 
-local function IsValidPlayer( ply )
+local function isValidPlayer( ply )
     local playerIsValid = IsValid( ply ) and ply:IsPlayer()
 
     return playerIsValid
@@ -32,7 +32,7 @@ end
 local function databaseGagPrint( action, succeeded, ply )
     local result = ( succeeded == false ) and "FAILED" or "SUCCEEDED"
 
-    if IsValidPlayer( ply ) then
+    if isValidPlayer( ply ) then
         gagPrint( action .. " for '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") in Database " .. result )
     else
         gagPrint( action .. " " .. result )
@@ -117,7 +117,7 @@ local function getGagReasonFromDatabase( ply )
 end
 
 local function removeExpiredGagFromDatabase( ply )
-    if not IsValidPlayer( ply ) then return end
+    if not isValidPlayer( ply ) then return end
 
     local query = string.format( GAG_QUERIES['delete_gag'], GAGS_SQL_TABLE, ply:SteamID() )
     
@@ -168,7 +168,7 @@ local function playerIsUlxGagged( ply )
 end
 
 local function gagPlayerUntil( ply, expirationTime, reason, fromDb )
-    if not IsValidPlayer( ply ) then return end
+    if not isValidPlayer( ply ) then return end
     
     -- Did this gag come directly from the database?
     fromDb = fromDb or false
@@ -202,7 +202,7 @@ local function gagPlayerForTime( ply, minutesToGag, reason )
 end
 
 local function ungagPlayer( ply )
-    if not IsValidPlayer( ply ) then return end
+    if not isValidPlayer( ply ) then return end
 
     if playerIsUlxGagged( ply ) then ulxUngagPlayer( ply ) end
 
@@ -210,7 +210,7 @@ local function ungagPlayer( ply )
 end
 
 local function getPlayerGagFromDatabase( ply )
-    if not IsValidPlayer( ply ) then return end
+    if not isValidPlayer( ply ) then return end
 
     -- Player is not in database
     local expiration = getGagExpirationFromDatabase( ply )
@@ -297,7 +297,7 @@ local function updateGags()
     if not gagsInitialized then initializeGags() end
 
     for ply, expiration in pairs( GaggedPlayers ) do
-        if IsValidPlayer( ply ) then 
+        if isValidPlayer( ply ) then 
             if gagIsExpired( expiration ) or not playerIsUlxGagged( ply ) then
                 removeExpiredGagFromDatabase( ply )
                 ungagPlayer( ply )
