@@ -9,8 +9,8 @@ local function freezeProps( callingPlayer, targetPlayers )
     end
 
     for _, ent in pairs( entities ) do
-        local owner = ent:CPPIGetOwner()
-        if entCounts[owner] then
+        local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
+        if owner and entCounts[owner] then
             local canFreeze = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
             local physicsObj = ent:GetPhysicsObject()
             if IsValid( physicsObj ) and canFreeze then
