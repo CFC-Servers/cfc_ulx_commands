@@ -11,8 +11,7 @@ local function freezeProps( callingPlayer, targetPlayers )
     for _, ent in pairs( entities ) do
         local owner = ent:CPPIGetOwner()
         if entCounts[owner] then
-            local cantFreezeIf = ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer()
-            local canFreeze = not cantFreezeIf
+            local canFreeze = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
             local physicsObj = ent:GetPhysicsObject()
             if IsValid( physicsObj ) and canFreeze then
                 physicsObj:EnableMotion( false )
