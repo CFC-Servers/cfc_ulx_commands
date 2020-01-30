@@ -1,4 +1,4 @@
-CATEGORY_NAME = "CFC"
+CATEGORY_NAME = "Cleanup"
 
 local function freezeProps( callingPlayer, targetPlayers ) 
     local entities = ents.GetAll()
@@ -22,9 +22,9 @@ local function freezeProps( callingPlayer, targetPlayers )
             end
         end
     end
-    ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T, in total. ", targetPlayers )
+    ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T", targetPlayers )
     for ply, num in pairs( entCounts ) do
-        ULib.tsay( ply, ply:Nick() .. " has " .. num .. " props.", true )
+        ULib.tsay( ply, ply:Nick() .. " owned " .. num .. " props.", true )
     end
 end
 
