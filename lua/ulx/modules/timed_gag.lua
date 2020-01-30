@@ -25,17 +25,17 @@ local function IsValidPlayer( ply )
     return playerIsValid
 end
 
-local function GagPrint( msg )
+local function gagPrint( msg )
     print( "[CFC Timed Gag] " .. msg )
 end
 
-local function DatabaseGagPrint( action, succeeded, ply )
+local function databaseGagPrint( action, succeeded, ply )
     local result = ( succeeded == false ) and "FAILED" or "SUCCEEDED"
 
     if IsValidPlayer( ply ) then
-        GagPrint( action .. " for '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") in Database " .. result )
+        gagPrint( action .. " for '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") in Database " .. result )
     else
-        GagPrint( action .. " " .. result )
+        gagPrint( action .. " " .. result )
     end
 end
 
@@ -53,7 +53,7 @@ local function SQLOperation( action, query, ply, isRead )
     local failed = ( result == false ) or ( isRead and result == nil )
     local succeeded = not failed
 
-    DatabaseGagPrint( action, succeeded, ply )
+    databaseGagPrint( action, succeeded, ply )
 
     return result
 end
@@ -67,7 +67,7 @@ local function SQLRead( action, query, ply )
 end
 
 local function createTable()
-    if sql.TableExists( GAGS_SQL_TABLE ) then return GagPrint( GAGS_SQL_TABLE .. " already exists!" ) end
+    if sql.TableExists( GAGS_SQL_TABLE ) then return gagPrint( GAGS_SQL_TABLE .. " already exists!" ) end
 
     local query = string.format( GAG_QUERIES['create_table'], GAGS_SQL_TABLE )
 
@@ -185,7 +185,7 @@ local function gagPlayerUntil( ply, expirationTime, reason, fromDb )
 
     local minutesLeftInGag = getMinutesRemainingInGag( expirationTime )
 
-    GagPrint( "Gagging '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") for " .. minutesLeftInGag .. " minutes!" )
+    gagPrint( "Gagging '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") for " .. minutesLeftInGag .. " minutes!" )
 
     message = "You have a time gag that expires in " .. tostring( minutesLeftInGag ) .. " minutes." 
 
@@ -286,7 +286,7 @@ hook.Add( "PlayerDisconnected", "CFC_GagRemove", removeDisconnectedPlayer )
 local function initializeGags()
     createTable()
 
-    GagPrint("Initializing Gags!")
+    gagPrint("Initializing Gags!")
 
     initializeGaggedPlayers()
 
