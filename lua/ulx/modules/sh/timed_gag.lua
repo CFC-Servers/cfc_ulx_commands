@@ -69,14 +69,14 @@ end
 local function createTable()
     if sql.TableExists( GAGS_SQL_TABLE ) then return gagPrint( GAGS_SQL_TABLE .. " already exists!" ) end
 
-    local query = string.format( GAG_QUERIES['create_table'], GAGS_SQL_TABLE )
+    local query = string.format( GAG_QUERIES.create_table, GAGS_SQL_TABLE )
 
     return SQLAction( "Creating table " .. GAGS_SQL_TABLE, query )
 end
 
 local function updatePlayerGagInDatabase( ply, expirationTime, reason )
     local query = string.format(
-        GAG_QUERIES['update_gag'],
+        GAG_QUERIES.update_gag,
         GAGS_SQL_TABLE,
         expirationTime,
         sql.SQLStr( reason, true ),
@@ -88,7 +88,7 @@ end
 
 local function createPlayerGagInDatabase( ply, expirationTime, reason )
     local query = string.format(
-        GAG_QUERIES['create_gag'],
+        GAG_QUERIES.create_gag,
         GAGS_SQL_TABLE,
         ply:SteamID(),
         expirationTime,
@@ -99,7 +99,7 @@ local function createPlayerGagInDatabase( ply, expirationTime, reason )
 end
 
 local function getColumnFromDatabase( ply, column )
-    local query = string.format( GAG_QUERIES['retrieve_gag'], column, GAGS_SQL_TABLE, ply:SteamID() )
+    local query = string.format( GAG_QUERIES.retrieve_gag, column, GAGS_SQL_TABLE, ply:SteamID() )
 
     return SQLRead( "Retrieving time gag " .. column, query, ply )
 end
@@ -119,7 +119,7 @@ end
 local function removeExpiredGagFromDatabase( ply )
     if not isValidPlayer( ply ) then return end
 
-    local query = string.format( GAG_QUERIES['delete_gag'], GAGS_SQL_TABLE, ply:SteamID() )
+    local query = string.format( GAG_QUERIES.delete_gag, GAGS_SQL_TABLE, ply:SteamID() )
     
     return SQLAction( "Deleting expired time gag", query, ply )
 end
@@ -155,7 +155,7 @@ end
 local function ulxGagPlayer( ply )
     -- This is how ulx gags someone
     ply.ulx_gagged = true
-	ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
+    ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
 end
 
 local function ulxUngagPlayer( ply )
@@ -244,7 +244,7 @@ end
 -- ULX COMMAND SETUP --
 
 local function timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
-	ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
+    ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
 
     -- time > 100 years
     if minutesToGag == 0 then minutesToGag = 9999999999 end
