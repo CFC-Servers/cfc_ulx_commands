@@ -1,5 +1,5 @@
 -- Constants
-local ULX_CATEGORY_NAME = "CFC"
+local ULX_CATEGORY_NAME = "Chat"
 local GAGS_SQL_TABLE = "cfc_timed_gags"
 local INIT_WAIT_TIME = 1
 local GAG_CHECK_INTERVAL = 1
@@ -254,12 +254,12 @@ local function timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
     end
 end
 
-local timegag = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", timeGag, "!tgag" )
-timegag:addParam{ type=ULib.cmds.PlayersArg }
-timegag:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.allowTimeString, min=0 }
-timegag:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.takeRestOfLine }
-timegag:defaultAccess( ULib.ACCESS_ADMIN )
-timegag:help( "Gags a user for a set amount of time" )
+local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", timeGag, "!tgag" )
+timeGagCommand:addParam{ type=ULib.cmds.PlayersArg }
+timeGagCommand:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.allowTimeString, min=0 }
+timeGagCommand:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.takeRestOfLine }
+timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
+timeGagCommand:help( "Gags a user for a set amount of time" )
 
 -- END ULX COMMAND SETUP --
 
@@ -267,9 +267,9 @@ timegag:help( "Gags a user for a set amount of time" )
 
 local function waitForPlayerToInitialize( ply )
     -- Timer because the steamId isn't available yet
-    timer.Simple(INIT_WAIT_TIME, function()
+    timer.Simple( INIT_WAIT_TIME, function()
         getPlayerGagFromDatabase( ply )
-    end)
+    end )
 end
 hook.Remove( "PlayerInitialSpawn", "CFC_GagCheck" )
 hook.Add( "PlayerInitialSpawn", "CFC_GagCheck", waitForPlayerToInitialize )
