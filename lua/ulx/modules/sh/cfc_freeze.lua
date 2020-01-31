@@ -22,8 +22,10 @@ local function freezeProps( callingPlayer, targetPlayers )
         end
     end
     ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T", targetPlayers )
-    for ply, num in pairs( entCounts ) do
-        ULib.tsay( ply, ply:Nick() .. " owned " .. num .. " props.", true )
+    if #targetPlayers > 1 then
+        for ply, num in pairs( entCounts ) do
+            ULib.tsay( ply, ply:Nick() .. " owned " .. num .. " props.", true )
+        end
     end
 end
 
