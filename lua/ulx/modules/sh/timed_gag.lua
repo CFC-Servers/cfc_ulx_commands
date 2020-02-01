@@ -9,11 +9,11 @@ local GaggedPlayers = {}
 local gagsInitialized = false
 
 local GAG_QUERIES = {
-    create_gag   = "INSERT INTO %s(steam_id, expiration, reason) VALUES('%s', %d, '%s')",
-    create_table = "CREATE TABLE %s(steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT)",
-    delete_gag   = "DELETE FROM %s WHERE steam_id='%s'",
-    retrieve_gag = "SELECT %s FROM %s WHERE steam_id='%s'",
-    update_gag   = "UPDATE %s SET expiration=%d,reason='%s' WHERE steam_id='%s'"
+    create_gag   = "INSERT INTO %s( steam_id, expiration, reason ) VALUES( '%s', %d, '%s' )",
+    create_table = "CREATE TABLE %s( steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT )",
+    delete_gag   = "DELETE FROM %s WHERE steam_id = '%s'",
+    retrieve_gag = "SELECT %s FROM %s WHERE steam_id = '%s'",
+    update_gag   = "UPDATE %s SET expiration = %d, reason = '%s' WHERE steam_id = '%s'"
 }
 
 
@@ -33,7 +33,7 @@ local function databaseGagPrint( action, succeeded, ply )
     local result = ( succeeded == false ) and "FAILED" or "SUCCEEDED"
 
     if isValidPlayer( ply ) then
-        gagPrint( action .. " for '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") in Database " .. result )
+        gagPrint( action .. " for '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) in Database " .. result )
     else
         gagPrint( action .. " " .. result )
     end
@@ -120,7 +120,7 @@ local function removeExpiredGagFromDatabase( ply )
     if not isValidPlayer( ply ) then return end
 
     local query = string.format( GAG_QUERIES.delete_gag, GAGS_SQL_TABLE, ply:SteamID() )
-    
+
     return SQLAction( "Deleting expired time gag", query, ply )
 end
 
@@ -128,7 +128,7 @@ end
 
 
 
--- GAG UTILITY FUNCTIONS -- 
+-- GAG UTILITY FUNCTIONS --
 
 local function gagIsExpired( expirationTime )
     return os.time() > expirationTime
@@ -169,12 +169,12 @@ end
 
 local function gagPlayerUntil( ply, expirationTime, reason, fromDb )
     if not isValidPlayer( ply ) then return end
-    
+
     -- Did this gag come directly from the database?
     fromDb = fromDb or false
 
     if not playerIsUlxGagged( ply ) then ulxGagPlayer( ply ) end
-    
+
     if not fromDb then
         if playerIsGagged( ply ) then
             updatePlayerGagInDatabase( ply, expirationTime, reason )
@@ -185,9 +185,9 @@ local function gagPlayerUntil( ply, expirationTime, reason, fromDb )
 
     local minutesLeftInGag = getMinutesRemainingInGag( expirationTime )
 
-    gagPrint( "Gagging '" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") for " .. minutesLeftInGag .. " minutes!" )
+    gagPrint( "Gagging '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) for " .. minutesLeftInGag .. " minutes!" )
 
-    message = "You have a time gag that expires in " .. tostring( minutesLeftInGag ) .. " minutes." 
+    message = "You have a time gag that expires in " .. tostring( minutesLeftInGag ) .. " minutes."
 
     if reason then message = message .. " Reason: " .. reason end
     ply:ChatPrint( message )
@@ -214,13 +214,13 @@ local function getPlayerGagFromDatabase( ply )
 
     -- Player is not in database
     local expiration = getGagExpirationFromDatabase( ply )
-    if expiration == nil then 
+    if expiration == nil then
         GaggedPlayers[ply] = nil
         return
     end
 
-    if gagIsExpired( expiration ) then 
-        removeExpiredGagFromDatabase( ply ) 
+    if gagIsExpired( expiration ) then
+        removeExpiredGagFromDatabase( ply )
         ungagPlayer( ply )
 
         return
@@ -255,9 +255,9 @@ local function timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
 end
 
 local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", timeGag, "!tgag" )
-timeGagCommand:addParam{ type=ULib.cmds.PlayersArg }
-timeGagCommand:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.allowTimeString, min=0 }
-timeGagCommand:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.takeRestOfLine }
+timeGagCommand:addParam{ type = ULib.cmds.PlayersArg }
+timeGagCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
+timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
 timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
 timeGagCommand:help( "Gags a user for a set amount of time" )
 
@@ -273,7 +273,7 @@ local function waitForPlayerToInitialize( ply )
 end
 hook.Remove( "PlayerInitialSpawn", "CFC_GagCheck" )
 hook.Add( "PlayerInitialSpawn", "CFC_GagCheck", waitForPlayerToInitialize )
-    
+
 
 local function removeDisconnectedPlayer( ply )
     if not playerIsGagged( ply ) then return end
@@ -286,7 +286,7 @@ hook.Add( "PlayerDisconnected", "CFC_GagRemove", removeDisconnectedPlayer )
 local function initializeGags()
     createTable()
 
-    gagPrint("Initializing Gags!")
+    gagPrint( "Initializing Gags!" )
 
     initializeGaggedPlayers()
 
@@ -297,7 +297,7 @@ local function updateGags()
     if not gagsInitialized then initializeGags() end
 
     for ply, expiration in pairs( GaggedPlayers ) do
-        if isValidPlayer( ply ) then 
+        if isValidPlayer( ply ) then
             if gagIsExpired( expiration ) or not playerIsUlxGagged( ply ) then
                 removeExpiredGagFromDatabase( ply )
                 ungagPlayer( ply )
