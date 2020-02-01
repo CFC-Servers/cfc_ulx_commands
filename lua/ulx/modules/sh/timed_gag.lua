@@ -9,11 +9,11 @@ local GaggedPlayers = {}
 local gagsInitialized = false
 
 local GAG_QUERIES = {
-    create_gag   = "INSERT INTO %s( steam_id, expiration, reason ) VALUES( '%s', %d, '%s' )",
-    create_table = "CREATE TABLE %s( steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT )",
-    delete_gag   = "DELETE FROM %s WHERE steam_id = '%s'",
-    retrieve_gag = "SELECT %s FROM %s WHERE steam_id = '%s'",
-    update_gag   = "UPDATE %s SET expiration = %d, reason = '%s' WHERE steam_id = '%s'"
+    create_gag   = "INSERT INTO %s(steam_id, expiration, reason) VALUES('%s', %d, '%s')",
+    create_table = "CREATE TABLE %s(steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT)",
+    delete_gag   = "DELETE FROM %s WHERE steam_id='%s'",
+    retrieve_gag = "SELECT %s FROM %s WHERE steam_id='%s'",
+    update_gag   = "UPDATE %s SET expiration=%d, reason='%s' WHERE steam_id='%s'"
 }
 
 
