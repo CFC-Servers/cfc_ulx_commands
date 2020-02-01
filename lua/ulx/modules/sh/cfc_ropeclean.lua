@@ -31,4 +31,4 @@ end
 local ropes = ulx.command( CATEGORY_NAME, "ulx ropeclean", ropeClean, "!ropeclean" )
 ropes:addParam{ type = ULib.cmds.PlayersArg }
 ropes:defaultAccess( ULib.ACCESS_ADMIN )
-ropes:help( "Remove target(s) ropes" )
+ropes:help( "Remove target( s ) ropes" )
