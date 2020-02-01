@@ -1,4 +1,4 @@
-CATEGORY_NAME = "CFC"
+CATEGORY_NAME = "Cleanup"
 
 local function ropeClean( callingPlayer, targetPlayers )
     local plyCounts = {}
