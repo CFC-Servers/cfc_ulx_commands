@@ -1,6 +1,6 @@
 CATEGORY_NAME = "Cleanup"
 
-local function freezeProps( callingPlayer, targetPlayers ) 
+local function freezeProps( callingPlayer, targetPlayers )
     local entities = ents.GetAll()
     local entCount = 0
     local entCounts = {}
@@ -21,16 +21,16 @@ local function freezeProps( callingPlayer, targetPlayers )
             end
         end
     end
-    ulx.fancyLogAdmin( callingPlayer, "#A froze "..entCount.." props owned by #T", targetPlayers )
-    
+    ulx.fancyLogAdmin( callingPlayer, "#A froze " .. entCount .. " props owned by #T", targetPlayers )
+
     if #targetPlayers <= 1 then return end
-    
+
     for ply, num in pairs( entCounts ) do
         ULib.tsay( ply, ply:Nick() .. " owned " .. num .. " props.", true )
     end
 end
 
 local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
-freezeCMD:addParam{ type=ULib.cmds.PlayersArg }
+freezeCMD:addParam{ type = ULib.cmds.PlayersArg }
 freezeCMD:defaultAccess( ULib.ACCESS_ADMIN )
-freezeCMD:help( "Freezes target(s) props" )
+freezeCMD:help( "Freezes target( s ) props" )
