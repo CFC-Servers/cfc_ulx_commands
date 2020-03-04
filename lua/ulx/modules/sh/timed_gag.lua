@@ -127,6 +127,14 @@ local function removeExpiredGagFromDatabase( ply )
     return SQLAction( "Deleting expired time gag", query, ply )
 end
 
+local function removeGagFromDatabase( ply )
+    if not isValidPlayer( ply ) then return end
+
+    local query = string.format( GAG_QUERIES.delete_gag, GAGS_SQL_TABLE, ply:SteamID() )
+
+    return SQLAction( "Manually deleting time gag", query, ply )
+end
+
 -- END DATABASE OPERATIONS --
 
 
@@ -246,8 +254,14 @@ end
 
 -- ULX COMMAND SETUP --
 
-function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
-    ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
+function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason, shouldUngag )
+    if shouldUngag then
+        for _, ply in pairs( targetPlayers ) do
+            removeGagFromDatabase( ply )
+        end
+
+        return ulx.fancyLogAdmin( callingPlayer, "#A ungagged #T!", targetPlayers )
+    end
 
     -- time > 100 years
     if minutesToGag == 0 then minutesToGag = 9999999999 end
@@ -255,14 +269,18 @@ function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
     for _, ply in pairs( targetPlayers ) do
         gagPlayerForTime( ply, minutesToGag, reason )
     end
+
+    ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
 end
 
 local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", cmd.timeGag, "!tgag" )
 timeGagCommand:addParam{ type = ULib.cmds.PlayersArg }
 timeGagCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
 timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+timeGagCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
 timeGagCommand:help( "Gags a user for a set amount of time" )
+timeGagCommand:SetOpposite( "ulx untimegag", {_, _, _, _, true}, "!untgag" )
 
 -- END ULX COMMAND SETUP --
 
