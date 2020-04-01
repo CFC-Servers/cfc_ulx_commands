@@ -17,7 +17,7 @@ local function warnkick( calling_ply, target_ply, reason )
     local command = string.format( 'awarn_warn \"%s" "%s (kick)" ', target_ply:SteamID(), reason, ULib.secondsToStringTime( minutes*60 ) )
     calling_ply:ConCommand( command ) 
 end
-local kick = ulx.command( CATEGORY_NAME, "ulx warnkick", ulx.kick, "!warnkick" )
+local kick = ulx.command( CATEGORY_NAME, "ulx warnkick", warnkick, "!warnkick" )
 kick:addParam{ type=ULib.cmds.PlayerArg }
 kick:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
 kick:defaultAccess( ULib.ACCESS_ADMIN )
