@@ -14,7 +14,7 @@ ban:help( "Bans target and warns them." )
 
 local function warnkick( calling_ply, target_ply, reason )
     ulx.kick( calling_ply, target_ply, reason )
-    local command = string.format( 'awarn_warn \"%s" "%s (kick)" ', target_ply:SteamID(), reason, ULib.secondsToStringTime( minutes*60 ) )
+    local command = string.format( 'awarn_warn \"%s" "%s (kick)" ', target_ply:SteamID(), reason )
     calling_ply:ConCommand( command ) 
 end
 local kick = ulx.command( CATEGORY_NAME, "ulx warnkick", warnkick, "!warnkick" )
