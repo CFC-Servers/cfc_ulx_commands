@@ -1,3 +1,5 @@
+// This is a test.
+
 CATEGORY_NAME = "Cleanup"
 
 local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
