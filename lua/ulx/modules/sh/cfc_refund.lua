@@ -1,11 +1,14 @@
 local CATEGORY_NAME = "Refund"
 
+// Storing table for kills on a player from a cheater.
 local playerKills = {}
 
+// Initialize the table when the cheater spawns.
 hook.Add( "PlayerInitialSpawn", "OnPlayerJoin", function(ply)
 	playerKills[ply] = {}
 end)
 
+// Still keep track of it after disconnect.
 hook.Add( "PlayerDisconnected", "OnPlayerDisconnect", function(ply)
 	playerKills[ply] = nil
 
@@ -14,12 +17,14 @@ hook.Add( "PlayerDisconnected", "OnPlayerDisconnect", function(ply)
 	end
 end)
 
+// Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "OnPlayerKill", function( ply, inflictor, attacker )
 	local playerKillsOnVictim = playerKills[ply][attacker]
 
 	playerKillsOnVictim = (playerKillsOnVictim or 0) + 1
 end)
 
+// The actual code.
 local function playerRefunds( callingPlayer, targetPlayers )
 
 	for victim, killsFromPly in pairs( playerKills[targetPlayers] ) do
