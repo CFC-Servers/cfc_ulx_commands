@@ -4,24 +4,22 @@ local CATEGORY_NAME = "Refund"
 local playerKills = {}
 
 // Initialize the table when the cheater spawns.
-hook.Add( "PlayerInitialSpawn", "OnPlayerJoin", function(ply)
+hook.Add( "PlayerInitialSpawn", "CFC_ULXCommands_CreateDeathTable", function(ply)
 	playerKills[ply] = {}
 end)
 
 // Still keep track of it after disconnect.
-hook.Add( "PlayerDisconnected", "OnPlayerDisconnect", function(ply)
+hook.Add( "PlayerDisconnected", "CFC_ULXCommands_KeepingTrackofDeathTable", function(ply)
 	playerKills[ply] = nil
 
-	for k, killData in pairs( playerKills )
+	for _, killData in pairs( playerKills )
 		killData[ply] = nil
 	end
 end)
 
 // Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
-hook.Add( "PlayerDeath", "OnPlayerKill", function( ply, inflictor, attacker )
-	local playerKillsOnVictim = playerKills[ply][attacker]
-
-	playerKillsOnVictim = (playerKillsOnVictim or 0) + 1
+hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
+	local playerKillsOnVictim = playerKills[attacker][ply] or 0
 end)
 
 // The actual code.
