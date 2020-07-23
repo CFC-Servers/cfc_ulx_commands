@@ -1,3 +1,4 @@
+-- This resets kills and deaths caused by the cheater.
 local CATEGORY_NAME = "Refund"
 
 -- Storing table for kills on a player from a cheater.
