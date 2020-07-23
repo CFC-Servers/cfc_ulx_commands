@@ -21,6 +21,7 @@ end)
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
 	local playerKillsOnVictim = playerKills[attacker][ply] or 0
+	playerKills[attacker][ply] = playerKillsOnVictim + 1
 end)
 
 -- Remove frags caused by the cheater.
