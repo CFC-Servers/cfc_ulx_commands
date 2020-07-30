@@ -9,7 +9,7 @@ hook.Add( "PlayerInitialSpawn", "CFC_ULXCommands_CreateDeathTable", function(ply
 	playerKills[ply] = {}
 end)
 
--- Still keep track of it after disconnect.
+-- Still keep track of it after disconnect. Forgot to add do.
 hook.Add( "PlayerDisconnected", "CFC_ULXCommands_KeepingTrackofDeathTable", function(ply)
 	playerKills[ply] = nil
 
