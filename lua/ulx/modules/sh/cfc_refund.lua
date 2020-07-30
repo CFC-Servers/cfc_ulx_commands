@@ -13,7 +13,7 @@ end)
 hook.Add( "PlayerDisconnected", "CFC_ULXCommands_KeepingTrackofDeathTable", function(ply)
 	playerKills[ply] = nil
 
-	for _, killData in pairs( playerKills )
+	for _, killData in pairs( playerKills ) do
 		killData[ply] = nil
 	end
 end)
