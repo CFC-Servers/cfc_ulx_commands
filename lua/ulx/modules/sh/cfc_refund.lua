@@ -25,11 +25,11 @@ hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor
 end)
 
 -- Remove frags caused by the cheater.
-local function playerRefunds( callingPlayer, targetPlayers )
+local function playerRefunds( callingPlayer, targetPlayer )
 
 	for victim, killsFromPly in pairs( playerKills[targetPlayers] ) do
 		local victimDeaths = victim:Frags()
-		victim:SetFrags( victimDeaths - killsFromPly )
+		victim:SetDeaths( victimDeaths - killsFromPly )
 	end
 
 	ulx.fancyLogAdmin( callingPlayer, "#A has reset #T 's deaths and kills", targetPlayers)
