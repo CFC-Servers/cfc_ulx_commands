@@ -27,7 +27,7 @@ end)
 -- Remove frags caused by the cheater.
 local function playerRefunds( callingPlayer, targetPlayers )
 
-	for k, v in pairs( playerKills[targetPlayers] ) do
+	for k, v in pairs( playerKills ) do
 		if not IsValid(v) then break end
 		local victimDeaths = victim:Deaths()
 		victim:SetDeaths( victimDeaths - v )
