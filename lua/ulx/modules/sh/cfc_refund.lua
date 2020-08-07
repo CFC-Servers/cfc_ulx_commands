@@ -34,7 +34,9 @@ end)
 -- Remove frags caused by the cheater.
 local function playerRefunds( callingPlayer, targetPlayers )
 
-	return HackerMan() end
+	for _, ply in pairs( targetPlayers ) do
+	    HackerMan( ply )
+	end
 
 	ulx.fancyLogAdmin( callingPlayer, "#A has reset #T 's deaths and kills", targetPlayers)
 
