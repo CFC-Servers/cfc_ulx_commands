@@ -20,7 +20,7 @@ function HackerMan( ply )
 	for k, v in pairs( kills ) do
 		for x, p in pairs(v) do
 			if ( x == ply ) then
-				killsp[ k ][ x ] = nil
+				kills[ k ][ x ] = nil
 			end
 		end
 	end
@@ -34,7 +34,9 @@ end)
 -- Remove frags caused by the cheater.
 local function playerRefunds( callingPlayer, targetPlayers )
 
-	return HackerMan() end
+	for _, ply in pairs( targetPlayers ) do
+    	HackerMan( ply )
+	end
 
 	ulx.fancyLogAdmin( callingPlayer, "#A has reset #T 's deaths and kills", targetPlayers)
 
