@@ -16,7 +16,6 @@ hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor
 	if ply == attacker then return end
 	local x = kills[ ply ][ attacker ] or 0
 	kills[ ply ][ attacker ] = x + 1
-	print( tostring(kills[ply][attacker]))
 end)
 
 function HackerMan( ply )
