@@ -12,7 +12,7 @@ end
 
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
-	local x = kills[ ply ][ attacker ] or 0
+	kills[ ply ][ attacker ] = tonumber( 0 )
 	kills[ply][attacker] = kills[ ply ][ attacker] + 1
 end)
 	
