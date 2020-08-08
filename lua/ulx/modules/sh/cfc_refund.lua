@@ -6,24 +6,29 @@ local CATEGORY_NAME = "Refund"
 -- Storing table for kills on a player from a cheater.
 local kills = {}
 
-for k, v in ipairs( player.GetAll() ) do
-	kills[ v ] = {}
-end
+hook.Add( "PlayerInitialSpawn", "CFC_ULXCommands_InitialSpawn", function(ply)
+	kills[ply] = {}
+end)
 
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
-	kills[ ply ][ attacker ] = tonumber( 0 )
-	kills[ply][attacker] = kills[ ply ][ attacker] + 1
+	if not IsValid(attacker) then return end
+	if ply == attacker then return end
+	local x = kills[ ply ][ attacker ] or 0
+	kills[ ply ][ attacker ] = x + 1
+	print( tostring(kills[ply][attacker]))
 end)
-	
+
 function HackerMan( ply )
-	for k, v in pairs( kills ) do
-		for x, p in pairs(v) do
-			if ( x == ply ) then
-				kills[ k ][ x ] = nil
-			end
-		end
-	end
+    for k, v in pairs( kills ) do
+        for x, p in pairs(v) do
+            if ( x == ply ) then
+                k:SetDeaths( k:Deaths() - kills[k][x] )
+                x:SetFrags( x:Frags() - kills[k][x] )
+                kills[ k ][ x ] = nil
+            end
+        end
+    end
 end
 
 -- Still keep track of it after disconnect. Forgot to add do.
