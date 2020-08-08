@@ -39,7 +39,7 @@ end)
 local function playerRefunds( callingPlayer, targetPlayers )
 
 	for _, ply in pairs( targetPlayers ) do
-    	HackerMan( ply )
+		HackerMan(ply)
 	end
 
 	ulx.fancyLogAdmin( callingPlayer, "#A has reset #T 's deaths and kills", targetPlayers)
