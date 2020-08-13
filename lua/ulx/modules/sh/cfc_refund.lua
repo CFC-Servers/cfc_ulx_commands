@@ -20,7 +20,7 @@ function HackerMan( ply )
 	for k, v in pairs( kills ) do
 		for x, p in pairs(v) do
 			if ( x == ply ) then
-				killsp[ k ][ x ] = nil
+				kills[ k ][ x ] = nil
 			end
 		end
 	end
