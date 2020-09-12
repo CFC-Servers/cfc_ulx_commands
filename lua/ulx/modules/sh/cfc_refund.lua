@@ -14,8 +14,8 @@ end)
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
 	if not IsValid(attacker) then return end
 	if ply == attacker then return end
-	local x = kills[ ply ][ attacker ] or 0
-	kills[ ply ][ attacker ] = x + 1
+	local x = kills[ply][attacker] or 0
+	kills[ply][attacker] = x + 1
 end)
 
 function HackerMan( ply )
@@ -23,7 +23,7 @@ function HackerMan( ply )
 	for k, v in pairs( kills ) do
 		for x, p in pairs(v) do
 			if ( x == ply ) then
-				kills[ k ][ x ] = nil
+				kills[k][x] = nil
 			end
 		end
 	end
