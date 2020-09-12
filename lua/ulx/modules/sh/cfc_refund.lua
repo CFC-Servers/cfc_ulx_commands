@@ -12,22 +12,21 @@ end)
 
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
-	if not IsValid(attacker) then return end
-	if ply == attacker then return end
-	local x = deaths[ply][attacker] or 0
-	deaths[ply][attacker] = x + 1
+    if not IsValid( attacker ) then return end
+    if ply == attacker then return end
+
+    local deathCount = deaths[ply][attacker] or 0
+    deaths[ply][attacker] = deathCount + 1
 end)
 
-function HackerMan( ply )
-
-	for victim, value in pairs( deaths ) do
-		for attacker in pairs( value ) do
-			if attacker == ply then
-				deaths[victim][attacker] = nil
-			end
-		end
-	end
-
+function removeKills( ply )
+    for victim, plyDeaths in pairs( deaths ) do
+        for attacker in pairs( plyDeaths ) do
+            if attacker == ply then
+                deaths[victim][attacker] = nil
+            end
+        end
+    end
 end
 
 -- Still keep track of it after disconnect. Forgot to add do.
