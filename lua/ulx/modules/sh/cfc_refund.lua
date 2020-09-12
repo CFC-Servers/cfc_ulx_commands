@@ -4,26 +4,26 @@
 local CATEGORY_NAME = "Refund"
 
 -- Storing table for kills on a player from a cheater.
-local kills = {}
+local deaths = {}
 
 hook.Add( "PlayerInitialSpawn", "CFC_ULXCommands_InitialSpawn", function(ply)
-	kills[ply] = {}
+	deaths[ply] = {}
 end)
 
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
 	if not IsValid(attacker) then return end
 	if ply == attacker then return end
-	local x = kills[ply][attacker] or 0
-	kills[ply][attacker] = x + 1
+	local x = deaths[ply][attacker] or 0
+	deaths[ply][attacker] = x + 1
 end)
 
 function HackerMan( ply )
 
-	for victim, value in pairs( kills ) do
+	for victim, value in pairs( deaths ) do
 		for attacker in pairs( value ) do
 			if attacker == ply then
-				kills[victim][attacker] = nil
+				deaths[victim][attacker] = nil
 			end
 		end
 	end
