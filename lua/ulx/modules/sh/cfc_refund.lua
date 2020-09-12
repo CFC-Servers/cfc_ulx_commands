@@ -11,7 +11,6 @@ hook.Add( "PlayerInitialSpawn", "CFC_ULXCommands_InitialSpawn", function(ply)
 end)
 
 -- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
--- Storing ply and attacker in playerKills table and reversing the deaths inflicted by the cheater.
 hook.Add( "PlayerDeath", "CFC_ULXCommands_PlayerDeath", function( ply, inflictor, attacker )
     if not IsValid( attacker ) then return end
     if ply == attacker then return end
@@ -29,6 +28,7 @@ function removeKills( ply )
         end
     end
 end
+
 -- Still keep track of it after disconnect. Forgot to add do.
 hook.Add( "PlayerDisconnected", "CFC_ULXCommands_KeepingTrackofDeathTable", function(ply)
 	removeKills(ply)
