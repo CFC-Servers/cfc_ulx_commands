@@ -20,10 +20,10 @@ end)
 
 function HackerMan( ply )
 
-	for k, v in pairs( kills ) do
-		for x, p in pairs(v) do
-			if ( x == ply ) then
-				kills[k][x] = nil
+	for victim, v in pairs( kills ) do
+		for attacker, p in pairs(v) do
+			if ( attacker == ply ) then
+				kills[victim][attacker] = nil
 			end
 		end
 	end
