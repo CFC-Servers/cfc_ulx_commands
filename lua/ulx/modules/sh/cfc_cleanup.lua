@@ -33,6 +33,6 @@ end
 
 local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cleanupPlayerEnts, "!cleanup" )
 cleanup:addParam{ type = ULib.cmds.PlayersArg }
-cleanup:addParam{ type = ULib.cmds.StringArg, hint = "class/model, * for all" }
+cleanup:addParam{ type = ULib.cmds.StringArg, hint = "class/model, * for all", ULib.cmds.optional }
 cleanup:defaultAccess( ULib.ACCESS_ADMIN )
 cleanup:help( "Remove entities owned by target" )
