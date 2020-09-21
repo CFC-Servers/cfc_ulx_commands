@@ -1,8 +1,6 @@
 CATEGORY_NAME = "Cleanup"
 
 local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
-    targetEntities = targetEntities
-
     local isTarget = {}
     for _, ply in pairs( targetPlayers ) do
         isTarget[ply] = true
