@@ -1,8 +1,6 @@
 CATEGORY_NAME = "Cleanup"
 
 local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
-    targetEntities = targetEntities or "*"
-
     local isTarget = {}
     for _, ply in pairs( targetPlayers ) do
         isTarget[ply] = true
@@ -33,6 +31,6 @@ end
 
 local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cleanupPlayerEnts, "!cleanup" )
 cleanup:addParam{ type = ULib.cmds.PlayersArg }
-cleanup:addParam{ type = ULib.cmds.StringArg, hint = "class/model, * for all" }
+cleanup:addParam{ type = ULib.cmds.StringArg, hint = "class/model, * for all", ULib.cmds.optional, default="*" }
 cleanup:defaultAccess( ULib.ACCESS_ADMIN )
 cleanup:help( "Remove entities owned by target" )
