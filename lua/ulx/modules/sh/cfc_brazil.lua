@@ -1,3 +1,4 @@
+local CATEGORY_TYPE = "Teleport"
 local MIN_X, MIN_Y, MIN_Z = -16384, -16384, -16384 / 2
 local MAX_X, MAX_Y, MAX_Z = 16384, 16384, 16384 / 2
 local HULL_BUFFER = 5
@@ -110,13 +111,13 @@ local function runRandTp( caller, targets )
     sendToPos( caller, targets, "#A randomly teleported #T" )
 end
 
-local brazilCommand = ulx.command( "Fun", "ulx brazil", runBrazil, "!brazil" )
+local brazilCommand = ulx.command( CATEGORY_TYPE, "ulx brazil", runBrazil, "!brazil" )
 brazilCommand:addParam{ type = ULib.cmds.PlayersArg }
 brazilCommand:defaultAccess( ULib.ACCESS_ADMIN )
 brazilCommand:help( "Sends target(s) to a random location on the map." )
 
 --Serious alias for brazil command
-local randTpCommand = ulx.command( "Fun", "ulx randtp", runRandTp, "!randtp" )
+local randTpCommand = ulx.command( CATEGORY_TYPE, "ulx randtp", runRandTp, "!randtp" )
 randTpCommand:addParam{ type = ULib.cmds.PlayersArg }
 randTpCommand:defaultAccess( ULib.ACCESS_ADMIN )
 randTpCommand:help( "Sends target(s) to a random location on the map." )
