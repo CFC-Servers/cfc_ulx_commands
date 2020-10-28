@@ -1,4 +1,4 @@
-CATEGORY_NAME = "Trainfuck"
+CATEGORY_NAME = "Fun"
 
 local function trainFuck( callingPlayer, targetPlayers )
 	local Y = 1
