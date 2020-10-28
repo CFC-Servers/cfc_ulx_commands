@@ -36,10 +36,9 @@ end
 
 local owoifyCommand = ulx.command( CATEGORY_TYPE, "ulx owoify", owoifyOn, "!owoify" )
 owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
-owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally." )
+owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally. (say: !owoify) (opposite: ulx unowoify)" )
 owoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
 
 local unOwoifyCommand = ulx.command( CATEGORY_TYPE, "ulx unowoify", owoifyOff, "!unowoify" )
 unOwoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
-unOwoifyCommand:help( "Unowoifies target(s) so they are able to chat normally." )
 unOwoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
