@@ -10,24 +10,26 @@ local function owoifyString( inputStr )
 end
 
 local function onPlayerSay( ply, inputStr )
+    if not table.HasValue( owoifyTargets, ply ) then return end
+    
     return owoifyString( inputStr )
 end
 
 local function owoifyOn( caller, targets )
-    table.Inherit( owoifyTargets, targets )
-    ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
+    table.Add( owoifyTargets, targets )
     hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
+    ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
 end
 
 local function owoifyOff( caller, targets )
-	for k, v in pairs( owoifyDict ) do
-		table.remove( k )
-	end
+    for k, v in pairs( owoifyTargets ) do
+        owoifyTargets[k] = nil
+    end
 
-	if table.Count( owoifyTargets ) == 0 then
-		hook.Remove( "PlayerSay", "CFC_ULX_OwoifyString" )
-	end
-
+    if table.Count( owoifyTargets ) == 0 then
+        hook.Remove( "PlayerSay", "CFC_ULX_OwoifyString" )
+    end
+    
     ulx.fancyLogAdmin( caller, "#A unowoified #T", targets )
 end
 
