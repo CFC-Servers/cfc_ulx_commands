@@ -1,5 +1,5 @@
 local CATEGORY_TYPE = "Chat"
-local OWOIFYDICT = { na = "nya", ne = "nye", ni = "nyi", no = "nyo", nu = "nyu", ove = "uv", r = "w", l = "w", U = "uwu" }
+local OWOIFYDICT = { na = "nya", ne = "nye", ni = "nyi", no = "nyo", nu = "nyu", ove = "uv", r = "w", l = "w", U = "uwu", wh = "w" }
 local owoifyTargets = {}
 
 local function owoifyString( inputStr )
