@@ -59,6 +59,7 @@ local function planTrip()
         
         if util.IsInWorld( pos ) then
             local trace = util.TraceLine( { start = pos, endpos = pos + Vector( 0, 0, MIN_Z ) } )
+            
             return trace["HitPos"] + Vector( 0, 0, 1 )
         end
     end
