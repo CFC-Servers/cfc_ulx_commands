@@ -13,7 +13,7 @@ local PHRASES_TO_REPLACE = {
     { "lmao", "uwu" },
     { "lmfao", "uwu" },
     { "l", "w" },	
-    { "na" "nya" },
+    { "na", "nya" },
     { "ne", "nye" },
     { "ni", "nyi" },
     { "no", "nyo" },
