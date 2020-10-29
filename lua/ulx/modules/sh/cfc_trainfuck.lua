@@ -1,7 +1,7 @@
 CATEGORY_NAME = "Fun"
 
 local function trainFuck( callingPlayer, targetPlayers )
-    for _, ply in pairs(	targetPlayers   ) do
+    for _, ply in pairs( targetPlayers ) do
         local train = ents.Create( "prop_physics" )
         train:SetModel( "models/props_trainstation/train001.mdl" )
         train:SetPos( ply:GetPos() + Vector( 0, -1000, 300 ) )
