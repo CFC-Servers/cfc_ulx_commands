@@ -1,5 +1,5 @@
 local CATEGORY_TYPE = "Chat"
-local OWOIFY_DICT = {
+    local OWOIFY_DICT = {
     O = "owo",
     U = "uwu",
     l = "w",
@@ -11,7 +11,9 @@ local OWOIFY_DICT = {
     ove = "uv",
     r = "w",
     tion = "shun",
-    wh = "w"
+    wha = "wa",
+    whe = "we",
+    whi = "wi"  
 }
 
 local function owoifyMessage( message )
