@@ -1,25 +1,26 @@
 local CATEGORY_TYPE = "Chat"
 local OWOIFY_DICT = {
-	O = "owo",
-	U = "uwu",
-	l = "w",
-	na = "nya",
-	ne = "nye",
-	ni = "nyi",
-	no = "nyo",
-	nu = "nyu",
-	ove = "uv",
-	r = "w",
-	wh = "w"
+    O = "owo",
+    U = "uwu",
+    l = "w",
+    na = "nya",
+    ne = "nye",
+    ni = "nyi",
+    no = "nyo",
+    nu = "nyu",
+    ove = "uv",
+    r = "w",
+    tion = "shun",
+    wh = "w"
 }
 
 local function owoifyMessage( message )
-	local owoifiedMessage = message
-	
-	for k, v in pairs( OWOIFY_DICT ) do
-		owoifiedMessage = string.Replace( owoifiedMessage, k, v )
-	end
-	
+    local owoifiedMessage = message
+    
+    for k, v in pairs( OWOIFY_DICT ) do
+        owoifiedMessage = string.Replace( owoifiedMessage, k, v )
+    end
+    
     return owoifiedMessage
 end
 
@@ -31,15 +32,15 @@ end
 
 local function owoifyOn( caller, targets )
     for _, ply in pairs( targets ) do
-    	ply.isOwoified = true
-	end
+        ply.isOwoified = true
+    end
     ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
 end
 
 local function owoifyOff( caller, targets )
     for _, ply in pairs( targets ) do
-    	ply.isOwoified = nil
-	end
+        ply.isOwoified = nil
+    end
     ulx.fancyLogAdmin( caller, "#A unowoified #T", targets )
 end
 
