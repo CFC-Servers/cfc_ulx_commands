@@ -1,28 +1,41 @@
 local CATEGORY_TYPE = "Chat"
-    local OWOIFY_DICT = {
-    O = "owo",
-    U = "uwu",
-    l = "w",
-    na = "nya",
-    ne = "nye",
-    ni = "nyi",
-    no = "nyo",
-    nu = "nyu",
-    ove = "uv",
-    r = "w",
-    tion = "shun",
-    wha = "wa",
-    whe = "we",
-    whi = "wi"  
+local PHRASES_TO_APPEND = {
+    " ^w^",
+    " ;;w;;",
+    " owo", 
+    " uwu", 
+    "~"
+}
+local PHRASES_TO_REPLACE = {
+    { "O", "owo" },
+    { "U", "uwu" },
+    { "lol", "uwu" },
+    { "lmao", "uwu" },
+    { "lmfao", "uwu" },
+    { "l", "w" },	
+    { "na" "nya" },
+    { "ne", "nye" },
+    { "ni", "nyi" },
+    { "no", "nyo" },
+    { "nu", "nyu" },
+    { "ove", "uv" },
+    { "r", "w" },
+    { "tion", "shun" },
+    { "wha", "wa" },
+    { "whe" "we" },
+    { "whi", "wi" }
 }
 
 local function owoifyMessage( message )
     local owoifiedMessage = message
     
-    for k, v in pairs( OWOIFY_DICT ) do
-        owoifiedMessage = string.Replace( owoifiedMessage, k, v )
+    for _, item in pairs( PHRASES_TO_REPLACE ) do
+        local old = item[1]        
+        local new = item[2]
+        owoifiedMessage = string.Replace( owoifiedMessage, old, new )
     end
-    
+    owoifiedMessage = owoifiedMessage .. math.random( 1, #PHRASES_TO_APPEND )
+
     return owoifiedMessage
 end
 
