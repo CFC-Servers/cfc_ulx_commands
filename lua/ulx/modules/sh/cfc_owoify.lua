@@ -34,7 +34,7 @@ local function owoifyMessage( message )
         local new = item[2]
         owoifiedMessage = string.Replace( owoifiedMessage, old, new )
     end
-    owoifiedMessage = owoifiedMessage .. math.random( 1, #PHRASES_TO_APPEND )
+    owoifiedMessage = owoifiedMessage .. PHRASES_TO_APPEND[math.random( 1, #PHRASES_TO_APPEND )]
 
     return owoifiedMessage
 end
