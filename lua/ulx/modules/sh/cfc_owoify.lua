@@ -1,38 +1,49 @@
 local CATEGORY_TYPE = "Chat"
-local OWOIFYDICT = { ove = "uv", na = "nya", ne = "nye", ni = "nyi", no = "nyo", nu = "nyu", r = "w", l = "w", O = "owo", U = "uwu", wh = "w" }
-local owoifyTargets = {}
+local OWOIFY_DICT = {
+	O = "owo",
+	U = "uwu",
+	l = "w",
+	na = "nya",
+	ne = "nye",
+	ni = "nyi",
+	no = "nyo",
+	nu = "nyu",
+	ove = "uv",
+	r = "w",
+	wh = "w"
+}
 
-local function owoifyString( inputStr )
-    for k, v in pairs( OWOIFYDICT ) do
-        inputStr = string.Replace( inputStr, k, v )
-    end
-
-    return inputStr
+local function owoifyMessage( message )
+	local owoifiedMessage = message
+	
+	for k, v in pairs( OWOIFY_DICT ) do
+		owoifiedMessage = string.Replace( owoifiedMessage, k, v )
+	end
+	
+    return owoifiedMessage
 end
 
-local function onPlayerSay( ply, inputStr )
-    if not table.HasValue( owoifyTargets, ply ) then return end
+local function onPlayerSay( ply, message )
+    if not ply.isOwoified then return end
 
-    return owoifyString( inputStr )
+    return owoifyMessage( message )
 end
 
 local function owoifyOn( caller, targets )
-    table.Add( owoifyTargets, targets )
-    hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
+    for _, ply in pairs( targets ) do
+    	ply.isOwoified = true
+	end
     ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
 end
 
 local function owoifyOff( caller, targets )
-    for k, v in pairs( owoifyTargets ) do
-        owoifyTargets[k] = nil
-    end
-
-    if table.Count( owoifyTargets ) == 0 then
-        hook.Remove( "PlayerSay", "CFC_ULX_OwoifyString" )
-    end
-
+    for _, ply in pairs( targets ) do
+    	ply.isOwoified = nil
+	end
     ulx.fancyLogAdmin( caller, "#A unowoified #T", targets )
 end
+
+hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
 
 local owoifyCommand = ulx.command( CATEGORY_TYPE, "ulx owoify", owoifyOn, "!owoify" )
 owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
