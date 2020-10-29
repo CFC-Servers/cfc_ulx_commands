@@ -22,7 +22,7 @@ local PHRASES_TO_REPLACE = {
     { "r", "w" },
     { "tion", "shun" },
     { "wha", "wa" },
-    { "whe" "we" },
+    { "whe", "we" },
     { "whi", "wi" }
 }
 
