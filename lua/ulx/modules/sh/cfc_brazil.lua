@@ -80,13 +80,11 @@ local function planTrip( ply )
         end
         
         if util.IsInWorld( pos ) then
-            local minHullSize, maxHullSize = ply:GetCollisionBounds()
-            local minHull = minHullSize + Vector( 0, 0, -minHullSize.z )
-            local maxHull = maxHullSize + Vector( 0, 0, 0.1 - minHullSize.z )
+            local minHull, maxHull = ply:GetCollisionBounds()
             
             local validationTrace = util.TraceHull( {
                 start = pos,
-                endpos = pos + Vector( 0, 0, maxHullSize.z ),
+                endpos = pos,
                 mins = minHull,
                 maxs = maxHull
             } )
