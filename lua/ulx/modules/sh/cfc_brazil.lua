@@ -2,7 +2,6 @@ local CATEGORY_TYPE = "Teleport"
 local MIN_X, MIN_Y, MIN_Z = -16384, -16384, -16384
 local MAX_X, MAX_Y, MAX_Z = 16384, 16384, 16384
 local MAX_TRIES = 20
-local HULL_BUFFER = 2
 local MAP_POSITION_DATA = {
     ["gm_bigcity"] = {
         centerZ = 14500 / 2 - 11400,
@@ -82,8 +81,8 @@ local function planTrip( ply )
         
         if util.IsInWorld( pos ) then
             local minHullSize, maxHullSize = ply:GetCollisionBounds()
-            local minHull = minHullSize - Vector( HULL_BUFFER, HULL_BUFFER, minHullSize.x )
-            local maxHull = maxHullSize + Vector( HULL_BUFFER, HULL_BUFFER, 0.1 - minHullSize.x )
+            local minHull = minHullSize + Vector( 0, 0, -minHullSize.z )
+            local maxHull = maxHullSize + Vector( 0, 0, 0.1 - minHullSize.z )
             
             local validationTrace = util.TraceHull( {
                 start = pos,
