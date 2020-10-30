@@ -8,22 +8,22 @@ function yeetPlayer( caller, targets, strength )
 	
 	for _, v in pairs( targets ) do 
 		
-		if not v:IsPlayer() then return end
-		if not v:Alive() then return end
+	if not v:IsPlayer() then return end
+	if not v:Alive() then return end
 
-		if v:IsFrozen() then
+	if v:IsFrozen() then
 		
-			v:Freeze( false )
+	v:Freeze( false )
 					
-		end
+	end
 	
-		if v:GetMoveType() == MOVETYPE_NOCLIP then
+	if v:GetMoveType() == MOVETYPE_NOCLIP then
 			
-			v:SetMoveType( MOVETYPE_WALK )
+	v:SetMoveType( MOVETYPE_WALK )
 			
-		end
+	end
 
-		v:SetVelocity( Vector( math.random( 50000 ) -20000, math.random( 50000 ) -20000, math.Clamp( strength, MIN_STRENGTH, MAX_STRENGTH ) or DEFAULT_STRENGTH ) )  
+	v:SetVelocity( Vector( math.random( 50000 ) -20000, math.random( 50000 ) -20000, math.Clamp( strength, MIN_STRENGTH, MAX_STRENGTH ) or DEFAULT_STRENGTH ) )  
 		
 	end
 	
