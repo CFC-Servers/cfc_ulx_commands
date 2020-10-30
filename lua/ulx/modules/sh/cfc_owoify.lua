@@ -26,7 +26,8 @@ local PHRASES_TO_REPLACE = {
     { "tion", "shun" },
     { "wha", "wa" },
     { "whe", "we" },
-    { "whi", "wi" }
+    { "whi", "wi" },
+    { "you", "nyu" }
 }
 
 local function owoifyMessage( message )
