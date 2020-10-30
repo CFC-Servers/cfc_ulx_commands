@@ -1,6 +1,8 @@
 local CATEGORY_TYPE = "Chat"
 local PHRASES_TO_APPEND = {
     " ^w^",
+    " :3",
+    " :3c",
     " ;;w;;",
     " owo", 
     " nya~",
