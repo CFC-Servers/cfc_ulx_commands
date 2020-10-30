@@ -3,7 +3,7 @@ local PHRASES_TO_APPEND = {
     " ^w^",
     " ;;w;;",
     " owo", 
-    " nya~"
+    " nya~",
     " uwu", 
     "~"
 }
