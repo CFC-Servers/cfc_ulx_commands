@@ -4,6 +4,7 @@ local PHRASES_TO_APPEND = {
     " :3",
     " :3c",
     " ;;w;;",
+    " x3",
     " owo", 
     " nya~",
     " uwu", 
