@@ -71,7 +71,7 @@ local MAP_POSITION_DATA = {
     }
 }
 
-local function planTrip( ply )
+local function getRandomPos( ply )
     for _ = 1, MAX_TRIES do
         local mapData = MAP_POSITION_DATA[game.GetMap()]
         local pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), math.random( MIN_Z, MAX_Z ) )
@@ -113,7 +113,7 @@ end
 
 local function sendToPos( caller, targets, message )
     for k, v in pairs( targets ) do
-        v:SetPos( planTrip( v ) )
+        v:SetPos( getRandomPos( v ) )
     end
     
     ulx.fancyLogAdmin( caller, message, targets )
