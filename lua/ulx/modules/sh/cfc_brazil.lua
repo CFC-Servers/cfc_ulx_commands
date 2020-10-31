@@ -74,12 +74,10 @@ local MAP_POSITION_DATA = {
 local function planTrip( ply )
     for _ = 1, MAX_TRIES do
         local mapData = MAP_POSITION_DATA[game.GetMap()]
-        local pos
+        local pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), math.random( MIN_Z, MAX_Z ) )
         
         if mapData then
-            pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), mapData.centerZ + math.random( -mapData.playableHeight, mapData.playableHeight ) )
-        else
-            pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), math.random( MIN_Z, MAX_Z ) )
+            pos.z = mapData.centerZ + math.random( -mapData.playableHeight, mapData.playableHeight )
         end
         
         if util.IsInWorld( pos ) then
