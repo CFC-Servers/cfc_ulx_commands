@@ -1,5 +1,3 @@
-CFCUlxCommands = CFCUlxCommands or {} --remove later
-
 CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
