@@ -1,6 +1,9 @@
+CFCUlxCommands.cleanup = CFCUlxCommands.cleanup or {}
+local cmd = CFCUlxCommands.cleanup
+
 CATEGORY_NAME = "Cleanup"
 
-local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
+function cmd.cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
     local isTarget = {}
     for _, ply in pairs( targetPlayers ) do
         isTarget[ply] = true
@@ -29,7 +32,7 @@ local function cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
     ulx.fancyLogAdmin( callingPlayer,  "#A removed " .. count .. " entities owned by #T", targetPlayers )
 end
 
-local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cleanupPlayerEnts, "!cleanup" )
+local cleanup = ulx.command( CATEGORY_NAME, "ulx cleanup", cmd.cleanupPlayerEnts, "!cleanup" )
 cleanup:addParam{ type = ULib.cmds.PlayersArg }
 cleanup:addParam{ type = ULib.cmds.StringArg, hint = "class/model, * for all", ULib.cmds.optional, default="*" }
 cleanup:defaultAccess( ULib.ACCESS_ADMIN )

@@ -1,6 +1,9 @@
+CFCUlxCommands.ropeClean = CFCUlxCommands.ropeClean or {}
+local cmd = CFCUlxCommands.ropeClean
+
 CATEGORY_NAME = "Cleanup"
 
-local function ropeClean( callingPlayer, targetPlayers )
+function cmd.ropeClean( callingPlayer, targetPlayers )
     local plyCounts = {}
     for _, ply in pairs( targetPlayers ) do
         plyCounts[ply] = 0
@@ -28,7 +31,7 @@ local function ropeClean( callingPlayer, targetPlayers )
     end
 end
 
-local ropes = ulx.command( CATEGORY_NAME, "ulx ropeclean", ropeClean, "!ropeclean" )
+local ropes = ulx.command( CATEGORY_NAME, "ulx ropeclean", cmd.ropeClean, "!ropeclean" )
 ropes:addParam{ type = ULib.cmds.PlayersArg }
 ropes:defaultAccess( ULib.ACCESS_ADMIN )
 ropes:help( "Remove target( s ) ropes" )
