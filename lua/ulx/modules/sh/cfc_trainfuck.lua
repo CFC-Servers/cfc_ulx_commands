@@ -14,7 +14,9 @@ local function trainFuck( callingPlayer, targetPlayers )
                 ply:SetMoveType( MOVETYPE_WALK )
             end
             ply:ExitVehicle()
+
             phys:ApplyForceCenter( ( ply:GetPos() - train:GetPos() ) * 1000000000 )
+
             timer.Simple( 1.5, function()
                 train:Remove()
             end)
