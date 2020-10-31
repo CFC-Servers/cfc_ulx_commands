@@ -9,9 +9,9 @@ function cmd.warnBan( calling_ply, target_ply, minutes, reason )
     calling_ply:ConCommand( command ) 
 end
 local ban = ulx.command( CATEGORY_NAME, "ulx warnban", cmd.warnBan, "!warnban", false, false, true )
-ban:addParam{ type=ULib.cmds.PlayerArg }
-ban:addParam{ type=ULib.cmds.NumArg, hint="minutes, 0 for perma", ULib.cmds.optional, ULib.cmds.allowTimeString, min=0 }
-ban:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+ban:addParam{ type = ULib.cmds.PlayerArg }
+ban:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.optional, ULib.cmds.allowTimeString, min = 0 }
+ban:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes = ulx.common_kick_reasons }
 ban:defaultAccess( ULib.ACCESS_ADMIN )
 ban:help( "Bans target and warns them." )
 
@@ -20,8 +20,8 @@ function cmd.warnKick( calling_ply, target_ply, reason )
     local command = string.format( 'awarn_warn \"%s" "%s (kick)" ', target_ply:SteamID(), reason )
     calling_ply:ConCommand( command ) 
 end
-local kick = ulx.command( CATEGORY_NAME, "ulx warnkick", cmd.warnkick, "!warnKick" )
-kick:addParam{ type=ULib.cmds.PlayerArg }
-kick:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes=ulx.common_kick_reasons }
+local kick = ulx.command( CATEGORY_NAME, "ulx warnkick", cmd.warnKick, "!warnkick" )
+kick:addParam{ type = ULib.cmds.PlayerArg }
+kick:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes = ulx.common_kick_reasons }
 kick:defaultAccess( ULib.ACCESS_ADMIN )
 kick:help( "Kicks target and warns them." )
