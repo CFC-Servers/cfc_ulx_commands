@@ -1,3 +1,6 @@
+CFCUlxCommands.brazil = CFCUlxCommands.brazil or {}
+local cmd = CFCUlxCommands.brazil
+
 local CATEGORY_TYPE = "Teleport"
 local MIN_X, MIN_Y, MIN_Z = -16384, -16384, -16384
 local MAX_X, MAX_Y, MAX_Z = 16384, 16384, 16384
@@ -68,7 +71,7 @@ local MAP_POSITION_DATA = {
     }
 }
 
-local function getRandomMapPos( ply )
+local function planTrip( ply )
     for _ = 1, MAX_TRIES do
         local mapData = MAP_POSITION_DATA[game.GetMap()]
         local pos
@@ -112,27 +115,27 @@ end
 
 local function sendToPos( caller, targets, message )
     for k, v in pairs( targets ) do
-        v:SetPos( getRandomMapPos( v ) )
+        v:SetPos( planTrip( v ) )
     end
     
     ulx.fancyLogAdmin( caller, message, targets )
 end
 
-local function runBrazil( caller, targets )
+function cmd.runBrazil( caller, targets )
     sendToPos( caller, targets, "#A sent #T to Brazil" )
 end
 
-local function runRandTp( caller, targets )
+function cmd.runRandTp( caller, targets )
     sendToPos( caller, targets, "#A randomly teleported #T" )
 end
 
-local brazilCommand = ulx.command( CATEGORY_TYPE, "ulx brazil", runBrazil, "!brazil" )
+local brazilCommand = ulx.command( CATEGORY_TYPE, "ulx brazil", cmd.runBrazil, "!brazil" )
 brazilCommand:addParam{ type = ULib.cmds.PlayersArg }
 brazilCommand:defaultAccess( ULib.ACCESS_ADMIN )
 brazilCommand:help( "Sends target(s) to a random location on the map." )
 
 --Serious alias for brazil command
-local randTpCommand = ulx.command( CATEGORY_TYPE, "ulx randtp", runRandTp, "!randtp" )
+local randTpCommand = ulx.command( CATEGORY_TYPE, "ulx randtp", cmd.runRandTp, "!randtp" )
 randTpCommand:addParam{ type = ULib.cmds.PlayersArg }
 randTpCommand:defaultAccess( ULib.ACCESS_ADMIN )
 randTpCommand:help( "Sends target(s) to a random location on the map." )
