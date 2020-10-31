@@ -11,6 +11,7 @@ local PHRASES_TO_APPEND = {
     "~"
 }
 local PHRASES_TO_REPLACE = {
+    { "oo", "ew" },
     { "O", "owo" },
     { "U", "uwu" },
     { "lol", "uwu" },
