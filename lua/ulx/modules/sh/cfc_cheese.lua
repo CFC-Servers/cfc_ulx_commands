@@ -22,6 +22,6 @@ end
 local cheeseCommand = ulx.command( CATEGORY_NAME, "ulx cheese", cmd.cheese, "!cheese" )
 cheeseCommand:addParam{ type = ULib.cmds.PlayersArg }
 cheeseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
-cheeseCommand:defaultAccess( ULib.ACCESS_ADMIN ) --Will need to be set up in the ulx menu to have identical permission settings as ulx ragdoll
+cheeseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 cheeseCommand:help( "Turns the target(s) into cheese." )
 cheeseCommand:setOpposite( "ulx uncheese", { _, _, true }, "!uncheese" )
