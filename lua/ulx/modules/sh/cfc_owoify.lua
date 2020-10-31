@@ -1,4 +1,4 @@
-local CATEGORY_TYPE = "Chat"
+local CATEGORY_NAME = "Chat"
 local PHRASES_TO_APPEND = {
     " ^w^",
     " :3",
@@ -51,27 +51,28 @@ local function onPlayerSay( ply, message )
     return owoifyMessage( message )
 end
 
-local function owoifyOn( caller, targets )
+local function owoifyCommand( caller, targets, shouldUnowoify )
     for _, ply in pairs( targets ) do
-        ply.isOwoified = true
+        
+        if shouldUnowoify then
+            ply.isOwoified = nil
+        else
+            ply.isOwoified = true
+        end
     end
-    ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
-end
-
-local function owoifyOff( caller, targets )
-    for _, ply in pairs( targets ) do
-        ply.isOwoified = nil
+    
+    if shouldUnowoify then
+        ulx.fancyLogAdmin( caller, "#A unowoified #T", targets )
+    else
+        ulx.fancyLogAdmin( caller, "#A owoified #T", targets )
     end
-    ulx.fancyLogAdmin( caller, "#A unowoified #T", targets )
 end
 
 hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
 
-local owoifyCommand = ulx.command( CATEGORY_TYPE, "ulx owoify", owoifyOn, "!owoify" )
+local owoifyCommand = ulx.command( CATEGORY_NAME, "ulx owoify", owoifyCommand, "!owoify" )
 owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
-owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally. (say: !owoify) (opposite: ulx unowoify)" )
+owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally." )
 owoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
-
-local unOwoifyCommand = ulx.command( CATEGORY_TYPE, "ulx unowoify", owoifyOff, "!unowoify" )
-unOwoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
-unOwoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
+owoifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
+owoifyCommand:setOpposite( "ulx unowoify", {_, _, true}, "!unowoify" )
