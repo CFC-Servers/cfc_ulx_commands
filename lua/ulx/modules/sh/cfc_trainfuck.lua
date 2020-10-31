@@ -22,10 +22,11 @@ local function trainFuck( callingPlayer, targetPlayers )
             end)
         end
     end
+
     ulx.fancyLogAdmin( callingPlayer, "#A trainfucked #T", targetPlayers )
 end
 
-local trainfuckCMD = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
+local trainFuckCommand = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
 trainfuckCMD:addParam{ type = ULib.cmds.PlayersArg }
 trainfuckCMD:defaultAccess( ULib.ACCESS_ADMIN )
-trainfuckCMD:help( "Trainfucks target( s )" )
+trainfuckCMD:help( "Trainfucks target(s)" )
