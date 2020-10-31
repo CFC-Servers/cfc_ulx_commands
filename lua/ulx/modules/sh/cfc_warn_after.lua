@@ -15,7 +15,7 @@ ban:addParam{ type=ULib.cmds.StringArg, hint="reason", ULib.cmds.optional, ULib.
 ban:defaultAccess( ULib.ACCESS_ADMIN )
 ban:help( "Bans target and warns them." )
 
-local function cmd.warnkick( calling_ply, target_ply, reason )
+function cmd.warnkick( calling_ply, target_ply, reason )
     ulx.kick( calling_ply, target_ply, reason )
     local command = string.format( 'awarn_warn \"%s" "%s (kick)" ', target_ply:SteamID(), reason )
     calling_ply:ConCommand( command ) 
