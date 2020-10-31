@@ -1,3 +1,6 @@
+CFCUlxCommands.owoify = CFCUlxCommands.owoify or {}
+local cmd = CFCUlxCommands.owoify
+
 local CATEGORY_NAME = "Chat"
 local PHRASES_TO_APPEND = {
     " ^w^",
@@ -52,7 +55,7 @@ local function onPlayerSay( ply, message )
     return owoifyMessage( message )
 end
 
-local function owoifyCommand( caller, targets, shouldUnowoify )
+function cmd.owoifyCommand( caller, targets, shouldUnowoify )
     for _, ply in pairs( targets ) do
         ply.isOwoified = not shouldUnowoify or nil
     end
@@ -66,7 +69,7 @@ end
 
 hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
 
-local owoifyCommand = ulx.command( CATEGORY_NAME, "ulx owoify", owoifyCommand, "!owoify" )
+local owoifyCommand = ulx.command( CATEGORY_NAME, "ulx owoify", cmd.owoifyCommand, "!owoify" )
 owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally." )
 owoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
