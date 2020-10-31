@@ -25,6 +25,7 @@ local PHRASES_TO_REPLACE = {
     { "nu", "nyu" },
     { "ove", "uv" },
     { "r", "w" },
+    { "that", "dat" },
     { "tion", "shun" },
     { "wha", "wa" },
     { "whe", "we" },
