@@ -1,3 +1,5 @@
+CFCUlxCommands = CFCUlxCommands or {} --remove later
+
 CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
@@ -178,21 +180,20 @@ local function propHop( ply, keyNum )
     
     ply.propifiedlastPressed = CurTime()
     
+    local phys = phys = ply.ragdoll:GetPhysicsObject()
+    local hopStrength = HOP_STRENGTH * phys:GetMass()
+    local eyeAngles = ply:EyeAngles()
+
     if keyNum == IN_FORWARD then
-        local phys = ply.ragdoll:GetPhysicsObject()
-        phys:ApplyForceCenter( ply:EyeAngles():Forward() * HOP_STRENGTH * phys:GetMass() )
+        phys:ApplyForceCenter( eyeAngles:Forward() * hopStrength )
     elseif keyNum == IN_BACK then
-        local phys = ply.ragdoll:GetPhysicsObject()
-        phys:ApplyForceCenter( -ply:EyeAngles():Forward() * HOP_STRENGTH * phys:GetMass() )
+        phys:ApplyForceCenter( -eyeAngles:Forward() * hopStrength )
     elseif keyNum == IN_MOVERIGHT then
-        local phys = ply.ragdoll:GetPhysicsObject()
-        phys:ApplyForceCenter( ply:EyeAngles():Right() * HOP_STRENGTH * phys:GetMass() )
+        phys:ApplyForceCenter( eyeAngles:Right() * hopStrength )
     elseif keyNum == IN_MOVELEFT then
-        local phys = ply.ragdoll:GetPhysicsObject()
-        phys:ApplyForceCenter( -ply:EyeAngles():Right() * HOP_STRENGTH * phys:GetMass() )
+        phys:ApplyForceCenter( -eyeAngles:Right() * hopStrength )
     elseif keyNum == IN_JUMP then
-        local phys = ply.ragdoll:GetPhysicsObject()
-        phys:ApplyForceCenter( Vector( 0, 0, HOP_STRENGTH * phys:GetMass() ) )
+        phys:ApplyForceCenter( Vector( 0, 0, hopStrength ) )
     end
 end
 hook.Add( "KeyPress", "CFC_ULXPropHop", propHop )
