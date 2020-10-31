@@ -178,7 +178,7 @@ local function propHop( ply, keyNum )
     
     ply.propifiedlastPressed = CurTime()
     
-    local phys = phys = ply.ragdoll:GetPhysicsObject()
+    local phys = ply.ragdoll:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH * phys:GetMass()
     local eyeAngles = ply:EyeAngles()
 
