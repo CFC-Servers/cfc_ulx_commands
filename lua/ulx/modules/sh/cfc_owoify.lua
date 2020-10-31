@@ -53,12 +53,7 @@ end
 
 local function owoifyCommand( caller, targets, shouldUnowoify )
     for _, ply in pairs( targets ) do
-        
-        if shouldUnowoify then
-            ply.isOwoified = nil
-        else
-            ply.isOwoified = true
-        end
+        ply.isOwoified = not shouldUnowoify or nil
     end
     
     if shouldUnowoify then
