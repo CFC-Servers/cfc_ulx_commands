@@ -1,6 +1,9 @@
+CFCUlxCommands.freezeProps = CFCUlxCommands.freezeProps or {}
+local cmd = CFCUlxCommands.freezeProps
+
 CATEGORY_NAME = "Cleanup"
 
-local function freezeProps( callingPlayer, targetPlayers )
+function cmd.freezeProps( callingPlayer, targetPlayers )
     local entities = ents.GetAll()
     local entCount = 0
     local entCounts = {}
@@ -30,7 +33,7 @@ local function freezeProps( callingPlayer, targetPlayers )
     end
 end
 
-local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", freezeProps, "!freezeprops" )
+local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", cmd.freezeProps, "!freezeprops" )
 freezeCMD:addParam{ type = ULib.cmds.PlayersArg }
 freezeCMD:defaultAccess( ULib.ACCESS_ADMIN )
 freezeCMD:help( "Freezes target( s ) props" )
