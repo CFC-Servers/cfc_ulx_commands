@@ -13,16 +13,19 @@ local function trainFuck( callingPlayer, targetPlayers )
                 ply:SetMoveType( MOVETYPE_WALK )
             end
             ply:ExitVehicle()
+
             phys:ApplyForceCenter( ( ply:GetPos() - train:GetPos() ) * 1000000000 )
+
             timer.Simple( 1.5, function()
                 train:Remove()
             end)
         end
     end
+
     ulx.fancyLogAdmin( callingPlayer, "#A trainfucked #T", targetPlayers )
 end
 
-local trainfuckCMD = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
-trainfuckCMD:addParam{ type = ULib.cmds.PlayersArg }
-trainfuckCMD:defaultAccess( ULib.ACCESS_ADMIN )
-trainfuckCMD:help( "Trainfucks target( s )" )
+local trainFuckCommand = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
+trainFuckCommand:addParam{ type = ULib.cmds.PlayersArg }
+trainFuckCommand:defaultAccess( ULib.ACCESS_ADMIN )
+trainFuckCommand:help( "Trainfucks target(s)" )
