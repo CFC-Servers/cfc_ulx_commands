@@ -1,13 +1,13 @@
 CFCUlxCommands.cheese = CFCUlxCommands.cheese or {}
 local cmd = CFCUlxCommands.cheese
 
-local CATEGORY_NAME = "Fun"
-local cmd.CHEESE_MODELS = {
+cmd.CHEESE_MODELS = {
     "models/hunter/triangles/025x025.mdl",
     "models/hunter/triangles/05x05x05.mdl",
     "models/hunter/triangles/1x05x05.mdl",
     "models/props_c17/playgroundtick-tack-toe_block01a.mdl"
 }
+local CATEGORY_NAME = "Fun"
 
 function cmd.cheese( caller, targets, shouldUncheese )
     local model = BASE_CHEESE_MODELS[ math.random( #BASE_CHEESE_MODELS ) ]
