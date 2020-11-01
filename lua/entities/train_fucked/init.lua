@@ -7,7 +7,7 @@ function ENT:Initialize()
 	self:SetModel( "models/props_trainstation/train001.mdl" )
 	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
-    self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+    self:SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS )
     self:PhysWake()
     
 end
