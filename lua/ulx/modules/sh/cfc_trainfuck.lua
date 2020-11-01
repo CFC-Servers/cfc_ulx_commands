@@ -27,6 +27,6 @@ local function trainFuck( callingPlayer, targetPlayers )
 end
 
 local trainFuckCommand = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
-trainfuckCMD:addParam{ type = ULib.cmds.PlayersArg }
-trainfuckCMD:defaultAccess( ULib.ACCESS_ADMIN )
-trainfuckCMD:help( "Trainfucks target(s)" )
+trainFuckCommand:addParam{ type = ULib.cmds.PlayersArg }
+trainFuckCommand:defaultAccess( ULib.ACCESS_ADMIN )
+trainFuckCommand:help( "Trainfucks target(s)" )
