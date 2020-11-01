@@ -8,8 +8,7 @@ local trainSounds = { "ambient/alarms/razortrain_horn1.wav",
                     
 local function trainFuck( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
-    
-        local soundPlay = trainSounds[ math.random( 1, 5 ) ]
+        local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
         
         train:SetPos( ply:GetPos() - ply:GetForward() * 500 + Vector( 0, 0, 150 ) )
