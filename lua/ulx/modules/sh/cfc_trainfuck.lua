@@ -1,11 +1,18 @@
 CATEGORY_NAME = "Fun"
-
+local trainSounds = { "ambient/alarms/razortrain_horn1.wav",
+                      "ambient/machines/usetoilet_flush1.wav",
+                      "ambient/machines/wall_crash1.wav",
+                      "garrysmod/balloon_pop_cute.wav",
+                      "garrysmod/save_load1.wav"
+                    }
 local function trainFuck( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
+        local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
-        train:SetPos( ply:GetPos() + Vector( 0, -1000, 300 ) )
+        train:SetPos( ply:GetPos() - ply:GetForward() * 500 + Vector( 0, 0, 150 ) )
+        train:SetAngles( ply:EyeAngles() - Angle( 0, 90, 0 ) )
         train:Spawn()
-
+        train:EmitSound( soundPlay, 150 )
         local phys = train:GetPhysicsObject()
 
         if IsValid( phys ) then
@@ -17,6 +24,7 @@ local function trainFuck( callingPlayer, targetPlayers )
             phys:ApplyForceCenter( ( ply:GetPos() - train:GetPos() ) * 1000000000 )
 
             timer.Simple( 1.5, function()
+                train:StopSound( soundPlay )
                 train:Remove()
             end)
         end
