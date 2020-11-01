@@ -2,7 +2,7 @@ CATEGORY_NAME = "Fun"
 
 local function trainFuck( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
-        local train = ents.Create( "prop_physics" )
+        local train = ents.Create( "train_fucked" )
         train:SetPos( ply:GetPos() + Vector( 0, -1000, 300 ) )
         train:Spawn()
 
