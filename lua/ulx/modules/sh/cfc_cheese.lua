@@ -2,7 +2,7 @@ CFCUlxCommands.cheese = CFCUlxCommands.cheese or {}
 local cmd = CFCUlxCommands.cheese
 
 local CATEGORY_NAME = "Fun"
-local BASE_CHEESE_MODELS = {
+local cmd.CHEESE_MODELS = {
     "models/hunter/triangles/025x025.mdl",
     "models/hunter/triangles/05x05x05.mdl",
     "models/hunter/triangles/1x05x05.mdl",
@@ -10,12 +10,14 @@ local BASE_CHEESE_MODELS = {
 }
 
 function cmd.cheese( caller, targets, shouldUncheese )
-    local prop = CFCUlxCommands.propify.propify( caller, targets, BASE_CHEESE_MODELS[ math.random( #BASE_CHEESE_MODELS ) ], shouldUncheese )
+    local model = BASE_CHEESE_MODELS[ math.random( #BASE_CHEESE_MODELS ) ]
+    local prop = CFCUlxCommands.Propify.propify( caller, targets, model, shouldUncheese )
     
     if not prop then return end
     
+    local color = Color( 255, math.Rand( 150, 221 ), 6, 255 )
     prop:SetMaterial( "models/XQM/Rails/gumball_1" )
-    prop:SetColor( Color( 255, math.Rand( 150, 221 ), 6, 255 )  )
+    prop:SetColor( color  )
     prop:GetPhysicsObject():SetMaterial( "dirt" )
 end
 
