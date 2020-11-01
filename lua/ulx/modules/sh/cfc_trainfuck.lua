@@ -1,10 +1,11 @@
 CATEGORY_NAME = "Fun"
-local trainSounds = { "ambient/alarms/razortrain_horn1.wav",
-                      "ambient/machines/usetoilet_flush1.wav",
-                      "ambient/machines/wall_crash1.wav",
-                      "garrysmod/balloon_pop_cute.wav",
-                      "garrysmod/save_load1.wav"
-                    }
+local trainSounds = {
+    "ambient/alarms/razortrain_horn1.wav",
+    "ambient/machines/usetoilet_flush1.wav",
+    "ambient/machines/wall_crash1.wav",
+    "garrysmod/balloon_pop_cute.wav",
+    "garrysmod/save_load1.wav"
+}
                     
 local function trainFuck( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
