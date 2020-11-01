@@ -73,7 +73,7 @@ local function unpropifyPlayer( ply )
     ulx.clearExclusive( ply )
 end
 
-function cmd.Propify( caller, targets, modelPath, shouldUnpropify )
+function cmd.PropifyTargets( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
     local err
     local prop
@@ -108,7 +108,7 @@ function cmd.Propify( caller, targets, modelPath, shouldUnpropify )
     return prop
 end
 
-local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.Propify, "!propify" )
+local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.PropifyTargets, "!propify" )
 propifyCommand:addParam{ type = ULib.cmds.PlayersArg }
 propifyCommand:addParam{ type = ULib.cmds.StringArg, default = PROP_DEFAULT_MODEL, ULib.cmds.optional }
 propifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
