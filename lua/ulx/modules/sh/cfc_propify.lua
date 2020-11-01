@@ -8,7 +8,7 @@ local HOP_STRENGTH = 400
 local HOP_COOLDOWN = 2
 
 local function propifyPlayer( ply, modelPath )
-    if not util.IsValidModel( modelPath ) then return true end
+    if not util.IsValidModel( modelPath ) then return "Invalid model!" end
     
     if ply:InVehicle() then
         local vehicle = ply:GetParent()
@@ -22,7 +22,7 @@ local function propifyPlayer( ply, modelPath )
     
     if prop:BoundingRadius() > PROP_MAX_SIZE then
         prop:Remove()
-        return false, true
+        return "Model too big!"
     end
     
     prop.ragdolledPly = ply
@@ -44,7 +44,7 @@ local function propifyPlayer( ply, modelPath )
     ply.ragdoll = prop
     ulx.setExclusive( ply, "ragdolled" )
     
-    return false, false, prop
+    return nil, prop
 end
 
 local function unpropifyPlayer( ply )
@@ -75,7 +75,7 @@ end
 
 function cmd.Propify( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
-    local invalidModel = false
+    local err
     local prop
     
     for _, v in pairs( targets ) do
@@ -85,28 +85,18 @@ function cmd.Propify( caller, targets, modelPath, shouldUnpropify )
             elseif not v:Alive() then
                 ULib.tsayError( caller, v:Nick() .. " is dead and cannot be propified!", true )
             else
-                invalidModel, propTooBig, prop = propifyPlayer( v, modelPath )
+                err, prop = propifyPlayer( v, modelPath )
                 
-                if not ( invalidModel or propTooBig ) then
+                if not err then
                     table.insert( affectedPlys, v )
+                else
+                    ULib.tsayError( caller, err, true )
                 end
             end
         elseif v.ragdoll then
             unpropifyPlayer( v )
             table.insert( affectedPlys, v )
         end
-    end
-    
-    if invalidModel then
-        ULib.tsayError( caller, "Invalid model!", true )
-        
-        return
-    end
-    
-    if propTooBig then
-        ULib.tsayError( caller, "Model too big!", true )
-        
-        return
     end
     
     if not shouldUnpropify then
