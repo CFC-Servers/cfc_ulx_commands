@@ -198,7 +198,7 @@ hook.Add( "AllowPlayerPickup", "CFC_ULXPropifyDisallowGrab", disallowGrab )
 --Prevents breakable props from existing after being broken
 local function removePropOnBreak( _, prop )
     if not prop.ragdolledPly then return end
-    cmd.propify( __, { prop.ragdolledPly }, __, true )
+    cmd.propifyTargets( __, { prop.ragdolledPly }, __, true )
 end
 hook.Add( "PropBreak", "CFC_ULXPropifyRemoveProp", removePropOnBreak )
 
