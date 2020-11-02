@@ -1,4 +1,8 @@
+CFCUlxCommands.trainfuck = CFCUlxCommands.trainfuck or {}
+local cmd = CFCUlxCommands.trainfuck
+
 CATEGORY_NAME = "Fun"
+
 local trainSounds = {
     "ambient/alarms/razortrain_horn1.wav",
     "ambient/machines/usetoilet_flush1.wav",
@@ -7,7 +11,7 @@ local trainSounds = {
     "garrysmod/save_load1.wav"
 }
                     
-local function trainFuck( callingPlayer, targetPlayers )
+local function trainFuck.trainFuckPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
         local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
@@ -36,7 +40,7 @@ local function trainFuck( callingPlayer, targetPlayers )
     ulx.fancyLogAdmin( callingPlayer, "#A trainfucked #T", targetPlayers )
 end
 
-local trainFuckCommand = ulx.command( CATEGORY_NAME, "ulx trainfuck", trainFuck, "!trainfuck" )
+local trainFuckCommand = ulx.command( CATEGORY_NAME, "ulx trainfuck", cmd.trainFuckPlayers, "!trainfuck" )
 trainFuckCommand:addParam{ type = ULib.cmds.PlayersArg }
 trainFuckCommand:defaultAccess( ULib.ACCESS_ADMIN )
 trainFuckCommand:help( "Trainfucks target(s)" )
