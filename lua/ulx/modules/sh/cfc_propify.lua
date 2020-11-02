@@ -8,6 +8,8 @@ local HOP_STRENGTH = 400
 local HOP_COOLDOWN = 2
 
 local function propifyPlayer( ply, modelPath )
+    local canPropify = hook.Call("CFC_ULX_PropifyPlayer", ply) ~= false
+    if not canPropify then return ply:GetNick() + " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
     
     if ply:InVehicle() then
