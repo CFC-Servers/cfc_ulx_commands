@@ -22,7 +22,7 @@ function yeetPlayer( caller, targets, strength )
 			
     end
 
-    v:SetVelocity( Vector( math.random( 50000 ) -20000, math.random( 50000 ) -20000, math.Clamp( strength, MIN_STRENGTH, MAX_STRENGTH ) or DEFAULT_STRENGTH ) )  
+    v:SetVelocity( Vector( math.random( 50000 ) -20000, math.random( 50000 ) -20000, math.Clamp( strength, DEFAULT_STRENGTH, MAX_STRENGTH ) )  
 		
     end
 
