@@ -11,7 +11,7 @@ local trainSounds = {
     "garrysmod/save_load1.wav"
 }
                     
-local function trainFuck.trainFuckPlayers( callingPlayer, targetPlayers )
+local function cmd.trainFuckPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
         local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
