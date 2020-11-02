@@ -1,5 +1,5 @@
-CFCUlxCommands.Propify = CFCUlxCommands.Propify or {}
-local cmd = CFCUlxCommands.Propify
+CFCUlxCommands.propify = CFCUlxCommands.propify or {}
+local cmd = CFCUlxCommands.propify
 
 local CATEGORY_NAME = "Fun"
 local PROP_MAX_SIZE = 100
@@ -73,7 +73,7 @@ local function unpropifyPlayer( ply )
     ulx.clearExclusive( ply )
 end
 
-function cmd.PropifyTargets( caller, targets, modelPath, shouldUnpropify )
+function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
     local err
     local prop
@@ -108,7 +108,7 @@ function cmd.PropifyTargets( caller, targets, modelPath, shouldUnpropify )
     return prop
 end
 
-local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.PropifyTargets, "!propify" )
+local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.propifyTargets, "!propify" )
 propifyCommand:addParam{ type = ULib.cmds.PlayersArg }
 propifyCommand:addParam{ type = ULib.cmds.StringArg, default = PROP_DEFAULT_MODEL, ULib.cmds.optional }
 propifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }

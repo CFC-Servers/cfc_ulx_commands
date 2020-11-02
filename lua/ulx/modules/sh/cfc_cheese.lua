@@ -1,5 +1,5 @@
-CFCUlxCommands.Cheese = CFCUlxCommands.Cheese or {}
-local cmd = CFCUlxCommands.Cheese
+CFCUlxCommands.cheese = CFCUlxCommands.cheese or {}
+local cmd = CFCUlxCommands.cheese
 
 cmd.CHEESE_MODELS = {
     "models/hunter/triangles/025x025.mdl",
@@ -9,9 +9,9 @@ cmd.CHEESE_MODELS = {
 }
 local CATEGORY_NAME = "Fun"
 
-function cmd.CheeseTargets( caller, targets, shouldUncheese )
+function cmd.cheeseTargets( caller, targets, shouldUncheese )
     local model = cmd.CHEESE_MODELS[ math.random( #cmd.CHEESE_MODELS ) ]
-    local prop = CFCUlxCommands.Propify.PropifyTargets( caller, targets, model, shouldUncheese )
+    local prop = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
     
     if not prop then return end
     
@@ -21,7 +21,7 @@ function cmd.CheeseTargets( caller, targets, shouldUncheese )
     prop:GetPhysicsObject():SetMaterial( "dirt" )
 end
 
-local cheeseCommand = ulx.command( CATEGORY_NAME, "ulx cheese", cmd.CheeseTargets, "!cheese" )
+local cheeseCommand = ulx.command( CATEGORY_NAME, "ulx cheese", cmd.cheeseTargets, "!cheese" )
 cheeseCommand:addParam{ type = ULib.cmds.PlayersArg }
 cheeseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 cheeseCommand:defaultAccess( ULib.ACCESS_ADMIN )
