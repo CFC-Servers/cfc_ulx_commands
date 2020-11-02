@@ -8,5 +8,4 @@ function ENT:Initialize()
     self:SetSolid( SOLID_VPHYSICS )
     self:SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS )
     self:PhysWake()
-    
 end
