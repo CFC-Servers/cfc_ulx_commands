@@ -1,6 +1,5 @@
 local CATEGORY_NAME = "Fun"
 
-local MIN_STRENGTH = 6000	
 local MAX_STRENGTH = 500000	
 local DEFAULT_STRENGTH = 6000 
 
