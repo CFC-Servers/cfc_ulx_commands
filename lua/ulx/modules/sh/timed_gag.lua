@@ -1,3 +1,6 @@
+CFCUlxCommands.tGag = CFCUlxCommands.tGag or {}
+local cmd = CFCUlxCommands.tGag
+
 -- Constants
 local ULX_CATEGORY_NAME = "Chat"
 local GAGS_SQL_TABLE = "cfc_timed_gags"
@@ -243,7 +246,7 @@ end
 
 -- ULX COMMAND SETUP --
 
-local function timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
+function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
     ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
 
     -- time > 100 years
@@ -254,7 +257,7 @@ local function timeGag( callingPlayer, targetPlayers, minutesToGag, reason )
     end
 end
 
-local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", timeGag, "!tgag" )
+local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", cmd.timeGag, "!tgag" )
 timeGagCommand:addParam{ type = ULib.cmds.PlayersArg }
 timeGagCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
 timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
