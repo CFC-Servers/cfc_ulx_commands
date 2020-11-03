@@ -10,7 +10,7 @@ cmd.CHEESE_MODELS = {
 local CATEGORY_NAME = "Fun"
 
 function cmd.cheeseTargets( caller, targets, shouldUncheese )
-    local model = cmd.CHEESE_MODELS[ math.random( #cmd.CHEESE_MODELS ) ]
+    local model = cmd.CHEESE_MODELS[math.random( #cmd.CHEESE_MODELS )]
     local prop = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
     
     if not prop then return end
