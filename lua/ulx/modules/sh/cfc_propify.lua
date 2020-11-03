@@ -8,8 +8,8 @@ local HOP_STRENGTH = 400
 local HOP_COOLDOWN = 2
 
 local function propifyPlayer( ply, modelPath )
-    local canPropify = hook.Call("CFC_ULX_PropifyPlayer", ply) ~= false
-    if not canPropify then return ply:GetNick() + " cannot be propified!" end
+    local canPropify = hook.Call( "CFC_ULX_PropifyPlayer", ply ) ~= false
+    if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
     
     if ply:InVehicle() then
@@ -77,27 +77,26 @@ end
 
 function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
-    local err
     local prop
     
-    for _, v in pairs( targets ) do
+    for _, ply in pairs( targets ) do
         if not shouldUnpropify then
-            if ulx.getExclusive( v, caller ) then
-                ULib.tsayError( caller, ulx.getExclusive( v, caller ), true )
-            elseif not v:Alive() then
-                ULib.tsayError( caller, v:Nick() .. " is dead and cannot be propified!", true )
+            if ulx.getExclusive( ply, caller ) then
+                ULib.tsayError( caller, ulx.getExclusive( ply, caller ), true )
+            elseif not ply:Alive() then
+                ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
-                err, prop = propifyPlayer( v, modelPath )
+                err, prop = propifyPlayer( ply, modelPath )
                 
                 if not err then
-                    table.insert( affectedPlys, v )
+                    table.insert( affectedPlys, ply )
                 else
                     ULib.tsayError( caller, err, true )
                 end
             end
-        elseif v.ragdoll then
-            unpropifyPlayer( v )
-            table.insert( affectedPlys, v )
+        elseif ply.ragdoll then
+            unpropifyPlayer( ply )
+            table.insert( affectedPlys, ply )
         end
     end
     
@@ -119,46 +118,44 @@ propifyCommand:help( "Turns the target(s) into a prop with the given model." )
 propifyCommand:setOpposite( "ulx unpropify", { _, _, _, true }, "!unpropify" )
 
 local function propifySpawnCheck( ply )
-    if ply.ragdoll then
-        timer.Simple( 0.01, function()
-            if not ply:IsValid() then return end
-            ply:Spectate( OBS_MODE_CHASE )
-            ply:SpectateEntity( ply.ragdoll )
-            ply:StripWeapons()
-        end )
-    end
+    if not ply.ragdoll then return end
+    timer.Simple( 0.01, function()
+        if not ply:IsValid() then return end
+        ply:Spectate( OBS_MODE_CHASE )
+        ply:SpectateEntity( ply.ragdoll )
+        ply:StripWeapons()
+    end )
 end
-hook.Add( "PlayerSpawn", "CFC_ULXPropifySpawnCheck", propifySpawnCheck )
+hook.Add( "PlayerSpawn", "CFC_ULX_PropifySpawnCheck", propifySpawnCheck )
 
 local function propDisconnectedCheck( ply )
-    if ply.ragdoll then
-        ply.ragdoll:DisallowDeleting( false )
-        ply.ragdoll:Remove()
-    end
+    if not ply.ragdoll then return end
+    ply.ragdoll:DisallowDeleting( false )
+    ply.ragdoll:Remove()
 end
-hook.Add( "PlayerDisconnected", "CFC_ULXPropDisconnectedCheck", propDisconnectedCheck, HOOK_MONITOR_HIGH )
+hook.Add( "PlayerDisconnected", "CFC_ULX_RemovePropifyRagdoll", propDisconnectedCheck, HOOK_MONITOR_HIGH )
 
 local function removePropOnCleanup()
     local players = player.GetAll()
-    for _, v in pairs( players ) do
-        if v.ragdoll then
-            v.propifyAfterCleanup = true
-            unpropifyPlayer( v )
+    for _, ply in pairs( players ) do
+        if ply.ragdoll then
+            ply.propifyAfterCleanup = true
+            unpropifyPlayer( ply )
         end
     end
 end
-hook.Add( "PreCleanupMap", "CFC_ULXPropBeforeCleanup", removePropOnCleanup )
+hook.Add( "PreCleanupMap", "CFC_ULX_RemovePropify", removePropOnCleanup )
 
 local function createPropAfterCleanup()
     local players = player.GetAll()
-    for _, v in pairs( players ) do
-        if v.propifyAfterCleanup then
-            v.propifyAfterCleanup = nil
-            timer.Simple( 0.1, function() propifyPlayer( v ) end )
+    for _, ply in pairs( players ) do
+        if ply.propifyAfterCleanup then
+            ply.propifyAfterCleanup = nil
+            timer.Simple( 0.1, function() propifyPlayer( ply ) end )
         end
     end
 end
-hook.Add( "PostCleanupMap", "CFC_ULXPropAfterCleanup", createPropAfterCleanup )
+hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 
 --Player movement:
 local function propHop( ply, keyNum )
@@ -186,25 +183,25 @@ local function propHop( ply, keyNum )
         phys:ApplyForceCenter( Vector( 0, 0, hopStrength ) )
     end
 end
-hook.Add( "KeyPress", "CFC_ULXPropHop", propHop )
+hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
 --Prevents propified players from picking themselves up
 local function disallowGrab( ply, _ )
     if ply.ragdoll then return false end
     return true
 end
-hook.Add( "AllowPlayerPickup", "CFC_ULXPropifyDisallowGrab", disallowGrab )
+hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDisallowGrab", disallowGrab )
 
 --Prevents breakable props from existing after being broken
 local function removePropOnBreak( _, prop )
     if not prop.ragdolledPly then return end
-    cmd.propifyTargets( __, { prop.ragdolledPly }, __, true )
+    cmd.propifyTargets( nil, { prop.ragdolledPly }, nil, true )
 end
-hook.Add( "PropBreak", "CFC_ULXPropifyRemoveProp", removePropOnBreak )
+hook.Add( "PropBreak", "CFC_ULX_PropifyRemoveProp", removePropOnBreak )
 
 --Prevents propified players from damaging other people
 local function ignorePropifyDamage( victim, dmgInfo )
     if not dmgInfo:GetAttacker().ragdolledPly then return end
     return true
 end
-hook.Add( "EntityTakeDamage", "CFC_ULXPropifyIgnoreDamage", ignorePropifyDamage )
+hook.Add( "EntityTakeDamage", "CFC_ULX_PropifyIgnoreDamage", ignorePropifyDamage )
