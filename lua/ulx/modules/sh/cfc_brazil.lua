@@ -78,14 +78,10 @@ local function getRandomPos( caller, target )
         return ulx.getExclusive( target, caller )
     end
     
-    target.ulx_prevpos = target:GetPos()
-    target.ulx_prevang = target:EyeAngles()
-    
     if target:InVehicle() then
         target:ExitVehicle()
     end
     
-    target:SetLocalVelocity( Vector( 0, 0, 0 ) )
     local mapData = MAP_POSITION_DATA[game.GetMap()]
     
     for _ = 1, MAX_TRIES do
@@ -126,12 +122,20 @@ local function getRandomPos( caller, target )
     return nil, fallback + randomOffset
 end
 
-local function sendToPos( caller, targets, message )
+local function sendToPos( caller, targets, message, doSlap )
     for _, ply in pairs( targets ) do
         local err, pos = getRandomPos( caller, ply )
         
         if not err then
-            ply:SetPos( pos )
+            ply.ulx_prevpos = ply:GetPos()
+            ply.ulx_prevang = ply:EyeAngles()
+            
+            if doSlap then
+                ULib.slap( ply, 0, 700, false )
+                timer.Simple( 0.5, function() ply:SetPos( pos ) end )
+            else
+                ply:SetPos( pos )
+            end
         else
             ULib.tsayError( caller, err, true )
         end
@@ -141,11 +145,11 @@ local function sendToPos( caller, targets, message )
 end
 
 function cmd.runBrazil( caller, targets )
-    sendToPos( caller, targets, "#A sent #T to Brazil" )
+    sendToPos( caller, targets, "#A sent #T to Brazil", true )
 end
 
 function cmd.runRandTp( caller, targets )
-    sendToPos( caller, targets, "#A randomly teleported #T" )
+    sendToPos( caller, targets, "#A randomly teleported #T", false )
 end
 
 local brazilCommand = ulx.command( CATEGORY_TYPE, "ulx brazil", cmd.runBrazil, "!brazil" )
