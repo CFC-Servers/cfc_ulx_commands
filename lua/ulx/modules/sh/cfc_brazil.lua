@@ -71,9 +71,24 @@ local MAP_POSITION_DATA = {
     }
 }
 
-local function getRandomPos( ply )
+local function getRandomPos( caller, target )
+    if not target:IsValid() then return "You can't send the console to brazil!" end
+    if not target:Alive() then return target:Nick() .. " is dead!" end
+    if ulx.getExclusive( target, caller ) then
+        return ulx.getExclusive( target, caller )
+    end
+    
+    target.ulx_prevpos = target:GetPos()
+    target.ulx_prevang = target:EyeAngles()
+    
+    if target:InVehicle() then
+        target:ExitVehicle()
+    end
+    
+    target:SetLocalVelocity( Vector( 0, 0, 0 ) )
+    local mapData = MAP_POSITION_DATA[game.GetMap()]
+    
     for _ = 1, MAX_TRIES do
-        local mapData = MAP_POSITION_DATA[game.GetMap()]
         local pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), math.random( MIN_Z, MAX_Z ) )
         
         if mapData then
@@ -81,7 +96,7 @@ local function getRandomPos( ply )
         end
         
         if util.IsInWorld( pos ) then
-            local minHull, maxHull = ply:GetCollisionBounds()
+            local minHull, maxHull = target:GetCollisionBounds()
             
             local validationTrace = util.TraceHull( {
                 start = pos,
@@ -98,22 +113,28 @@ local function getRandomPos( ply )
                     maxs = maxHull
                 } )
                 
-                return floorTrace.HitPos + Vector( 0, 0, 1 )
+                return nil, floorTrace.HitPos + Vector( 0, 0, 1 )
             end
         end
     end
     
-    if not mapData then return Vector( 0, 0, 0 ) end
+    if not mapData then return nil, Vector( 0, 0, 0 ) end
     
     local fallback = mapData.fallback
     local randomOffset = VectorRand() * Vector( mapData.offsetX, mapdata.offsetY, 0 )
     
-    return fallback + randomOffset
+    return nil, fallback + randomOffset
 end
 
 local function sendToPos( caller, targets, message )
-    for k, v in pairs( targets ) do
-        v:SetPos( getRandomPos( v ) )
+    for _, ply in pairs( targets ) do
+        local err, pos = getRandomPos( caller, ply )
+        
+        if not err then
+            ply:SetPos( pos )
+        else
+            ULib.tsayError( caller, err, true )
+        end
     end
     
     ulx.fancyLogAdmin( caller, message, targets )
