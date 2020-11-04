@@ -11,14 +11,16 @@ local CATEGORY_NAME = "Fun"
 
 function cmd.cheeseTargets( caller, targets, shouldUncheese )
     local model = cmd.CHEESE_MODELS[math.random( #cmd.CHEESE_MODELS )]
-    local prop = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
+    local props = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
     
-    if not prop then return end
+    if table.IsEmpty( props ) then return end
     
-    local color = Color( 255, math.Rand( 150, 221 ), 6, 255 )
-    prop:SetMaterial( "models/XQM/Rails/gumball_1" )
-    prop:SetColor( color  )
-    prop:GetPhysicsObject():SetMaterial( "dirt" )
+    for _, prop in pairs( props ) do
+        local color = Color( 255, math.Rand( 150, 221 ), 6, 255 )
+        prop:SetMaterial( "models/XQM/Rails/gumball_1" )
+        prop:SetColor( color  )
+        prop:GetPhysicsObject():SetMaterial( "dirt" )
+    end
 end
 
 local cheeseCommand = ulx.command( CATEGORY_NAME, "ulx cheese", cmd.cheeseTargets, "!cheese" )
