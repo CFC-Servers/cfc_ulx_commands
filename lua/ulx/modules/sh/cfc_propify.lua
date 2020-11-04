@@ -77,7 +77,7 @@ end
 
 function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
-    local prop
+    local props = {}
     
     for _, ply in pairs( targets ) do
         if not shouldUnpropify then
@@ -86,10 +86,11 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
             elseif not ply:Alive() then
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
-                err, prop = propifyPlayer( ply, modelPath )
+                local err, prop = propifyPlayer( ply, modelPath )
                 
                 if not err then
                     table.insert( affectedPlys, ply )
+                    table.insert( props, prop )
                 else
                     ULib.tsayError( caller, err, true )
                 end
@@ -106,7 +107,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
         ulx.fancyLogAdmin( caller, "#A unpropified #T", affectedPlys )
     end
     
-    return prop
+    return props
 end
 
 local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.propifyTargets, "!propify" )
