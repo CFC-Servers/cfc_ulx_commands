@@ -7,12 +7,11 @@ function yeetPlayer( caller, targets, strength )
 	
     for _, v in pairs( targets ) do
 		
-    if not v:IsPlayer() then return end
-    if not v:Alive() then return end
+    	if not v:IsPlayer() then return end
 
-    if v:IsFrozen() then
+    	if v:IsFrozen() then
 		
-   	    v:Freeze( false )
+   	    	v:Freeze( false )
 					
     end
 	
