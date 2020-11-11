@@ -101,6 +101,8 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
         end
     end
     
+    if not IsValid( caller ) then return props end
+    
     if not shouldUnpropify then
         ulx.fancyLogAdmin( caller, "#A propified #T", affectedPlys )
     else
@@ -186,17 +188,17 @@ local function propHop( ply, keyNum )
 end
 hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
---Prevents propified players from picking themselves up
+--Prevents ragdolled and propified players from pressing use on anything
 local function disallowGrab( ply, _ )
     if ply.ragdoll then return false end
-    return true
 end
-hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDisallowGrab", disallowGrab )
+hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
+hook.Remove("PlayerUse", "InstrumentChairModelHook") --This unnecessary hook breaks PlayerUse, removing it is temporary until the workshop addon gets updated
 
 --Prevents breakable props from existing after being broken
 local function removePropOnBreak( _, prop )
     if not prop.ragdolledPly then return end
-    cmd.propifyTargets( nil, { prop.ragdolledPly }, nil, true )
+    unpropifyPlayer( prop.ragdolledPly )
 end
 hook.Add( "PropBreak", "CFC_ULX_PropifyRemoveProp", removePropOnBreak )
 
