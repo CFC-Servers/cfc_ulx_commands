@@ -194,7 +194,7 @@ local function disallowGrab( ply, _ )
     if ply.ragdoll then return false end
 end
 hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
-hook.Remove("PlayerUse", "InstrumentChairModelHook") --This unnecessary hook breaks PlayerUse, removing it is temporary until the workshop addon gets updated
+hook.Remove( "PlayerUse", "InstrumentChairModelHook" ) --This unnecessary hook breaks PlayerUse, removing it is temporary until the workshop addon gets updated
 
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
