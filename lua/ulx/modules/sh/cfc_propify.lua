@@ -38,9 +38,7 @@ local function propifyPlayer( ply, modelPath )
     ply:SpectateEntity( prop )
     ply:StripWeapons()
     
-    prop:DisallowDeleting( true, function( old, new )
-        if ply:IsValid() then ply.prop = new end
-    end )
+    prop:DisallowDeleting( true, _, true )
     ply:DisallowSpawning( true )
     
     ply.ragdoll = prop
@@ -50,6 +48,8 @@ local function propifyPlayer( ply, modelPath )
 end
 
 local function unpropifyPlayer( ply )
+    if not ply then return end
+    
     ply:DisallowSpawning( false )
     ply:SetParent()
 
@@ -57,7 +57,7 @@ local function unpropifyPlayer( ply )
 
     local prop = ply.ragdoll
     ply.ragdoll = nil
-
+    
     if not prop:IsValid() then
         ULib.spawn( ply, true )
     else
@@ -68,6 +68,7 @@ local function unpropifyPlayer( ply )
         ply:SetPos( pos )
         ply:SetVelocity( prop:GetVelocity() )
         ply:SetAngles( Angle( 0, prop:GetAngles().yaw, 0 ) )
+        prop.ragdolledPly = nil
         prop:DisallowDeleting( false )
         prop:Remove()
     end
@@ -195,12 +196,12 @@ end
 hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
 hook.Remove("PlayerUse", "InstrumentChairModelHook") --This unnecessary hook breaks PlayerUse, removing it is temporary until the workshop addon gets updated
 
---Prevents breakable props from existing after being broken
-local function removePropOnBreak( _, prop )
+--Prevents propify props from existing after being removed, including breakable props breaking
+local function unpropifyOnRemove( prop )
     if not prop.ragdolledPly then return end
     unpropifyPlayer( prop.ragdolledPly )
 end
-hook.Add( "PropBreak", "CFC_ULX_PropifyRemoveProp", removePropOnBreak )
+hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
 
 --Prevents propified players from damaging other people
 local function ignorePropifyDamage( victim, dmgInfo )
