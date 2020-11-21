@@ -8,7 +8,7 @@ local HOP_STRENGTH = 400
 local HOP_COOLDOWN = 2
 
 local function propifyPlayer( caller, ply, modelPath )
-    local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply ) ~= false
+    local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
     
@@ -47,7 +47,7 @@ local function propifyPlayer( caller, ply, modelPath )
     return nil, prop
 end
 
-local function unpropifyPlayer( ply )
+function cmd.unpropifyPlayer( ply )
     if not ply then return end
     
     ply:DisallowSpawning( false )
@@ -97,7 +97,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
                 end
             end
         elseif ply.ragdoll then
-            unpropifyPlayer( ply )
+            cmd.unpropifyPlayer( ply )
             table.insert( affectedPlys, ply )
         end
     end
@@ -144,7 +144,7 @@ local function removePropOnCleanup()
     for _, ply in pairs( players ) do
         if ply.ragdoll then
             ply.propifyAfterCleanup = true
-            unpropifyPlayer( ply )
+            cmd.unpropifyPlayer( ply )
         end
     end
 end
@@ -199,7 +199,7 @@ hook.Remove( "PlayerUse", "InstrumentChairModelHook" ) --This unnecessary hook b
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
     if not prop.ragdolledPly then return end
-    unpropifyPlayer( prop.ragdolledPly )
+    cmd.unpropifyPlayer( prop.ragdolledPly )
 end
 hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
 
