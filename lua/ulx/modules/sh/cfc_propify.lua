@@ -7,8 +7,8 @@ local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
 local HOP_STRENGTH = 400
 local HOP_COOLDOWN = 2
 
-local function propifyPlayer( ply, modelPath )
-    local canPropify = hook.Call( "CFC_ULX_PropifyPlayer", ply ) ~= false
+local function propifyPlayer( caller, ply, modelPath )
+    local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply ) ~= false
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
     
@@ -87,7 +87,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
             elseif not ply:Alive() then
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
-                local err, prop = propifyPlayer( ply, modelPath )
+                local err, prop = propifyPlayer( caller, ply, modelPath )
                 
                 if not err then
                     table.insert( affectedPlys, ply )
