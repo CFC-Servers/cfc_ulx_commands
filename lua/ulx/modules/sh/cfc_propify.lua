@@ -165,11 +165,11 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 local function propHop( ply, keyNum )
     if not ply.ragdoll or not ply.ragdoll:GetClass() == "prop_physics" then return end
     
-    ply.propifiedlastPressed = ply.propifiedlastPressed or 0
+    ply.propifyLastHop = ply.propifyLastHop or 0
     
-    if ply.propifiedlastPressed + HOP_COOLDOWN:GetFloat() > CurTime() then return end
+    if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
     
-    ply.propifiedlastPressed = CurTime()
+    ply.propifyLastHop = CurTime()
     
     local phys = ply.ragdoll:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
