@@ -164,6 +164,7 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 --Player movement:
 local function propHop( ply, keyNum )
     if not ply.ragdoll then return end
+    if prop.propifyNoHop then return end
     
     local isRagdoll = ply.ragdoll:GetClass() == "prop_ragdoll"
     ply.propifyLastHop = ply.propifyLastHop or 0
