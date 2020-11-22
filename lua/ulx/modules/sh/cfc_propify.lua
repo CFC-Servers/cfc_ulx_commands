@@ -163,8 +163,9 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 
 --Player movement:
 local function propHop( ply, keyNum )
-    if not ply.ragdoll or not ply.ragdoll:GetClass() == "prop_physics" then return end
+    if not ply.ragdoll then return end
     
+    local isRagdoll = ply.ragdoll:GetClass() == "prop_ragdoll"
     ply.propifyLastHop = ply.propifyLastHop or 0
     
     if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
@@ -174,7 +175,18 @@ local function propHop( ply, keyNum )
     local phys = ply.ragdoll:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
     local eyeAngles = ply:EyeAngles()
-
+    
+    if isRagdoll then
+        local boneID = ply.ragdoll:LookupBone( "ValveBiped.Bip01_Spine2" )
+        
+        if boneID then
+            local physID = ply.ragdoll:TranslateBoneToPhysBone( boneID )
+            phys = ply.ragdoll:GetPhysicsObjectNum( physID )
+        end
+    end
+    
+    if not phys then return end
+    
     if keyNum == IN_FORWARD then
         phys:ApplyForceCenter( eyeAngles:Forward() * hopStrength )
     elseif keyNum == IN_BACK then
