@@ -2,10 +2,10 @@ CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
 local CATEGORY_NAME = "Fun"
-local PROP_MAX_SIZE = 100
 local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
-local HOP_STRENGTH = 400
-local HOP_COOLDOWN = 2
+local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE, "The max radius allowed for propify models (default 150)", 0, 50000 )
+local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
+local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
 
 local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
@@ -22,7 +22,7 @@ local function propifyPlayer( caller, ply, modelPath )
     local prop = ents.Create( "prop_physics" )
     prop:SetModel( modelPath )
     
-    if prop:BoundingRadius() > PROP_MAX_SIZE then
+    if prop:BoundingRadius() > PROP_MAX_SIZE:GetFloat() then
         prop:Remove()
         return "Model too big!"
     end
@@ -167,12 +167,12 @@ local function propHop( ply, keyNum )
     
     ply.propifiedlastPressed = ply.propifiedlastPressed or 0
     
-    if ply.propifiedlastPressed + HOP_COOLDOWN > CurTime() then return end
+    if ply.propifiedlastPressed + HOP_COOLDOWN:GetFloat() > CurTime() then return end
     
     ply.propifiedlastPressed = CurTime()
     
     local phys = ply.ragdoll:GetPhysicsObject()
-    local hopStrength = HOP_STRENGTH * phys:GetMass()
+    local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
     local eyeAngles = ply:EyeAngles()
 
     if keyNum == IN_FORWARD then
