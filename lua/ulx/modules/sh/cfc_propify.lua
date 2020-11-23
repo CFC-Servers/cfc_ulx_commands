@@ -11,59 +11,59 @@ local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
-    
+
     if ply:InVehicle() then
         local vehicle = ply:GetParent()
         ply:ExitVehicle()
     end
-    
+
     ULib.getSpawnInfo( ply )
-    
+
     local prop = ents.Create( "prop_physics" )
     prop:SetModel( modelPath )
-    
+
     if prop:BoundingRadius() > PROP_MAX_SIZE:GetFloat() then
         prop:Remove()
         return "Model too big!"
     end
-    
+
     prop.ragdolledPly = ply
     prop:SetPos( ply:WorldSpaceCenter() )
     prop:SetAngles( ply:GetAngles() )
     prop:Spawn()
     prop:Activate()
     prop:GetPhysicsObject():SetVelocity( ply:GetVelocity() )
-    
+
     ply:Spectate( OBS_MODE_CHASE )
     ply:SpectateEntity( prop )
     ply:StripWeapons()
-    
+
     prop:DisallowDeleting( true, _, true )
     ply:DisallowSpawning( true )
-    
+
     ply.ragdoll = prop
     ulx.setExclusive( ply, "ragdolled" )
-    
+
     return nil, prop
 end
 
 function cmd.unpropifyPlayer( ply )
     if not ply then return end
-    
+
     ply:DisallowSpawning( false )
     ply:SetParent()
-    
+
     ply:UnSpectate()
-    
+
     local prop = ply.ragdoll
     ply.ragdoll = nil
-    
+
     if not prop:IsValid() then
         ULib.spawn( ply, true )
     else
         local pos = prop:GetPos()
         pos.z = pos.z + 10
-        
+
         ULib.spawn( ply, true )
         ply:SetPos( pos )
         ply:SetVelocity( prop:GetVelocity() )
@@ -72,14 +72,14 @@ function cmd.unpropifyPlayer( ply )
         prop:DisallowDeleting( false )
         prop:Remove()
     end
-    
+
     ulx.clearExclusive( ply )
 end
 
 function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
     local affectedPlys = {}
     local props = {}
-    
+
     for _, ply in pairs( targets ) do
         if not shouldUnpropify then
             if ulx.getExclusive( ply, caller ) then
@@ -88,7 +88,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
                 local err, prop = propifyPlayer( caller, ply, modelPath )
-                
+
                 if not err then
                     table.insert( affectedPlys, ply )
                     table.insert( props, prop )
@@ -101,15 +101,15 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
             table.insert( affectedPlys, ply )
         end
     end
-    
+
     if not IsValid( caller ) then return props end
-    
+
     if not shouldUnpropify then
         ulx.fancyLogAdmin( caller, "#A propified #T", affectedPlys )
     else
         ulx.fancyLogAdmin( caller, "#A unpropified #T", affectedPlys )
     end
-    
+
     return props
 end
 
@@ -165,29 +165,29 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 local function propHop( ply, keyNum )
     if not ply.ragdoll then return end
     if prop.propifyNoHop then return end
-    
+
     local isRagdoll = ply.ragdoll:GetClass() == "prop_ragdoll"
     ply.propifyLastHop = ply.propifyLastHop or 0
-    
+
     if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
-    
+
     ply.propifyLastHop = CurTime()
-    
+
     local phys = ply.ragdoll:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
     local eyeAngles = ply:EyeAngles()
-    
+
     if isRagdoll then
         local boneID = ply.ragdoll:LookupBone( "ValveBiped.Bip01_Spine2" )
-        
+
         if boneID then
             local physID = ply.ragdoll:TranslateBoneToPhysBone( boneID )
             phys = ply.ragdoll:GetPhysicsObjectNum( physID )
         end
     end
-    
+
     if not phys then return end
-    
+
     if keyNum == IN_FORWARD then
         phys:ApplyForceCenter( eyeAngles:Forward() * hopStrength )
     elseif keyNum == IN_BACK then
