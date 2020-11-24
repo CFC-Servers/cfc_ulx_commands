@@ -58,7 +58,7 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
 
-    if not prop:IsValid() then
+    if not IsValid( prop ) then
         ULib.spawn( ply, true )
     else
         local pos = prop:GetPos()
@@ -164,25 +164,26 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 --Player movement:
 local function propHop( ply, keyNum )
     if not ply.ragdoll then return end
-    if prop.propifyNoHop then return end
+    if ply.ragdoll.propifyNoHop then return end
 
-    local isRagdoll = ply.ragdoll:GetClass() == "prop_ragdoll"
+    local prop = ply.ragdoll
+    local isRagdoll = prop:GetClass() == "prop_ragdoll"
     ply.propifyLastHop = ply.propifyLastHop or 0
 
     if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
 
     ply.propifyLastHop = CurTime()
 
-    local phys = ply.ragdoll:GetPhysicsObject()
+    local phys = prop:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
     local eyeAngles = ply:EyeAngles()
 
     if isRagdoll then
-        local boneID = ply.ragdoll:LookupBone( "ValveBiped.Bip01_Spine2" )
+        local boneID = prop:LookupBone( "ValveBiped.Bip01_Spine2" )
 
         if boneID then
-            local physID = ply.ragdoll:TranslateBoneToPhysBone( boneID )
-            phys = ply.ragdoll:GetPhysicsObjectNum( physID )
+            local physID = prop:TranslateBoneToPhysBone( boneID )
+            phys = prop:GetPhysicsObjectNum( physID )
         end
     end
 
