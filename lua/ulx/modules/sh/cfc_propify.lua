@@ -163,7 +163,7 @@ hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 
 --Player movement:
 local function propHop( ply, keyNum )
-    if not ply.ragdoll then return end
+    if not IsValid( ply.ragdoll ) then return end
     if ply.ragdoll.propifyNoHop then return end
 
     local prop = ply.ragdoll
@@ -211,14 +211,14 @@ hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
 
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
-    if not prop.ragdolledPly then return end
+    if not IsValid( prop.ragdolledPly ) then return end
     cmd.unpropifyPlayer( prop.ragdolledPly )
 end
 hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
 
 --Prevents propified players from damaging other people
 local function ignorePropifyDamage( victim, dmgInfo )
-    if not dmgInfo:GetAttacker().ragdolledPly then return end
+    if not IsValid( dmgInfo:GetAttacker().ragdolledPly ) then return end
     return true
 end
 hook.Add( "EntityTakeDamage", "CFC_ULX_PropifyIgnoreDamage", ignorePropifyDamage )
