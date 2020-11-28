@@ -58,7 +58,7 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
 
-    if not IsValid( ply ) then
+    if not IsValid( prop ) then
         ULib.spawn( ply, true )
     else
         local pos = prop:GetPos()
@@ -201,6 +201,8 @@ hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
     if not IsValid( prop.ragdolledPly ) then return end
+    if not IsValid( prop.ragdolledPly.ragdoll ) then return end
+
     cmd.unpropifyPlayer( prop.ragdolledPly )
 end
 hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
