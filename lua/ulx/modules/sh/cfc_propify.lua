@@ -58,7 +58,7 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
 
-    if not IsValid( prop ) then
+    if not prop:IsValid() then
         ULib.spawn( ply, true )
     else
         local pos = prop:GetPos()
