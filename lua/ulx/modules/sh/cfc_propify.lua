@@ -58,7 +58,7 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
 
-    if not prop:IsValid() then
+    if not IsValid( prop ) then
         ULib.spawn( ply, true )
     else
         local pos = prop:GetPos()
@@ -120,17 +120,6 @@ propifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 propifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 propifyCommand:help( "Turns the target(s) into a prop with the given model." )
 propifyCommand:setOpposite( "ulx unpropify", { _, _, _, true }, "!unpropify" )
-
-local function propifySpawnCheck( ply )
-    if not ply.ragdoll then return end
-    timer.Simple( 0.01, function()
-        if not ply:IsValid() then return end
-        ply:Spectate( OBS_MODE_CHASE )
-        ply:SpectateEntity( ply.ragdoll )
-        ply:StripWeapons()
-    end )
-end
-hook.Add( "PlayerSpawn", "CFC_ULX_PropifySpawnCheck", propifySpawnCheck )
 
 local function propDisconnectedCheck( ply )
     if not ply.ragdoll then return end
