@@ -21,7 +21,7 @@ end
 local checkluaCommand = ulx.command( CATEGORY_NAME, "ulx checklua", cmd.checkluaPlayers, "!checklua" )
 checkluaCommand:addParam{ type = ULib.cmds.PlayersArg }
 checkluaCommand:defaultAccess( ULib.ACCESS_ADMIN )
-checkluaCommand:help( "Checks target(s) sv_allowcslua" )
+checkluaCommand:help( "Checks target(s) sv_allowcslua, true means they modified their client value." )
 
 if CLIENT then
     net.Receive( "CFC_ULX_StatCheckCL", function()
