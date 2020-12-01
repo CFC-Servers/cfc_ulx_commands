@@ -2,20 +2,30 @@ CFCUlxCommands.checklua = CFCUlxCommands.checklua or {}
 local cmd = CFCUlxCommands.checklua
 
 CATEGORY_NAME = "Utility"
-                    
+
+if SERVER then
+    util.AddNetworkString( "CFC_ULX_StatCheckCL" )
+    util.AddNetworkString( "CFC_ULX_StatCheckSV" )
+end
+
+local awaitingResponse = {}
+
+net.Receive( "CFC_ULX_StatCheckSV", function( _, ply )
+    if not ply.waitingOnVar then return end
+    convar = net.ReadBool()
+    ply.waitingOnVar = false
+    ulx.fancyLogAdmin( awaitingResponse[ply], true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
+
+    awaitingResponse[ply] = nil
+end )
+
 function cmd.checkluaPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
         ply.waitingOnVar = true
+        awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_StatCheckCL" )
         net.Send( ply )
     end
-
-    net.Receive( "CFC_ULX_StatCheckSV", function( _, ply )
-        if not ply.waitingOnVar then return end
-        convar = net.ReadBool()
-        ply.waitingOnVar = false
-        ulx.fancyLogAdmin( callingPlayer, true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
-    end )
 end
 
 local checkluaCommand = ulx.command( CATEGORY_NAME, "ulx checklua", cmd.checkluaPlayers, "!checklua" )
