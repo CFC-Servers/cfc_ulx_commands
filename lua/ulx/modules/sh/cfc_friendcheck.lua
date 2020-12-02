@@ -9,7 +9,6 @@ if SERVER then
 end
 
 local awaitingResponse = {}
-local targettedPlayers
 
 net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     if not ply.waitingOnFriendCheck then return end
@@ -27,17 +26,16 @@ net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     caller:PrintMessage( 2 , "=======================" )
 
     awaitingResponse[ply] = nil
+    ulx.fancyLogAdmin( caller, true, "#A checked #T's friends." , ply )
 end )
 
 function cmd.friendcheckPlayers( callingPlayer, targetPlayers )
-    targettedPlayers = targetPlayers
     for _, ply in pairs( targetPlayers ) do
         ply.waitingOnFriendCheck = true
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_FriendCheckSend" )
         net.Send( ply )
     end
-    ulx.fancyLogAdmin( callingPlayer, true, "#A checked #T's friends." , targettedPlayers )
 end
 
 if CLIENT then
