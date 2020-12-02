@@ -15,7 +15,15 @@ net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     local friendTable = net.ReadTable()
     ply.waitingOnFriendCheck = false
 
-    PrintTable( friendTable )
+    local caller = awaitingResponse[ply]
+    
+    caller:PrintMessage( 2 , "\n=======================" )
+    caller:PrintMessage( 2 , ply:Name() .. "'s friend statuses:" )
+    for target, status in pairs( friendTable ) do
+        caller:PrintMessage( 2 , target:Name() .. " : " .. status )
+    end
+    caller:PrintMessage( 2 , "=======================\n " )
+
     ulx.fancyLogAdmin( awaitingResponse[ply], true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
 
     awaitingResponse[ply] = nil
@@ -31,13 +39,21 @@ function cmd.friendcheckPlayers( callingPlayer, targetPlayers )
 end
 
 if CLIENT then
-    net.Receive( "CFC_ULX_FriendCheckSend", function()
-        local friendTable
+    local friendTable = {}
+    function getFriendStatus( ply )
+        if ply == LocalPlayer() then return end
 
-        for _, ply in pairs( player.GetHumans() ) do
-            local friendStatus = ply:GetFriendStatus()
-            if friendStatus == "none" then return end
-            table.insert( friendTable, ply, friendStatus )
+        local friendStatus = ply:GetFriendStatus()
+        if friendStatus == "none" then return end
+
+        friendTable[ply] = friendStatus
+    end
+
+    net.Receive( "CFC_ULX_FriendCheckSend", function()
+        friendTable = {}
+        local onlinePlayers = player.GetHumans()
+        for _, ply in pairs( onlinePlayers ) do
+            getFriendStatus( ply )
         end
 
         net.Start( "CFC_ULX_FriendCheckRecieve" )
