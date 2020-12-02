@@ -9,6 +9,7 @@ if SERVER then
 end
 
 local awaitingResponse = {}
+local targettedPlayers
 
 net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     if not ply.waitingOnFriendCheck then return end
@@ -18,24 +19,25 @@ net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     local caller = awaitingResponse[ply]
     
     caller:PrintMessage( 2 , "\n=======================" )
-    caller:PrintMessage( 2 , ply:Name() .. "'s friend statuses:" )
+    caller:PrintMessage( 2 , ply:Name() .. "'s friends:" )
+    caller:PrintMessage( 2 , "-----------------------" )
     for target, status in pairs( friendTable ) do
         caller:PrintMessage( 2 , target:Name() .. " : " .. status )
     end
-    caller:PrintMessage( 2 , "=======================\n " )
-
-    ulx.fancyLogAdmin( awaitingResponse[ply], true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
+    caller:PrintMessage( 2 , "=======================" )
 
     awaitingResponse[ply] = nil
 end )
 
 function cmd.friendcheckPlayers( callingPlayer, targetPlayers )
+    targettedPlayers = targetPlayers
     for _, ply in pairs( targetPlayers ) do
         ply.waitingOnFriendCheck = true
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_FriendCheckSend" )
         net.Send( ply )
     end
+    ulx.fancyLogAdmin( callingPlayer, true, "#A checked #T's friends." , targettedPlayers )
 end
 
 if CLIENT then
@@ -65,4 +67,4 @@ end
 local friendcheckCommand = ulx.command( CATEGORY_NAME, "ulx friendcheck", cmd.friendcheckPlayers, "!friendcheck" )
 friendcheckCommand:addParam{ type = ULib.cmds.PlayersArg }
 friendcheckCommand:defaultAccess( ULib.ACCESS_ADMIN )
-friendcheckCommand:help( "Checks the targetted player(s) friends." )
+friendcheckCommand:help( "Checks the targetted player(s) friends and prints the results in the console." )
