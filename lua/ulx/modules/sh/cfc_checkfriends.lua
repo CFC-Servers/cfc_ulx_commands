@@ -1,19 +1,19 @@
-CFCUlxCommands.friendcheck = CFCUlxCommands.friendcheck or {}
-local cmd = CFCUlxCommands.friendcheck
+CFCUlxCommands.checkfriends = CFCUlxCommands.checkfriends or {}
+local cmd = CFCUlxCommands.checkfriends
 
 CATEGORY_NAME = "Utility"
 
 if SERVER then
-    util.AddNetworkString( "CFC_ULX_FriendCheckSend" )
-    util.AddNetworkString( "CFC_ULX_FriendCheckRecieve" )
+    util.AddNetworkString( "CFC_ULX_CheckfriendsSend" )
+    util.AddNetworkString( "CFC_ULX_CheckfriendsRecieve" )
 end
 
 local awaitingResponse = {}
 
-net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
-    if not ply.waitingOnFriendCheck then return end
+net.Receive( "CFC_ULX_CheckfriendsRecieve", function( _, ply )
+    if not ply.waitingOnCheckfriends then return end
     local friendTable = net.ReadTable()
-    ply.waitingOnFriendCheck = false
+    ply.waitingOnCheckfriends = false
 
     local caller = awaitingResponse[ply]
     
@@ -29,11 +29,11 @@ net.Receive( "CFC_ULX_FriendCheckRecieve", function( _, ply )
     ulx.fancyLogAdmin( caller, true, "#A checked #T's friends." , ply )
 end )
 
-function cmd.friendcheckPlayers( callingPlayer, targetPlayers )
+function cmd.checkfriendsPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
-        ply.waitingOnFriendCheck = true
+        ply.waitingOnCheckfriends = true
         awaitingResponse[ply] = callingPlayer
-        net.Start( "CFC_ULX_FriendCheckSend" )
+        net.Start( "CFC_ULX_CheckfriendsSend" )
         net.Send( ply )
     end
 end
@@ -49,20 +49,20 @@ if CLIENT then
         friendTable[ply] = friendStatus
     end
 
-    net.Receive( "CFC_ULX_FriendCheckSend", function()
+    net.Receive( "CFC_ULX_CheckfriendsSend", function()
         friendTable = {}
         local onlinePlayers = player.GetHumans()
         for _, ply in pairs( onlinePlayers ) do
             getFriendStatus( ply )
         end
 
-        net.Start( "CFC_ULX_FriendCheckRecieve" )
+        net.Start( "CFC_ULX_CheckfriendsRecieve" )
         net.WriteTable( friendTable )
         net.SendToServer()
     end )
 end
 
-local friendcheckCommand = ulx.command( CATEGORY_NAME, "ulx friendcheck", cmd.friendcheckPlayers, "!friendcheck" )
-friendcheckCommand:addParam{ type = ULib.cmds.PlayersArg }
-friendcheckCommand:defaultAccess( ULib.ACCESS_ADMIN )
-friendcheckCommand:help( "Checks the targetted player(s) friends and prints the results in the console." )
+local checkfriendsCommand = ulx.command( CATEGORY_NAME, "ulx checkfriends", cmd.checkfriendsPlayers, "!checkfriends" )
+checkfriendsCommand:addParam{ type = ULib.cmds.PlayersArg }
+checkfriendsCommand:defaultAccess( ULib.ACCESS_ADMIN )
+checkfriendsCommand:help( "Checks the targetted player(s) friends and prints the results in the console." )
