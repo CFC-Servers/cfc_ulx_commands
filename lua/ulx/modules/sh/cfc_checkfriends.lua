@@ -16,6 +16,11 @@ net.Receive( "CFC_ULX_CheckfriendsRecieve", function( _, ply )
     ply.waitingOnCheckfriends = false
 
     local caller = awaitingResponse[ply]
+    PrintTable(friendTable)
+    if table.IsEmpty(friendTable) then
+        ulx.fancyLogAdmin( caller, true, "#A checked #T's friends, they have currently no friends playing on this server" , ply )
+        return
+    end
     
     caller:PrintMessage( 2 , "\n=======================" )
     caller:PrintMessage( 2 , ply:Name() .. "'s friends:" )
