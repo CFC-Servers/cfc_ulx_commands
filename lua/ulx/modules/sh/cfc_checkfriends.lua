@@ -11,12 +11,10 @@ end
 local awaitingResponse = {}
 
 net.Receive( "CFC_ULX_CheckfriendsRecieve", function( _, ply )
-    if not ply.waitingOnCheckfriends then return end
+    if awaitingResponse[ply] == nil then return end
     local friendTable = net.ReadTable()
-    ply.waitingOnCheckfriends = false
 
     local caller = awaitingResponse[ply]
-    PrintTable(friendTable)
     if table.IsEmpty(friendTable) then
         ulx.fancyLogAdmin( caller, true, "#A checked #T's friends, they have currently no friends playing on this server" , ply )
         return
@@ -36,7 +34,6 @@ end )
 
 function cmd.checkfriendsPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
-        ply.waitingOnCheckfriends = true
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_CheckfriendsSend" )
         net.Send( ply )
@@ -45,20 +42,20 @@ end
 
 if CLIENT then
     local friendTable = {}
-    function getFriendStatus( ply )
+    local function getFriendStatus( ply )
         if ply == LocalPlayer() then return end
 
         local friendStatus = ply:GetFriendStatus()
         if friendStatus == "none" then return end
 
-        friendTable[ply] = friendStatus
+        return friendStatus
     end
 
     net.Receive( "CFC_ULX_CheckfriendsSend", function()
         friendTable = {}
         local onlinePlayers = player.GetHumans()
         for _, ply in pairs( onlinePlayers ) do
-            getFriendStatus( ply )
+            friendTable[ply] = getFriendStatus( ply )
         end
 
         net.Start( "CFC_ULX_CheckfriendsRecieve" )

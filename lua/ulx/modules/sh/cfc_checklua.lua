@@ -11,9 +11,8 @@ end
 local awaitingResponse = {}
 
 net.Receive( "CFC_ULX_StatCheckSV", function( _, ply )
-    if not ply.waitingOnStatCheck then return end
+    if awaitingResponse[ply] == nil then return end
     local convar = net.ReadBool()
-    ply.waitingOnStatCheck = false
     ulx.fancyLogAdmin( awaitingResponse[ply], true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
 
     awaitingResponse[ply] = nil
@@ -21,7 +20,6 @@ end )
 
 function cmd.checkluaPlayers( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
-        ply.waitingOnStatCheck = true
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_StatCheckCL" )
         net.Send( ply )
