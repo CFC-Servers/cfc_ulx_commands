@@ -6,7 +6,8 @@ CATEGORY_NAME = "Fun"
 function cmd.speedPlayers( callingPlayer, targetPlayers, amount )
     for _, ply in pairs( targetPlayers ) do
         local inPvp = hook.Run( "CFC_Ulxcommands_SpeedPvpCheck", ply )
-        if inPvp ~= true then
+        --false = in pvp
+        if inPvp ~= false then
             ply:SetWalkSpeed( 2 * amount )
             ply:SetRunSpeed( 4 * amount )
         end
