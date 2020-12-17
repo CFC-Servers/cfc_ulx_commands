@@ -1,7 +1,7 @@
 CFCUlxCommands.speed = CFCUlxCommands.speed or {}
 local cmd = CFCUlxCommands.speed
 
-CATEGORY_NAME = "Fun"
+local CATEGORY_NAME = "Fun"
                     
 function cmd.speedPlayers( callingPlayer, targetPlayers, amount )
     for _, ply in pairs( targetPlayers ) do
