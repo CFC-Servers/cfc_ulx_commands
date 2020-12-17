@@ -58,7 +58,7 @@ if CLIENT then
             friendTable[ply] = getFriendStatus( ply )
         end
 
-        net.Start( "CFC_ULX_CheckfriendsRecieve" )
+        net.Start( "CFC_ULX_CheckFriendsReceive" )
         net.WriteTable( friendTable )
         net.SendToServer()
     end )
