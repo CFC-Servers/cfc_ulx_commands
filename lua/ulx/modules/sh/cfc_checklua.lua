@@ -11,7 +11,7 @@ end
 local awaitingResponse = {}
 
 net.Receive( "CFC_ULX_StatCheckSV", function( _, ply )
-    if awaitingResponse[ply] == nil then return end
+    if not awaitingResponse[ply] then return end
     local convar = net.ReadBool()
     ulx.fancyLogAdmin( awaitingResponse[ply], true, "#T's sv_allowcslua value is " .. tostring( convar ), ply )
 
