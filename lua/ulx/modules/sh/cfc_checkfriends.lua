@@ -51,7 +51,7 @@ if CLIENT then
         return friendStatus
     end
 
-    net.Receive( "CFC_ULX_CheckfriendsSend", function()
+    net.Receive( "CFC_ULX_CheckFriendsSend", function()
         friendTable = {}
         local onlinePlayers = player.GetHumans()
         for _, ply in pairs( onlinePlayers ) do
