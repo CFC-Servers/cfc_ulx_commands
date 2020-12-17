@@ -1,7 +1,7 @@
 CFCUlxCommands.checklua = CFCUlxCommands.checklua or {}
 local cmd = CFCUlxCommands.checklua
 
-CATEGORY_NAME = "Utility"
+local CATEGORY_NAME = "Utility"
 
 if SERVER then
     util.AddNetworkString( "CFC_ULX_StatCheckCL" )
