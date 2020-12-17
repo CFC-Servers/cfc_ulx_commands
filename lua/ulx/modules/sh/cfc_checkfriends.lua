@@ -1,16 +1,16 @@
 CFCUlxCommands.checkfriends = CFCUlxCommands.checkfriends or {}
 local cmd = CFCUlxCommands.checkfriends
 
-CATEGORY_NAME = "Utility"
+local CATEGORY_NAME = "Utility"
 
 if SERVER then
-    util.AddNetworkString( "CFC_ULX_CheckfriendsSend" )
-    util.AddNetworkString( "CFC_ULX_CheckfriendsRecieve" )
+    util.AddNetworkString( "CFC_ULX_CheckFriendsSend" )
+    util.AddNetworkString( "CFC_ULX_CheckFriendsReceive" )
 end
 
 local awaitingResponse = {}
 
-net.Receive( "CFC_ULX_CheckfriendsRecieve", function( _, ply )
+net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
     if awaitingResponse[ply] == nil then return end
     local friendTable = net.ReadTable()
 
