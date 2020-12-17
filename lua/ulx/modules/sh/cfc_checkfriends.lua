@@ -10,6 +10,16 @@ end
 
 local awaitingResponse = {}
 
+local function sendResponse( ply, friendTable, caller )
+    caller:PrintMessage( 2 , "\n=======================" )
+    caller:PrintMessage( 2 , ply:Name() .. "'s friends:" )
+    caller:PrintMessage( 2 , "-----------------------" )
+    for target, status in pairs( friendTable ) do
+        caller:PrintMessage( 2 , target:Name() .. " : " .. status )
+    end
+    caller:PrintMessage( 2 , "=======================" )
+end
+
 net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
     if awaitingResponse[ply] == nil then return end
     local friendTable = net.ReadTable()
@@ -20,13 +30,7 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
         return
     end
     
-    caller:PrintMessage( 2 , "\n=======================" )
-    caller:PrintMessage( 2 , ply:Name() .. "'s friends:" )
-    caller:PrintMessage( 2 , "-----------------------" )
-    for target, status in pairs( friendTable ) do
-        caller:PrintMessage( 2 , target:Name() .. " : " .. status )
-    end
-    caller:PrintMessage( 2 , "=======================" )
+    sendResponse( ply, friendTable, caller )
 
     awaitingResponse[ply] = nil
     ulx.fancyLogAdmin( caller, true, "#A checked #T's friends." )
