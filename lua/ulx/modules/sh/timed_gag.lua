@@ -273,7 +273,7 @@ timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.
 timeGagCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
 timeGagCommand:help( "Gags a user for a set amount of time" )
-timeGagCommand:SetOpposite( "ulx untimegag", {_, _, _, _, true}, "!untgag" )
+timeGagCommand:setOpposite( "ulx untimegag", {_, _, _, _, true}, "!untgag" )
 
 -- END ULX COMMAND SETUP --
 
