@@ -14,7 +14,7 @@ function cmd.removeShadows( callingPlayer, targetPlayers, removeShadows )
     for _, ent in pairs( entities ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
         if owner and entCounts[owner] then
-            local canShadow = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
+            local canShadow = not ( ent:IsWeapon() or ent:IsPlayer() )
             if IsValid( ent ) and canShadow then
                 if not removeShadows then
                     ent:DrawShadow( false )
