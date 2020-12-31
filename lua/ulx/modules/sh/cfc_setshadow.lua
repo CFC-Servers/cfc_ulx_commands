@@ -1,9 +1,9 @@
-CFCUlxCommands.freezeProps = CFCUlxCommands.freezeProps or {}
-local cmd = CFCUlxCommands.freezeProps
+CFCUlxCommands.removeShadows = CFCUlxCommands.removeShadows or {}
+local cmd = CFCUlxCommands.removeShadows
 
 CATEGORY_NAME = "Cleanup"
 
-function cmd.freezeProps( callingPlayer, targetPlayers )
+function cmd.removeShadows( callingPlayer, targetPlayers, removeShadows )
     local entities = ents.GetAll()
     local entCount = 0
     local entCounts = {}
@@ -14,17 +14,24 @@ function cmd.freezeProps( callingPlayer, targetPlayers )
     for _, ent in pairs( entities ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
         if owner and entCounts[owner] then
-            local canFreeze = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
-            local physicsObj = ent:GetPhysicsObject()
-            if IsValid( physicsObj ) and canFreeze then
-                physicsObj:EnableMotion( false )
-                physicsObj:Sleep()
+            local canShadow = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
+            if IsValid( ent ) and canShadow then
+                if not removeShadows then
+                    ent:DrawShadow( false )
+                else
+                    ent:DrawShadow( true )
+                end
                 entCount = entCount + 1
                 entCounts[owner] = entCounts[owner] + 1
             end
         end
     end
-    ulx.fancyLogAdmin( callingPlayer, "#A froze " .. entCount .. " props owned by #T", targetPlayers )
+
+    if not removeShadows then
+        ulx.fancyLogAdmin( callingPlayer, "#A removed shadows from " .. entCount .. " props owned by #T", targetPlayers )
+    else
+        ulx.fancyLogAdmin( callingPlayer, "#A added shadows to " .. entCount .. " props owned by #T", targetPlayers )
+    end
 
     if #targetPlayers <= 1 then return end
 
@@ -33,7 +40,9 @@ function cmd.freezeProps( callingPlayer, targetPlayers )
     end
 end
 
-local freezeCMD = ulx.command( CATEGORY_NAME, "ulx freezeprops", cmd.freezeProps, "!freezeprops" )
-freezeCMD:addParam{ type = ULib.cmds.PlayersArg }
-freezeCMD:defaultAccess( ULib.ACCESS_ADMIN )
-freezeCMD:help( "Freezes target( s ) props" )
+local removeShadows = ulx.command( CATEGORY_NAME, "ulx removeshadows", cmd.removeShadows, "!removeshadows" )
+removeShadows:addParam{ type = ULib.cmds.PlayersArg }
+removeShadows:addParam{ type = ULib.cmds.BoolArg, invisible = true }
+removeShadows:defaultAccess( ULib.ACCESS_ADMIN )
+removeShadows:help( "Removes shadows from target( s ) props" )
+removeShadows:setOpposite( "ulx addshadows", { _, _, true }, "!addshadows" )
