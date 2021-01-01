@@ -88,7 +88,8 @@ if CLIENT then
         net.Start( networkString )
 
         for _, convar in pairs( CONVARS_TO_CHECK ) do
-            net.WriteBool( GetConVar( convar ):GetBool() )
+            local cvar = GetConVar( convar )
+            net.WriteBool( cvar and cvar:GetBool() or false )
         end
 
         net.SendToServer()
