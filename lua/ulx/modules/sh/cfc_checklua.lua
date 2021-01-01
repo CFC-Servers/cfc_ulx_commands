@@ -57,15 +57,15 @@ if SERVER then
             print( "Banning " .. tostring( ply ) .. " for having bad convars." )
             PrintTable( badConvars )
 
-            ulx.ban( nil, ply, AUTO_BAN_LENGTH, AUTO_BAN_REASON )
             sendAwarn( ply )
+            ulx.ban( nil, ply, AUTO_BAN_LENGTH, AUTO_BAN_REASON )
         end
     end )
 
     function cmd.checkluaPlayers( callingPlayer, targetPlayers )
         for _, ply in pairs( targetPlayers ) do
             awaitingResponse[ply] = callingPlayer
-            net.Start( "CFC_ULX_StatCheckCL" )
+            net.Start( "CFC_ULX_StatCheck" )
             net.Send( ply )
         end
     end
@@ -103,13 +103,7 @@ if CLIENT then
     end )
 end
 
-local function doCheck( ... )
-    if CLIENT then return end
-
-    return cmd.checkluaPlayers( ... )
-end
-
-local checkluaCommand = ulx.command( CATEGORY_NAME, "ulx checklua", doCheck, "!checklua" )
+local checkluaCommand = ulx.command( CATEGORY_NAME, "ulx checklua", cmd.checkluaPlayers, "!checklua" )
 checkluaCommand:addParam{ type = ULib.cmds.PlayersArg }
 checkluaCommand:defaultAccess( ULib.ACCESS_ADMIN )
 checkluaCommand:help( "Checks target(s) sv_allowcslua, true means they modified their client value." )
