@@ -74,7 +74,7 @@ function cmd.owoifyCommand( caller, targets, shouldUnowoify )
     end
 end
 
-hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay )
+hook.Add( "PlayerSay", "CFC_ULX_OwoifyString", onPlayerSay, HOOK_LOW )
 
 local owoifyCommand = ulx.command( CATEGORY_NAME, "ulx owoify", cmd.owoifyCommand, { "!owoify", "!owo" } )
 owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
