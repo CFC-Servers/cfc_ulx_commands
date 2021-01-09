@@ -8,9 +8,9 @@ local PHRASES_TO_APPEND = {
     " :3c",
     " ;;w;;",
     " x3",
-    " owo", 
+    " owo",
     " nya~",
-    " uwu", 
+    " uwu",
     "~"
 }
 local PHRASES_TO_REPLACE = {
@@ -39,9 +39,9 @@ local ID_OWO = 3
 
 local function owoifyMessage( message )
     local owoifiedMessage = message
-    
+
     for _, item in pairs( PHRASES_TO_REPLACE ) do
-        local old = item[1]        
+        local old = item[1]
         local new = item[2]
         owoifiedMessage = string.Replace( owoifiedMessage, old, new )
     end
@@ -58,7 +58,7 @@ end
 
 function cmd.owoifyCommand( caller, targets, shouldUnowoify )
     local shouldOwoify = not shouldUnowoify
-    
+
     for _, ply in pairs( targets ) do
         if shouldOwoify then
             ply.gimp = ID_OWO
