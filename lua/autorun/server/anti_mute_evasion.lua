@@ -10,7 +10,7 @@ local isBannedWhileMuted = {
 hook.Add( "ULibCommandCalled", "CFC_AntiUnmute_PreventUnmute", function( ply, commandName, args )
     if not isBannedWhileMuted[commandName] then return end
     if ply.gimp == ID_MUTE then
-        ULib.tsayError( ply, "you can't do that while muted" )
+        ULib.tsayError( ply, "You can't do that while muted" )
         return false
     end
 end )
