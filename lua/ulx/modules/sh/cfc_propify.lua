@@ -10,6 +10,8 @@ local STRUGGLE_AMOUNT = CreateConVar( "cfc_ulx_propify_struggle_amount", 30, FCV
 local STRUGGLE_DECAY = CreateConVar( "cfc_ulx_propify_struggle_decay", 0.25, FCVAR_NONE, "How many seconds it takes for a propified players' struggle power to decrease by one (default 0.25)", 0, 50000 )
 local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.1, FCVAR_NONE, "How frequently, in seconds, a propified player can increase their struggle power (default 0.1)", 0, 50000 )
 local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 5, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 5)", 0, 50000 )
+local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500, FCVAR_NONE, "The strength that a propified player launches at when escaping a grab (default 500)", 0, 50000 )
+local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 
 local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
@@ -252,6 +254,7 @@ local function detectPropifyPickup( ply, ent )
 
     ragdolledPly:SetNWBool( "propifyGrabbed", true )
     ragdolledPly.propifyCanStruggle = true
+    ent.propifyGrabber = ply
 
     local timerName = "CFC_ULX_PropifyStruggleDecay_" .. ragdolledPly:SteamID()
 
@@ -290,6 +293,7 @@ local function detectPropifyDrop( ply, ent )
     if ragdolledPly:GetNWBool( "propifyGrabbed" ) then
         ragdolledPly:SetNWBool( "propifyGrabbed", false )
         ent.ragdolledPly.propifyCanStruggle = nil
+        ent.propifyGrabber = nil
     end
 end
 hook.Add( "OnPlayerPhysicsDrop", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
@@ -309,8 +313,23 @@ local function struggle( ply, button )
     if struggleAmount >= struggleAmountMax then
         local prop = ply.ragdoll
 
+        DropEntityIfHeld( prop )
+
+        local physObj = prop:GetPhysicsObject()
+
+        if IsValid( physObj ) then
+            local escapeStrength = STRUGGLE_STRENGTH:GetFloat() * physObj:GetMass()
+            local escapeDir = prop.propifyGrabber:EyeAngles()
+            local escapeRand = STRUGGLE_FLEE_RANDOM:GetFloat()
+            escapeDir:RotateAroundAxis( escapeDir:Up(), math.Rand( -1, 1 )*escapeRand )
+            escapeDir:RotateAroundAxis( escapeDir:Right(), math.Rand( -1, 1 )*escapeRand )
+
+            physObj:ApplyForceCenter( escapeDir:Forward() * escapeStrength )
+        end
+
         prop.propifyCantGrab = true
         ply.propifyCanStruggle = nil
+        prop.propifyGrabber = nil
 
         timer.Simple( STRUGGLE_SAFETY:GetFloat(), function()
             if IsValid( prop ) then
