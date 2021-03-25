@@ -6,7 +6,7 @@ local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
 local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE, "The max radius allowed for propify models (default 150)", 0, 50000 )
 local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
 local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
-local STRUGGLE_AMOUNT = CreateConVar( "cfc_ulx_propify_struggle_amount", 30, FCVAR_NONE, "How much a propified player must struggle to escape being picked up (default 30, set to 0 to disallow struggling)", 0, 50000 )
+local STRUGGLE_AMOUNT = CreateConVar( "cfc_ulx_propify_struggle_amount", 30, FCVAR_REPLICATED, "How much a propified player must struggle to escape being picked up (default 30, set to 0 to disallow struggling)", 0, 50000 )
 local STRUGGLE_DECAY = CreateConVar( "cfc_ulx_propify_struggle_decay", 0.25, FCVAR_NONE, "How many seconds it takes for a propified players' struggle power to decrease by one (default 0.25)", 0, 50000 )
 local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.1, FCVAR_NONE, "How frequently, in seconds, a propified player can increase their struggle power (default 0.1)", 0, 50000 )
 local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 5, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 5)", 0, 50000 )
@@ -32,6 +32,7 @@ local function propifyPlayer( caller, ply, modelPath )
     end
 
     prop.ragdolledPly = ply
+    ply:SetNWBool( "propifyGrabbed", false )
     ply:SetNWInt( "propifyStruggle", 0 )
 
     prop:SetPos( ply:WorldSpaceCenter() )
@@ -64,6 +65,7 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
     ply.propifyCanStruggle = nil
+    ply:SetNWBool( "propifyGrabbed", false )
     timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
 
     if not IsValid( prop ) then
@@ -238,14 +240,6 @@ local function handleUse( ply, ent )
 end
 hook.Add( "PlayerUse", "CFC_ULX_PropifyUse", handleUse, HOOK_HIGH )
 
-local function enableStruggleBar()
-    --TODO
-end
-
-local function disableStruggleBar()
-    --TODO
-end
-
 local function detectPropifyPickup( ply, ent )
     local ragdolledPly = ent.ragdolledPly
 
@@ -256,9 +250,7 @@ local function detectPropifyPickup( ply, ent )
     if struggleAmountMax == 0 then return end
     if ent.propifyCantGrab then return false end
 
-    enableStruggleBar()
-
-    ent.propifyGrabbed = true
+    ragdolledPly:SetNWBool( "propifyGrabbed", true )
     ragdolledPly.propifyCanStruggle = true
 
     local timerName = "CFC_ULX_PropifyStruggleDecay_" .. ragdolledPly:SteamID()
@@ -291,10 +283,12 @@ hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPi
 local function detectPropifyDrop( ply, ent )
     if not IsValid( ent ) then return end
 
-    if ent.propifyGrabbed then
-        disableStruggleBar()
+    local ragdolledPly = ent.ragdolledPly
 
-        ent.propifyGrabbed = nil
+    if not IsValid( ragdolledPly ) then return end
+
+    if ragdolledPly:GetNWBool( "propifyGrabbed" ) then
+        ragdolledPly:SetNWBool( "propifyGrabbed", false )
         ent.ragdolledPly.propifyCanStruggle = nil
     end
 end
@@ -315,8 +309,6 @@ local function struggle( ply, button )
     if struggleAmount >= struggleAmountMax then
         local prop = ply.ragdoll
 
-        disableStruggleBar()
-
         prop.propifyCantGrab = true
         ply.propifyCanStruggle = nil
 
@@ -329,7 +321,7 @@ local function struggle( ply, button )
         timer.Simple( STRUGGLE_LIMIT:GetFloat(), function()
             local prop = ply.ragdoll
 
-            if not IsValid( prop ) or not prop.propifyGrabbed then return end
+            if not IsValid( prop ) or not ply:GetNWBool( "propifyGrabbed" ) then return end
 
             ply.propifyCanStruggle = true
         end )
