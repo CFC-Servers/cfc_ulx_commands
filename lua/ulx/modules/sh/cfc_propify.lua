@@ -6,6 +6,10 @@ local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
 local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE, "The max radius allowed for propify models (default 150)", 0, 50000 )
 local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
 local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
+local STRUGGLE_AMOUNT = CreateConVar( "cfc_ulx_propify_struggle_amount", 30, FCVAR_NONE, "How much a propified player must struggle to escape being picked up (default 30, set to 0 to disallow struggling)", 0, 50000 )
+local STRUGGLE_DECAY = CreateConVar( "cfc_ulx_propify_struggle_decay", 0.25, FCVAR_NONE, "How many seconds it takes for a propified players' struggle power to decrease by one (default 0.25)", 0, 50000 )
+local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.1, FCVAR_NONE, "How frequently, in seconds, a propified player can increase their struggle power (default 0.1)", 0, 50000 )
+local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 5, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 5)", 0, 50000 )
 
 local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
@@ -28,6 +32,8 @@ local function propifyPlayer( caller, ply, modelPath )
     end
 
     prop.ragdolledPly = ply
+    ply:SetNWInt( "propifyStruggle", 0 )
+
     prop:SetPos( ply:WorldSpaceCenter() )
     prop:SetAngles( ply:GetAngles() )
     prop:Spawn()
@@ -57,6 +63,8 @@ function cmd.unpropifyPlayer( ply )
 
     local prop = ply.ragdoll
     ply.ragdoll = nil
+    ply.propifyCanStruggle = nil
+    timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
 
     if not IsValid( prop ) then
         ULib.spawn( ply, true )
@@ -69,6 +77,7 @@ function cmd.unpropifyPlayer( ply )
         ply:SetVelocity( prop:GetVelocity() )
         ply:SetAngles( Angle( 0, prop:GetAngles().yaw, 0 ) )
         prop.ragdolledPly = nil
+        prop.propifyStruggle = nil
         prop:DisallowDeleting( false )
         prop:Remove()
     end
@@ -193,7 +202,7 @@ end
 hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
 --Prevents ragdolled and propified players from pressing use on themselves, props, and vehicles
-local function handleGrab( ply, ent )
+local function handleUse( ply, ent )
     if not ply.ragdoll then return end
 
     local isInitialCheck = false
@@ -227,7 +236,106 @@ local function handleGrab( ply, ent )
         return false
     end
 end
-hook.Add( "PlayerUse", "CFC_ULX_PropifyGrab", handleGrab, HOOK_HIGH )
+hook.Add( "PlayerUse", "CFC_ULX_PropifyUse", handleUse, HOOK_HIGH )
+
+local function enableStruggleBar()
+    --TODO
+end
+
+local function disableStruggleBar()
+    --TODO
+end
+
+local function detectPropifyPickup( ply, ent )
+    local ragdolledPly = ent.ragdolledPly
+
+    if not ragdolledPly then return end
+
+    local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
+
+    if struggleAmountMax == 0 then return end
+    if ent.propifyCantGrab then return false end
+
+    enableStruggleBar()
+
+    ent.propifyGrabbed = true
+    ragdolledPly.propifyCanStruggle = true
+
+    local timerName = "CFC_ULX_PropifyStruggleDecay_" .. ragdolledPly:SteamID()
+
+    timer.Create( timerName, STRUGGLE_DECAY:GetFloat(), 0, function()
+        local stillPropified = IsValid( ent )
+        local struggleAmount = 0
+
+        if stillPropified then
+            struggleAmount = ragdolledPly:GetNWInt( "propifyStruggle" )
+        end
+
+        if not stillPropified then
+            timer.Remove( timerName )
+            return
+        end
+
+        struggleAmount = math.max( struggleAmount - 1, 0 )
+
+        ragdolledPly:SetNWInt( "propifyStruggle", struggleAmount )
+
+        if struggleAmount == 0 then
+            timer.Remove( timerName )
+        end
+    end )
+end
+hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
+hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
+
+local function detectPropifyDrop( ply, ent )
+    if not IsValid( ent ) then return end
+
+    if ent.propifyGrabbed then
+        disableStruggleBar()
+
+        ent.propifyGrabbed = nil
+        ent.ragdolledPly.propifyCanStruggle = nil
+    end
+end
+hook.Add( "OnPlayerPhysicsDrop", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
+hook.Add( "GravGunOnDropped", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
+
+local function struggle( ply, button )
+    if button ~= IN_USE then return end
+
+    if not ply.propifyCanStruggle then return end
+
+    local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
+    local struggleAmount = ply:GetNWInt( "propifyStruggle" )
+
+    struggleAmount = math.min( struggleAmount + 1, struggleAmountMax )
+    ply:SetNWInt( "propifyStruggle", struggleAmount )
+
+    if struggleAmount >= struggleAmountMax then
+        local prop = ply.ragdoll
+
+        disableStruggleBar()
+
+        prop.propifyCantGrab = true
+        ply.propifyCanStruggle = nil
+
+        timer.Simple( STRUGGLE_SAFETY:GetFloat(), function()
+            if IsValid( prop ) then
+                prop.propifyCantGrab = nil
+            end
+        end )
+    else
+        timer.Simple( STRUGGLE_LIMIT:GetFloat(), function()
+            local prop = ply.ragdoll
+
+            if not IsValid( prop ) or not prop.propifyGrabbed then return end
+
+            ply.propifyCanStruggle = true
+        end )
+    end
+end
+hook.Add( "KeyPressed", "CFC_ULX_PropifyStruggle", struggle )
 
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
