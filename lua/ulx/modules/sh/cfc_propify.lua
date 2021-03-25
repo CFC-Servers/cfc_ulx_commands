@@ -192,11 +192,42 @@ local function propHop( ply, keyNum )
 end
 hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
---Prevents ragdolled and propified players from pressing use on anything
-local function disallowGrab( ply, _ )
-    if ply.ragdoll then return false end
+--Prevents ragdolled and propified players from pressing use on themselves, props, and vehicles
+local function handleGrab( ply, ent )
+    if not ply.ragdoll then return end
+
+    local isInitialCheck = false
+
+    if ent == ply.ragdoll then
+        isInitialCheck = true
+
+        local _, boundMax = ent:GetModelBounds()
+        local traceSettings = {
+            start = ply:EyePos() + Vector( 0, 0, boundMax.z + 6 ), --Account for camera/eye position disconnect in prop specate
+            endpos = ply:EyePos() + ply:EyeAngles():Forward()*250,
+            filter = {
+            	ply.ragdoll,
+            	ply,
+        	},
+        }
+
+        local trace = util.TraceLine( traceSettings )
+        ent = trace.Entity
+    end
+
+    if not IsValid( ent ) then return false end
+
+    local class = ent:GetClass()
+
+    if class == "prop_physics" or ent:IsVehicle() then return false end
+
+    if isInitialCheck then
+        ent:Use( ply )
+
+        return false
+    end
 end
-hook.Add( "PlayerUse", "CFC_ULX_PropifyDisallowGrab", disallowGrab, HOOK_HIGH )
+hook.Add( "PlayerUse", "CFC_ULX_PropifyGrab", handleGrab, HOOK_HIGH )
 
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
