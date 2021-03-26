@@ -312,6 +312,7 @@ local function struggle( ply, button )
 
     if struggleAmount >= struggleAmountMax then
         local prop = ply.ragdoll
+        local grabber = prop.propifyGrabber
 
         DropEntityIfHeld( prop )
 
@@ -319,7 +320,7 @@ local function struggle( ply, button )
 
         if IsValid( physObj ) then
             local escapeStrength = STRUGGLE_STRENGTH:GetFloat() * physObj:GetMass()
-            local escapeDir = prop.propifyGrabber:EyeAngles()
+            local escapeDir = grabber:EyeAngles()
             local escapeRand = STRUGGLE_FLEE_RANDOM:GetFloat()
             escapeDir:RotateAroundAxis( escapeDir:Up(), math.Rand( -1, 1 )*escapeRand )
             escapeDir:RotateAroundAxis( escapeDir:Right(), math.Rand( -1, 1 )*escapeRand )
