@@ -264,9 +264,7 @@ local function detectPropifyPickup( ply, ent )
 
         if stillPropified then
             struggleAmount = ragdolledPly:GetNWInt( "propifyStruggle" )
-        end
-
-        if not stillPropified then
+        else
             timer.Remove( timerName )
             return
         end
