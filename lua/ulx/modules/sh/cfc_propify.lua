@@ -250,7 +250,11 @@ local function detectPropifyPickup( ply, ent )
     local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
 
     if struggleAmountMax == 0 then return end
-    if ent.propifyCantGrab then return false end
+    if ent.propifyCantGrab then
+        ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
+
+        return false
+    end
 
     ragdolledPly:SetNWBool( "propifyGrabbed", true )
     ragdolledPly.propifyCanStruggle = true
