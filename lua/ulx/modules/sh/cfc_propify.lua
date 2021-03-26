@@ -302,17 +302,19 @@ local function struggle( ply, button )
 
     local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
     local struggleAmount = ply:GetNWInt( "propifyStruggle" )
+    local prop = ply.ragdoll
 
     struggleAmount = math.min( struggleAmount + 1, struggleAmountMax )
     ply:SetNWInt( "propifyStruggle", struggleAmount )
 
     if struggleAmount >= struggleAmountMax then
-        local prop = ply.ragdoll
         local grabber = prop.propifyGrabber
 
         DropEntityIfHeld( prop )
 
         timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
+
+        prop:EmitSound( "physics/body/body_medium_impact_hard" .. math.random( 1, 6 ) .. ".wav" )
 
         local physObj = prop:GetPhysicsObject()
 
@@ -336,6 +338,8 @@ local function struggle( ply, button )
             end
         end )
     else
+        prop:EmitSound( "physics/body/body_medium_impact_soft" .. math.random( 1, 7 ) .. ".wav" )
+
         timer.Simple( STRUGGLE_LIMIT:GetFloat(), function()
             local prop = ply.ragdoll
 
