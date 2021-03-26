@@ -269,13 +269,11 @@ local function detectPropifyPickup( ply, ent )
             return
         end
 
+        if struggleAmount == 0 then return end
+
         struggleAmount = math.max( struggleAmount - 1, 0 )
 
         ragdolledPly:SetNWInt( "propifyStruggle", struggleAmount )
-
-        if struggleAmount == 0 then
-            timer.Remove( timerName )
-        end
     end )
 end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
@@ -313,6 +311,8 @@ local function struggle( ply, button )
         local grabber = prop.propifyGrabber
 
         DropEntityIfHeld( prop )
+
+        timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
 
         local physObj = prop:GetPhysicsObject()
 
