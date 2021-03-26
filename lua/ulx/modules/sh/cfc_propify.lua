@@ -7,9 +7,9 @@ local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE,
 local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
 local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
 local STRUGGLE_AMOUNT = CreateConVar( "cfc_ulx_propify_struggle_amount", 30, FCVAR_REPLICATED, "How much a propified player must struggle to escape being picked up (default 30, set to 0 to disallow struggling)", 0, 50000 )
-local STRUGGLE_DECAY = CreateConVar( "cfc_ulx_propify_struggle_decay", 0.25, FCVAR_NONE, "How many seconds it takes for a propified players' struggle power to decrease by one (default 0.25)", 0, 50000 )
-local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.1, FCVAR_NONE, "How frequently, in seconds, a propified player can increase their struggle power (default 0.1)", 0, 50000 )
-local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 5, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 5)", 0, 50000 )
+local STRUGGLE_DECAY = CreateConVar( "cfc_ulx_propify_struggle_decay", 0.45, FCVAR_NONE, "How many seconds it takes for a propified players' struggle power to decrease by one (default 0.45)", 0, 50000 )
+local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.125, FCVAR_NONE, "How frequently, in seconds, a propified player can increase their struggle power (default 0.125)", 0, 50000 )
+local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 10, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 10)", 0, 50000 )
 local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500, FCVAR_NONE, "The strength that a propified player launches at when escaping a grab (default 500)", 0, 50000 )
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 
