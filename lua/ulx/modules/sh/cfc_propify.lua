@@ -205,34 +205,42 @@ local function propHop( ply, keyNum )
 end
 hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
+local function manualUseTrace( ply )
+    local prop = ply.ragdoll
+    local _, boundMax = prop:GetModelBounds()
+    local traceSettings = {
+        start = prop:GetPos() + Vector( 0, 0, boundMax.z + 6 ), --Account for camera/eye position disconnect in prop specate
+        endpos = prop:GetPos() + ply:EyeAngles():Forward()*250,
+        filter = {
+            prop,
+            ply,
+        },
+    }
+
+    local trace = util.TraceLine( traceSettings )
+
+    return trace.Entity
+end
+
 --Prevents ragdolled and propified players from pressing use on themselves, props, and vehicles
 local function handleUse( ply, ent )
     if not ply.ragdoll then return end
+
+    timer.Remove( "CFC_ULX_PropifyForceTryUse" .. ply:SteamID() )
 
     local isInitialCheck = false
 
     if ent == ply.ragdoll then
         isInitialCheck = true
 
-        local _, boundMax = ent:GetModelBounds()
-        local traceSettings = {
-            start = ply:EyePos() + Vector( 0, 0, boundMax.z + 6 ), --Account for camera/eye position disconnect in prop specate
-            endpos = ply:EyePos() + ply:EyeAngles():Forward()*250,
-            filter = {
-            	ply.ragdoll,
-            	ply,
-        	},
-        }
-
-        local trace = util.TraceLine( traceSettings )
-        ent = trace.Entity
+        ent = manualUseTrace( ply )
     end
 
     if not IsValid( ent ) then return false end
 
     local class = ent:GetClass()
 
-    if class == "prop_physics" or ent:IsVehicle() then return false end
+    if class == "prop_physics" or class == "gmod_sent_vehicle_fphysics_wheel" or ent:IsVehicle() then return false end
 
     if isInitialCheck then
         ent:Use( ply )
@@ -241,6 +249,23 @@ local function handleUse( ply, ent )
     end
 end
 hook.Add( "PlayerUse", "CFC_ULX_PropifyUse", handleUse, HOOK_HIGH )
+
+local function propifyForceTryUse( ply, button )
+    if button ~= IN_USE then return end
+
+    timer.Create( "CFC_ULX_PropifyForceTryUse" .. ply:SteamID(), 0.01, 1, function()
+        local ent = manualUseTrace( ply )
+
+        if not IsValid( ent ) then return end
+
+        local class = ent:GetClass()
+
+        if class ~= "prop_physics" and class ~= "gmod_sent_vehicle_fphysics_wheel" and not ent:IsVehicle() then
+            ent:Use( ply )
+        end
+    end )
+end
+hook.Add( "KeyPress", "CFC_ULX_PropifyForceTryUse", propifyForceTryUse )
 
 local function detectPropifyPickup( ply, ent )
     local ragdolledPly = ent.ragdolledPly
