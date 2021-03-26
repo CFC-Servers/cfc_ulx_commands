@@ -346,7 +346,7 @@ local function struggle( ply, button )
         end )
     end
 end
-hook.Add( "KeyPressed", "CFC_ULX_PropifyStruggle", struggle )
+hook.Add( "KeyPress", "CFC_ULX_PropifyStruggle", struggle )
 
 --Prevents propify props from existing after being removed, including breakable props breaking
 local function unpropifyOnRemove( prop )
