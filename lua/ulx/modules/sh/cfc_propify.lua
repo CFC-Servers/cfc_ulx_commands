@@ -331,6 +331,7 @@ local function struggle( ply, button )
         prop.propifyCantGrab = true
         ply.propifyCanStruggle = nil
         prop.propifyGrabber = nil
+        grabber:SetNWInt( "propifyStruggle", 0 )
 
         timer.Simple( STRUGGLE_SAFETY:GetFloat(), function()
             if IsValid( prop ) then
