@@ -23,14 +23,14 @@ hook.Add( "PostRenderVGUI", "CFC_ULX_PropifyStruggleBar", function()
     local scrW = ScrW()
     local scrH = ScrH()
 
-    local x = scrW*( 0.5 - STRUGGLE_BAR_WIDTH/2 )
-    local y = scrH*( 1 - STRUGGLE_BAR_UP/2 - STRUGGLE_BAR_HEIGHT/2 )
+    local x = scrW * ( 0.5 - STRUGGLE_BAR_WIDTH/2 )
+    local y = scrH * ( 1 - STRUGGLE_BAR_UP / 2 - STRUGGLE_BAR_HEIGHT / 2 )
 
     surface.SetDrawColor( 230, 230, 230, 255 )
-    surface.DrawRect( x, y, scrW*STRUGGLE_BAR_WIDTH, scrH*STRUGGLE_BAR_HEIGHT )
+    surface.DrawRect( x, y, scrW * STRUGGLE_BAR_WIDTH, scrH*STRUGGLE_BAR_HEIGHT )
 
     surface.SetDrawColor( 255, 0, 0, 255 )
-    surface.DrawRect( x, y, scrW*STRUGGLE_BAR_WIDTH*struggleProgress, scrH*STRUGGLE_BAR_HEIGHT )
+    surface.DrawRect( x, y, scrW * STRUGGLE_BAR_WIDTH*struggleProgress, scrH * STRUGGLE_BAR_HEIGHT )
 
     local struggleKey = input.LookupBinding( "+use" ) or "e"
     struggleKey = string.upper( struggleKey )
