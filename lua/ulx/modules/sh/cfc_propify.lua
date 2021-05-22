@@ -252,6 +252,7 @@ hook.Add( "PlayerUse", "CFC_ULX_PropifyUse", handleUse, HOOK_HIGH )
 
 local function propifyForceTryUse( ply, button )
     if button ~= IN_USE then return end
+    if not ply.ragdoll then return end
 
     timer.Create( "CFC_ULX_PropifyForceTryUse" .. ply:SteamID(), 0.01, 1, function()
         local ent = manualUseTrace( ply )
