@@ -12,7 +12,7 @@ local trainSounds = {
 }
                     
 function cmd.trainFuckPlayers( callingPlayer, targetPlayers )
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
         
