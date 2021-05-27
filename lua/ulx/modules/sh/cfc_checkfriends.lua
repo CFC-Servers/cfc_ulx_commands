@@ -37,7 +37,7 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
 end )
 
 function cmd.checkfriendsPlayers( callingPlayer, targetPlayers )
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_CheckfriendsSend" )
         net.Send( ply )
