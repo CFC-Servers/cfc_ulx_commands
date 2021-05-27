@@ -5,14 +5,14 @@ CATEGORY_NAME = "Cleanup"
 
 function cmd.ropeClean( callingPlayer, targetPlayers )
     local plyCounts = {}
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         plyCounts[ply] = 0
     end
 
     local ropes = ents.FindByClass( "keyframe_rope" )
     local ropeCount = 0
 
-    for _, rope in pairs( ropes ) do
+    for _, rope in ipairs( ropes ) do
         local owner = rope:CPPIGetOwner()
 
         if plyCounts[owner] ~= nil then
