@@ -19,7 +19,7 @@ net.Receive( "CFC_ULX_StatCheckSV", function( _, ply )
 end )
 
 function cmd.checkluaPlayers( callingPlayer, targetPlayers )
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         awaitingResponse[ply] = callingPlayer
         net.Start( "CFC_ULX_StatCheckCL" )
         net.Send( ply )
