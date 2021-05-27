@@ -59,7 +59,7 @@ end
 function cmd.owoifyCommand( caller, targets, shouldUnowoify )
     local shouldOwoify = not shouldUnowoify
 
-    for _, ply in pairs( targets ) do
+    for _, ply in ipairs( targets ) do
         if shouldOwoify then
             ply.gimp = ID_OWO
         else
