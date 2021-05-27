@@ -4,7 +4,7 @@ local cmd = CFCUlxCommands.speed
 local CATEGORY_NAME = "Fun"
                     
 function cmd.speedPlayers( callingPlayer, targetPlayers, amount )
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         local inPvp = hook.Run( "CFC_ULXCommands_CanApplySpeedModifier", ply )
         -- false = in pvp
         if inPvp ~= false then
