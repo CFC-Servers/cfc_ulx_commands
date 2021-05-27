@@ -58,7 +58,7 @@ if CLIENT then
     net.Receive( "CFC_ULX_CheckFriendsSend", function()
         friendTable = {}
         local onlinePlayers = player.GetHumans()
-        for _, ply in pairs( onlinePlayers ) do
+        for _, ply in ipairs( onlinePlayers ) do
             friendTable[ply] = getFriendStatus( ply )
         end
 
