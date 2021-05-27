@@ -3,7 +3,7 @@ local cmd = CFCUlxCommands.clearpac
 local CATEGORY_NAME = "Utility"
 
 function cmd.clearPac( callingPlayer, targetPlayers )
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         ply:ConCommand( "pac_clear_parts" )
     end
 
