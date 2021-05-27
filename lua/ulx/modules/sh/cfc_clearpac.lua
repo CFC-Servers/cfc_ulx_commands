@@ -1,8 +1,8 @@
 CFCUlxCommands.clearpac = CFCUlxCommands.clearpac or {}
 local cmd = CFCUlxCommands.clearpac
 local CATEGORY_NAME = "Utility"
-                    
-function cmd.clearPac( callingPlayer, targetPlayers, amount )
+
+function cmd.clearPac( callingPlayer, targetPlayers )
     for _, ply in pairs( targetPlayers ) do
         ply:ConCommand( "pac_clear_parts" )
     end
