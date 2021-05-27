@@ -1,6 +1,5 @@
 CFCUlxCommands.clearpac = CFCUlxCommands.clearpac or {}
 local cmd = CFCUlxCommands.clearpac
-
 local CATEGORY_NAME = "Utility"
                     
 function cmd.clearPac( callingPlayer, targetPlayers, amount )
