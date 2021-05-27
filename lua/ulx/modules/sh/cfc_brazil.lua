@@ -123,7 +123,7 @@ local function getRandomPos( caller, target )
 end
 
 local function sendToPos( caller, targets, message, doSlap )
-    for _, ply in pairs( targets ) do
+    for _, ply in ipairs( targets ) do
         local err, pos = getRandomPos( caller, ply )
         
         if not err then
