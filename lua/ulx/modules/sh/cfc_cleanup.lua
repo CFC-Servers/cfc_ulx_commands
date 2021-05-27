@@ -5,7 +5,7 @@ CATEGORY_NAME = "Cleanup"
 
 function cmd.cleanupPlayerEnts( callingPlayer, targetPlayers, targetEntities )
     local isTarget = {}
-    for _, ply in pairs( targetPlayers ) do
+    for _, ply in ipairs( targetPlayers ) do
         isTarget[ply] = true
     end
 
