@@ -143,7 +143,7 @@ hook.Add( "PlayerDisconnected", "CFC_ULX_RemovePropifyRagdoll", propDisconnected
 
 local function removePropOnCleanup()
     local players = player.GetAll()
-    for _, ply in pairs( players ) do
+    for _, ply in ipairs( players ) do
         if ply.ragdoll then
             ply.propifyAfterCleanup = true
             cmd.unpropifyPlayer( ply )
@@ -154,7 +154,7 @@ hook.Add( "PreCleanupMap", "CFC_ULX_RemovePropify", removePropOnCleanup )
 
 local function createPropAfterCleanup()
     local players = player.GetAll()
-    for _, ply in pairs( players ) do
+    for _, ply in ipairs( players ) do
         if ply.propifyAfterCleanup then
             ply.propifyAfterCleanup = nil
             timer.Simple( 0.1, function() propifyPlayer( ply ) end )
