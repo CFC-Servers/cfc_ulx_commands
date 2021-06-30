@@ -5,7 +5,7 @@ local CATEGORY_NAME = "Utility"
 function cmd.weprem( callingPlayer, targetPlayers )
     local count = 0
 
-    for _, entity in pairs( ents.GetAll() ) do
+    for _, entity in ipairs( ents.GetAll() ) do
         if IsValid( entity ) then
             local isUnownedWeapon = entity:IsWeapon() and not IsValid( entity.Owner )
 
