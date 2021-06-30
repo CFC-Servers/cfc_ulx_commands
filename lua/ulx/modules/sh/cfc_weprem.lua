@@ -1,6 +1,7 @@
 CFCUlxCommands.weprem = CFCUlxCommands.weprem or {}
 local cmd = CFCUlxCommands.weprem
 local CATEGORY_NAME = "Utility"
+local IsValid = IsValid
 
 function cmd.weprem( callingPlayer, targetPlayers )
     local count = 0
