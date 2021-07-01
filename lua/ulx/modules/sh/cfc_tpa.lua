@@ -4,6 +4,7 @@ local CATEGORY_NAME = "Teleport"
 
 CreateConVar( "cfc_tpa_decline_cooldown", 10, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The time a person can't receive teleports from a player after declining.", 0 )
 CreateConVar( "cfc_tpa_cooldown", 5, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The cooldown between tpa request for any player.", 0 )
+CreateConVar( "cfc_tpa_teleport_delay", 0, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The delay for someone to teleport after getting accepted.", 0 )
 
 local function setDeclineCooldown( caller, target )
     target.cfcTpaCooldownDecline = target.cfcTpaCooldownDecline or {}
@@ -40,8 +41,18 @@ function cmd.tpa( callingPlayer, targetPlayers )
 
     function notif:OnButtonPressed( _, ind )
         if ind == 1 then
-            ulx.goto( callingPlayer, target )
-            CFCNotifications.sendSimple( "tpaClose", "TPA", "Teleport request was accepted.", callingPlayer )
+            local delay = GetConVar( "cfc_tpa_teleport_delay" ):GetInt()
+
+            local acceptNotif = CFCNotifications.new( "tpaClose", "Text", true )
+            acceptNotif:SetTitle( "TPA" )
+            acceptNotif:SetText( "Teleport request was accepted, teleporting shortly." )
+            acceptNotif:SetDisplayTime( delay )
+            acceptNotif:Send( callingPlayer )
+
+            timer.Simple( delay, function()
+                CFCNotifications.sendSimple( "tpaClose", "TPA", "Successfully teleported.", callingPlayer )
+                ulx.goto( callingPlayer, target )
+            end)
         else
             CFCNotifications.sendSimple( "tpaClose", "TPA", "The recipient has denied your teleport request.", callingPlayer )
             setDeclineCooldown( callingPlayer, target )
