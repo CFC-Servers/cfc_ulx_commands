@@ -29,7 +29,7 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
         ulx.fancyLogAdmin( caller, true, "#A checked #T's friends, they have currently no friends playing on this server" , ply )
         return
     end
-    
+
     sendResponse( ply, friendTable, caller )
 
     awaitingResponse[ply] = nil
