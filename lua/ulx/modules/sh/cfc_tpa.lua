@@ -2,6 +2,15 @@ CFCUlxCommands.tpa = CFCUlxCommands.tpa or {}
 local cmd = CFCUlxCommands.tpa
 local CATEGORY_NAME = "Teleport"
 
+if SERVER then
+    local allowTeleports = {}
+
+    util.AddNetworkString( "cfcUlxTpaBlockRequests" )
+    net.Receive( "cfcUlxTpaBlockRequests", function( _, ply )
+        allowTeleports[ply] = net.ReadBool()
+    end)
+end
+
 CreateConVar( "cfc_tpa_decline_cooldown", 10, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The time a person can't receive teleports from a player after declining.", 0 )
 CreateConVar( "cfc_tpa_cooldown", 5, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The cooldown between tpa request for any player.", 0 )
 CreateConVar( "cfc_tpa_teleport_delay", 0, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The delay for someone to teleport after getting accepted.", 0 )
@@ -13,6 +22,11 @@ end
 
 function cmd.tpa( callingPlayer, targetPlayers )
     local target = targetPlayers[1]
+
+    if not allowTeleports[target] then
+        CFCNotifications.sendSimple( "tpaNotAllowed", "TPA", "This player has tpa requests disabled.", callingPlayer )
+        return
+    end
 
     if target.cfcTpaCooldownDecline and target.cfcTpaCooldownDecline[ callingPlayer ] and target.cfcTpaCooldownDecline[ callingPlayer ] > CurTime() then
         CFCNotifications.sendSimple( "tpaDeclineCooldown", "TPA", "You cannot request a TPA to that player yet.", callingPlayer )
@@ -75,3 +89,23 @@ local tpaCommand = ulx.command( CATEGORY_NAME, "ulx tpa", cmd.tpa, "!tpa" )
 tpaCommand:addParam{ type = ULib.cmds.PlayersArg }
 tpaCommand:defaultAccess( ULib.ACCESS_ADMIN )
 tpaCommand:help( "Requests a teleport to other players." )
+
+-- Q menu disable checkbox
+if CLIENT then
+    CreateClientConVar( "tpa_disable", 0, true, true, "Disables ulx tpa request from being shown." )
+
+    hook.Add( "AddToolMenuCategories", "CFC_TPA_AddToolMenuCategories", function()
+        spawnmenu.AddToolCategory( "Options", "CFC", "#CFC" )
+    end)
+
+    hook.Add( "PopulateToolMenu", "CFC_TPA_PopulateToolMenu", function()
+        spawnmenu.AddToolMenuOption( "Options", "CFC", "cfc_tpa", "#TPA", "", "", function( panel )
+            local checkbox = panel:CheckBox( "Disable tpa's from all players", "streamcore_disable" )
+            function checkbox:OnChange( val )
+                net.Start( "cfcUlxTpaBlockRequests" )
+                net.WriteBool( val )
+                net.SendToServer()
+            end
+        end)
+    end)
+end
