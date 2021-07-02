@@ -47,21 +47,21 @@ local MAP_POSITION_DATA = {
         fallback = Vector( -8750, -8500, -1084 ),
         offsetX = 500,
         offsetY = 500
-    }, 
+    },
     ["gm_flatgrass"] = {
         centerZ = 28200 / 2 - 12800,
         playableHeight = 28200 / 2,
         fallback = Vector( -700, 100, -12764 ),
         offsetX = 250,
         offsetY = 500
-    }, 
+    },
     ["gm_functional_flatgrass"] = {
         centerZ = 28600 / 2 - 16300,
         playableHeight = 28600 / 2,
         fallback = Vector( 10500, -9400, -16252 ),
         offsetX = 3500,
         offsetY = 3500
-    }, 
+    },
     ["gm_genesis"] = {
         centerZ = 27600 / 2 - 15300,
         playableHeight = 27600 / 2,
@@ -77,30 +77,30 @@ local function getRandomPos( caller, target )
     if ulx.getExclusive( target, caller ) then
         return ulx.getExclusive( target, caller )
     end
-    
+
     if target:InVehicle() then
         target:ExitVehicle()
     end
-    
+
     local mapData = MAP_POSITION_DATA[game.GetMap()]
-    
+
     for _ = 1, MAX_TRIES do
         local pos = Vector( math.random( MIN_X, MAX_X ), math.random( MIN_Y, MAX_Y ), math.random( MIN_Z, MAX_Z ) )
-        
+
         if mapData then
             pos.z = mapData.centerZ + math.random( -mapData.playableHeight, mapData.playableHeight )
         end
-        
+
         if util.IsInWorld( pos ) then
             local minHull, maxHull = target:GetCollisionBounds()
-            
+
             local validationTrace = util.TraceHull( {
                 start = pos,
                 endpos = pos,
                 mins = minHull,
                 maxs = maxHull
             } )
-            
+
             if not validationTrace.Hit then
                 local floorTrace = util.TraceHull( {
                     start = pos,
@@ -108,28 +108,28 @@ local function getRandomPos( caller, target )
                     mins = minHull,
                     maxs = maxHull
                 } )
-                
+
                 return nil, floorTrace.HitPos + Vector( 0, 0, 1 )
             end
         end
     end
-    
+
     if not mapData then return nil, Vector( 0, 0, 0 ) end
-    
+
     local fallback = mapData.fallback
     local randomOffset = VectorRand() * Vector( mapData.offsetX, mapdata.offsetY, 0 )
-    
+
     return nil, fallback + randomOffset
 end
 
 local function sendToPos( caller, targets, message, doSlap )
     for _, ply in ipairs( targets ) do
         local err, pos = getRandomPos( caller, ply )
-        
+
         if not err then
             ply.ulx_prevpos = ply:GetPos()
             ply.ulx_prevang = ply:EyeAngles()
-            
+
             if doSlap then
                 ULib.slap( ply, 0, 700, false )
                 timer.Simple( 0.5, function() ply:SetPos( pos ) end )
@@ -140,7 +140,7 @@ local function sendToPos( caller, targets, message, doSlap )
             ULib.tsayError( caller, err, true )
         end
     end
-    
+
     ulx.fancyLogAdmin( caller, message, targets )
 end
 
