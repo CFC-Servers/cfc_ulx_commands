@@ -308,7 +308,7 @@ end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
 hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
 
-local function detectPropifyDrop( ply, ent )
+local function detectPropifyDrop( _, ent )
     if not IsValid( ent ) then return end
 
     local ragdolledPly = ent.ragdolledPly
@@ -391,7 +391,7 @@ end
 hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
 
 --Prevents propified players from damaging other people
-local function ignorePropifyDamage( victim, dmgInfo )
+local function ignorePropifyDamage( _, dmgInfo )
     if not IsValid( dmgInfo:GetAttacker().ragdolledPly ) then return end
     return true
 end
