@@ -12,9 +12,9 @@ cmd.CHEESE_MODELS = {
 function cmd.cheeseTargets( caller, targets, shouldUncheese )
     local model = cmd.CHEESE_MODELS[math.random( #cmd.CHEESE_MODELS )]
     local props = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
-    
+
     if table.IsEmpty( props ) then return end
-    
+
     for _, prop in pairs( props ) do
         local color = Color( 255, math.Rand( 150, 221 ), 6, 255 )
         prop:SetMaterial( "models/XQM/Rails/gumball_1" )

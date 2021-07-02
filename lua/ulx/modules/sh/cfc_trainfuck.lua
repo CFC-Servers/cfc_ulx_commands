@@ -10,12 +10,12 @@ local trainSounds = {
     "garrysmod/balloon_pop_cute.wav",
     "garrysmod/save_load1.wav"
 }
-                    
+
 function cmd.trainFuckPlayers( callingPlayer, targetPlayers )
     for _, ply in ipairs( targetPlayers ) do
         local soundPlay = trainSounds[math.random( 1, 5 )]
         local train = ents.Create( "train_fucked" )
-        
+
         train:SetPos( ply:GetPos() - ply:GetForward() * 500 + Vector( 0, 0, 150 ) )
         train:SetAngles( ply:EyeAngles() - Angle( 0, 90, 0 ) )
         train:Spawn()

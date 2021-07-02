@@ -19,7 +19,6 @@ local function propifyPlayer( caller, ply, modelPath )
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
 
     if ply:InVehicle() then
-        local vehicle = ply:GetParent()
         ply:ExitVehicle()
     end
 
@@ -210,7 +209,7 @@ local function manualUseTrace( ply )
     local _, boundMax = prop:GetModelBounds()
     local traceSettings = {
         start = prop:GetPos() + Vector( 0, 0, boundMax.z + 6 ), --Account for camera/eye position disconnect in prop specate
-        endpos = prop:GetPos() + ply:EyeAngles():Forward()*250,
+        endpos = prop:GetPos() + ply:EyeAngles():Forward() * 250,
         filter = {
             prop,
             ply,
@@ -309,7 +308,7 @@ end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
 hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
 
-local function detectPropifyDrop( ply, ent )
+local function detectPropifyDrop( _, ent )
     if not IsValid( ent ) then return end
 
     local ragdolledPly = ent.ragdolledPly
@@ -352,8 +351,8 @@ local function struggle( ply, button )
             local escapeStrength = STRUGGLE_STRENGTH:GetFloat() * physObj:GetMass()
             local escapeDir = grabber:EyeAngles()
             local escapeRand = STRUGGLE_FLEE_RANDOM:GetFloat()
-            escapeDir:RotateAroundAxis( escapeDir:Up(), math.Rand( -1, 1 )*escapeRand )
-            escapeDir:RotateAroundAxis( escapeDir:Right(), math.Rand( -1, 1 )*escapeRand )
+            escapeDir:RotateAroundAxis( escapeDir:Up(), math.Rand( -1, 1 ) * escapeRand )
+            escapeDir:RotateAroundAxis( escapeDir:Right(), math.Rand( -1, 1 ) * escapeRand )
 
             physObj:ApplyForceCenter( escapeDir:Forward() * escapeStrength )
         end
@@ -392,7 +391,7 @@ end
 hook.Add( "EntityRemoved", "CFC_ULX_PropifyRemoveProp", unpropifyOnRemove )
 
 --Prevents propified players from damaging other people
-local function ignorePropifyDamage( victim, dmgInfo )
+local function ignorePropifyDamage( _, dmgInfo )
     if not IsValid( dmgInfo:GetAttacker().ragdolledPly ) then return end
     return true
 end
