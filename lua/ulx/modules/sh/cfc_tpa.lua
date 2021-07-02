@@ -2,15 +2,6 @@ CFCUlxCommands.tpa = CFCUlxCommands.tpa or {}
 local cmd = CFCUlxCommands.tpa
 local CATEGORY_NAME = "Teleport"
 
-if SERVER then
-    local allowTeleports = {}
-
-    util.AddNetworkString( "cfcUlxTpaBlockRequests" )
-    net.Receive( "cfcUlxTpaBlockRequests", function( _, ply )
-        allowTeleports[ply] = net.ReadBool()
-    end)
-end
-
 CreateConVar( "cfc_tpa_decline_cooldown", 10, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The time a person can't receive teleports from a player after declining.", 0 )
 CreateConVar( "cfc_tpa_cooldown", 5, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The cooldown between tpa request for any player.", 0 )
 CreateConVar( "cfc_tpa_teleport_delay", 0, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The delay for someone to teleport after getting accepted.", 0 )
@@ -23,7 +14,7 @@ end
 function cmd.tpa( callingPlayer, targetPlayers )
     local target = targetPlayers[1]
 
-    if not allowTeleports[target] then
+    if target:GetInfoNum( "cfc_tpa_disable", 0 ) == 1 then
         CFCNotifications.sendSimple( "tpaNotAllowed", "TPA", "This player has tpa requests disabled.", callingPlayer )
         return
     end
@@ -92,7 +83,7 @@ tpaCommand:help( "Requests a teleport to other players." )
 
 -- Q menu disable checkbox
 if CLIENT then
-    CreateClientConVar( "tpa_disable", 0, true, true, "Disables ulx tpa request from being shown." )
+    CreateClientConVar( "cfc_tpa_disable", 0, true, true, "Disables ulx tpa request from being shown." )
 
     hook.Add( "AddToolMenuCategories", "CFC_TPA_AddToolMenuCategories", function()
         spawnmenu.AddToolCategory( "Options", "CFC", "#CFC" )
@@ -100,12 +91,7 @@ if CLIENT then
 
     hook.Add( "PopulateToolMenu", "CFC_TPA_PopulateToolMenu", function()
         spawnmenu.AddToolMenuOption( "Options", "CFC", "cfc_tpa", "#TPA", "", "", function( panel )
-            local checkbox = panel:CheckBox( "Disable tpa's from all players", "streamcore_disable" )
-            function checkbox:OnChange( val )
-                net.Start( "cfcUlxTpaBlockRequests" )
-                net.WriteBool( val )
-                net.SendToServer()
-            end
+            panel:CheckBox( "Disable tpa's from all players", "cfc_tpa_disable" )
         end)
     end)
 end
