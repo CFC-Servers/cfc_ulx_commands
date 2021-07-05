@@ -7,7 +7,7 @@ local MUTES_SQL_TABLE = "cfc_timed_mutes"
 local INIT_WAIT_TIME = 1
 local MUTE_CHECK_INTERVAL = 1
 
-local MutegedPlayers = {}
+local MutedPlayers = {}
 
 local mutesInitialized = false
 
@@ -137,8 +137,8 @@ local function muteIsExpired( expirationTime )
     return os.time() > expirationTime
 end
 
-local function playerIsMuteged( ply )
-    return MutegedPlayers[ply] ~= nil
+local function playerIsMuted( ply )
+    return MutedPlayers[ply] ~= nil
 end
 
 local function getExpirationTime( minutesToMute )
@@ -166,7 +166,7 @@ local function ulxUnmutePlayer( ply )
     ply:SetNWBool( "ulx_muted", ply.ulx_muted )
 end
 
-local function playerIsUlxMuteged( ply )
+local function playerIsUlxMuted( ply )
     return ply:GetNWBool( "ulx_muted", false )
 end
 
@@ -176,10 +176,10 @@ local function mutePlayerUntil( ply, expirationTime, reason, fromDb )
     -- Did this mute come directly from the database?
     fromDb = fromDb or false
 
-    if not playerIsUlxMuteged( ply ) then ulxMutePlayer( ply ) end
+    if not playerIsUlxMuted( ply ) then ulxMutePlayer( ply ) end
 
     if not fromDb then
-        if playerIsMuteged( ply ) then
+        if playerIsMuted( ply ) then
             updatePlayerMuteInDatabase( ply, expirationTime, reason )
         else
             createPlayerMuteInDatabase( ply, expirationTime, reason )
@@ -195,7 +195,7 @@ local function mutePlayerUntil( ply, expirationTime, reason, fromDb )
     if reason then message = message .. " Reason: " .. reason end
     ply:ChatPrint( message )
 
-    MutegedPlayers[ply] = expirationTime
+    MutedPlayers[ply] = expirationTime
 end
 
 local function mutePlayerForTime( ply, minutesToMute, reason )
@@ -207,9 +207,9 @@ end
 local function unmutePlayer( ply )
     if not isValidPlayer( ply ) then return end
 
-    if playerIsUlxMuteged( ply ) then ulxUnmutePlayer( ply ) end
+    if playerIsUlxMuted( ply ) then ulxUnmutePlayer( ply ) end
 
-    MutegedPlayers[ply] = nil
+    MutedPlayers[ply] = nil
 end
 
 local function getPlayerMuteFromDatabase( ply )
@@ -218,7 +218,7 @@ local function getPlayerMuteFromDatabase( ply )
     -- Player is not in database
     local expiration = getMuteExpirationFromDatabase( ply )
     if expiration == nil then
-        MutegedPlayers[ply] = nil
+        MutedPlayers[ply] = nil
         return
     end
 
@@ -234,7 +234,7 @@ local function getPlayerMuteFromDatabase( ply )
     mutePlayerUntil( ply, expiration, reason, true )
 end
 
-local function initializeMutegedPlayers()
+local function initializeMutedPlayers()
     for _, ply in pairs( player.GetHumans() ) do
         getPlayerMuteFromDatabase( ply )
     end
@@ -253,7 +253,7 @@ function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shou
             unmutePlayer( ply )
         end
 
-        return ulx.fancyLogAdmin( callingPlayer, "#A unmuteged #T!", targetPlayers )
+        return ulx.fancyLogAdmin( callingPlayer, "#A unmuted #T!", targetPlayers )
     end
 
     -- time > 100 years
@@ -263,7 +263,7 @@ function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shou
         mutePlayerForTime( ply, minutesToMute, reason )
     end
 
-    ulx.fancyLogAdmin( callingPlayer, "#A muteged #T for #i minutes!", targetPlayers, minutesToMute )
+    ulx.fancyLogAdmin( callingPlayer, "#A muted #T for #i minutes!", targetPlayers, minutesToMute )
 end
 
 local timeMuteCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timemute", cmd.timeMute, "!tmute" )
@@ -290,9 +290,9 @@ hook.Add( "PlayerInitialSpawn", "CFC_MuteCheck", waitForPlayerToInitialize )
 
 
 local function removeDisconnectedPlayer( ply )
-    if not playerIsMuteged( ply ) then return end
+    if not playerIsMuted( ply ) then return end
 
-    MutegedPlayers[ply] = nil
+    MutedPlayers[ply] = nil
 end
 hook.Remove( "PlayerDisconnected", "CFC_MuteRemove" )
 hook.Add( "PlayerDisconnected", "CFC_MuteRemove", removeDisconnectedPlayer )
@@ -302,7 +302,7 @@ local function initializeMutes()
 
     mutePrint( "Initializing Mutes!" )
 
-    initializeMutegedPlayers()
+    initializeMutedPlayers()
 
     mutesInitialized = true
 end
@@ -310,7 +310,7 @@ end
 local function updateMutes()
     if not mutesInitialized then initializeMutes() end
 
-    for ply, expiration in pairs( MutegedPlayers ) do
+    for ply, expiration in pairs( MutedPlayers ) do
         if isValidPlayer( ply ) then
             if muteIsExpired( expiration ) then
                 removeMuteFromDatabase( ply )
