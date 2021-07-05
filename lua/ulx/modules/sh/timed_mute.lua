@@ -156,14 +156,13 @@ local function getMinutesRemainingInMute( expirationTime )
 end
 
 local function ulxMutePlayer( ply )
-    -- This is how ulx mutes someone
-    ply.ulx_muted = true
-    ply:SetNWBool( "ulx_muted", ply.ulx_muted )
+    ply.gimp = 2
+    ply:SetNWBool( "ulx_muted", true )
 end
 
 local function ulxUnmutePlayer( ply )
-    ply.ulx_muted = false
-    ply:SetNWBool( "ulx_muted", ply.ulx_muted )
+    ply.gimp = nil
+    ply:SetNWBool( "ulx_muted", false )
 end
 
 local function playerIsUlxMuted( ply )
