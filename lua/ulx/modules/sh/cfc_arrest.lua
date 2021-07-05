@@ -1,9 +1,9 @@
-CFCUlxCommands.halt = CFCUlxCommands.halt or {}
-local cmd = CFCUlxCommands.halt
+CFCUlxCommands.arrest = CFCUlxCommands.arrest or {}
+local cmd = CFCUlxCommands.arrest
 
 CATEGORY_NAME = "Cleanup"
 
-function cmd.halt( callingPlayer, targetPlayers )
+function cmd.arrest( callingPlayer, targetPlayers )
     local entities = ents.GetAll()
     local entCount = 0
     local entCounts = {}
@@ -35,7 +35,7 @@ function cmd.halt( callingPlayer, targetPlayers )
             end
         end
     end
-    ulx.fancyLogAdmin( callingPlayer, "#A halted " .. entCount .. " props owned by #T", targetPlayers )
+    ulx.fancyLogAdmin( callingPlayer, "#A froze " .. entCount .. " props owned by #T", targetPlayers )
     ulx.jail( callingPlayer, targetPlayers, 0 )
 
     if #targetPlayers <= 1 then return end
@@ -45,7 +45,7 @@ function cmd.halt( callingPlayer, targetPlayers )
     end
 end
 
-local freezeCMD = ulx.command( CATEGORY_NAME, "ulx halt", cmd.halt, "!halt" )
+local freezeCMD = ulx.command( CATEGORY_NAME, "ulx arrest", cmd.arrest, "!arrest" )
 freezeCMD:addParam{ type = ULib.cmds.PlayersArg }
 freezeCMD:defaultAccess( ULib.ACCESS_ADMIN )
-freezeCMD:help( "Halts target( s ) props, chips and jails the target." )
+freezeCMD:help( "Arrests target( s ) props, chips and jails the target." )
