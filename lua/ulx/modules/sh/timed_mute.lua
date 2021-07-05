@@ -1,22 +1,22 @@
-CFCUlxCommands.tGag = CFCUlxCommands.tGag or {}
-local cmd = CFCUlxCommands.tGag
+CFCUlxCommands.tMute = CFCUlxCommands.tMute or {}
+local cmd = CFCUlxCommands.tMute
 
 -- Constants
 local ULX_CATEGORY_NAME = "Chat"
-local GAGS_SQL_TABLE = "cfc_timed_gags"
+local MUTES_SQL_TABLE = "cfc_timed_mutes"
 local INIT_WAIT_TIME = 1
-local GAG_CHECK_INTERVAL = 1
+local MUTE_CHECK_INTERVAL = 1
 
-local GaggedPlayers = {}
+local MutegedPlayers = {}
 
-local gagsInitialized = false
+local mutesInitialized = false
 
-local GAG_QUERIES = {
-    create_gag   = "INSERT INTO %s(steam_id, expiration, reason) VALUES('%s', %d, '%s')",
+local MUTE_QUERIES = {
+    create_mute   = "INSERT INTO %s(steam_id, expiration, reason) VALUES('%s', %d, '%s')",
     create_table = "CREATE TABLE %s(steam_id TEXT NOT NULL UNIQUE, expiration BIGINT, reason TEXT)",
-    delete_gag   = "DELETE FROM %s WHERE steam_id='%s'",
-    retrieve_gag = "SELECT %s FROM %s WHERE steam_id='%s'",
-    update_gag   = "UPDATE %s SET expiration=%d, reason='%s' WHERE steam_id='%s'"
+    delete_mute   = "DELETE FROM %s WHERE steam_id='%s'",
+    retrieve_mute = "SELECT %s FROM %s WHERE steam_id='%s'",
+    update_mute   = "UPDATE %s SET expiration=%d, reason='%s' WHERE steam_id='%s'"
 }
 
 
@@ -28,17 +28,17 @@ local function isValidPlayer( ply )
     return playerIsValid
 end
 
-local function gagPrint( msg )
-    print( "[CFC Timed Gag] " .. msg )
+local function mutePrint( msg )
+    print( "[CFC Timed Mute] " .. msg )
 end
 
-local function databaseGagPrint( action, succeeded, ply )
+local function databaseMutePrint( action, succeeded, ply )
     local result = ( succeeded == false ) and "FAILED" or "SUCCEEDED"
 
     if isValidPlayer( ply ) then
-        gagPrint( action .. " for '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) in Database " .. result )
+        mutePrint( action .. " for '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) in Database " .. result )
     else
-        gagPrint( action .. " " .. result )
+        mutePrint( action .. " " .. result )
     end
 end
 
@@ -56,7 +56,7 @@ local function SQLOperation( action, query, ply, isRead )
     local failed = ( result == false ) or ( isRead and result == nil )
     local succeeded = not failed
 
-    databaseGagPrint( action, succeeded, ply )
+    databaseMutePrint( action, succeeded, ply )
 
     return result
 end
@@ -70,210 +70,210 @@ local function SQLRead( action, query, ply )
 end
 
 local function createTable()
-    if sql.TableExists( GAGS_SQL_TABLE ) then return gagPrint( GAGS_SQL_TABLE .. " already exists!" ) end
+    if sql.TableExists( MUTES_SQL_TABLE ) then return mutePrint( MUTES_SQL_TABLE .. " already exists!" ) end
 
-    local query = string.format( GAG_QUERIES.create_table, GAGS_SQL_TABLE )
+    local query = string.format( MUTE_QUERIES.create_table, MUTES_SQL_TABLE )
 
-    return SQLAction( "Creating table " .. GAGS_SQL_TABLE, query )
+    return SQLAction( "Creating table " .. MUTES_SQL_TABLE, query )
 end
 
-local function updatePlayerGagInDatabase( ply, expirationTime, reason )
+local function updatePlayerMuteInDatabase( ply, expirationTime, reason )
     local query = string.format(
-        GAG_QUERIES.update_gag,
-        GAGS_SQL_TABLE,
+        MUTE_QUERIES.update_mute,
+        MUTES_SQL_TABLE,
         expirationTime,
         sql.SQLStr( reason, true ),
         ply:SteamID()
     )
 
-    return SQLAction( "Updating timed gag", query, ply )
+    return SQLAction( "Updating timed mute", query, ply )
 end
 
-local function createPlayerGagInDatabase( ply, expirationTime, reason )
+local function createPlayerMuteInDatabase( ply, expirationTime, reason )
     local query = string.format(
-        GAG_QUERIES.create_gag,
-        GAGS_SQL_TABLE,
+        MUTE_QUERIES.create_mute,
+        MUTES_SQL_TABLE,
         ply:SteamID(),
         expirationTime,
         sql.SQLStr( reason, true )
     )
 
-    return SQLAction( "Creating timed gag", query, ply )
+    return SQLAction( "Creating timed mute", query, ply )
 end
 
 local function getColumnFromDatabase( ply, column )
-    local query = string.format( GAG_QUERIES.retrieve_gag, column, GAGS_SQL_TABLE, ply:SteamID() )
+    local query = string.format( MUTE_QUERIES.retrieve_mute, column, MUTES_SQL_TABLE, ply:SteamID() )
 
-    return SQLRead( "Retrieving time gag " .. column, query, ply )
+    return SQLRead( "Retrieving time mute " .. column, query, ply )
 end
 
-local function getGagExpirationFromDatabase( ply )
+local function getMuteExpirationFromDatabase( ply )
     local expiration = tonumber( getColumnFromDatabase( ply, "expiration" ) )
 
     return expiration
 end
 
-local function getGagReasonFromDatabase( ply )
+local function getMuteReasonFromDatabase( ply )
     local reason = getColumnFromDatabase( ply, "reason" )
 
     return reason
 end
 
-local function removeGagFromDatabase( ply )
+local function removeMuteFromDatabase( ply )
     if not isValidPlayer( ply ) then return end
 
-    local query = string.format( GAG_QUERIES.delete_gag, GAGS_SQL_TABLE, ply:SteamID() )
+    local query = string.format( MUTE_QUERIES.delete_mute, MUTES_SQL_TABLE, ply:SteamID() )
 
-    return SQLAction( "Deleting expired time gag", query, ply )
+    return SQLAction( "Deleting expired time mute", query, ply )
 end
 
 -- END DATABASE OPERATIONS --
 
 
 
--- GAG UTILITY FUNCTIONS --
+-- MUTE UTILITY FUNCTIONS --
 
-local function gagIsExpired( expirationTime )
+local function muteIsExpired( expirationTime )
     return os.time() > expirationTime
 end
 
-local function playerIsGagged( ply )
-    return GaggedPlayers[ply] ~= nil
+local function playerIsMuteged( ply )
+    return MutegedPlayers[ply] ~= nil
 end
 
-local function getExpirationTime( minutesToGag )
-    local timeInSeconds = minutesToGag * 60
+local function getExpirationTime( minutesToMute )
+    local timeInSeconds = minutesToMute * 60
     local expirationTime = os.time() + timeInSeconds
 
     return expirationTime
 end
 
-local function getMinutesRemainingInGag( expirationTime )
-    local secondsLeftInGag = expirationTime - os.time()
-    local minutesLeftInGag = math.ceil( secondsLeftInGag / 60 )
+local function getMinutesRemainingInMute( expirationTime )
+    local secondsLeftInMute = expirationTime - os.time()
+    local minutesLeftInMute = math.ceil( secondsLeftInMute / 60 )
 
-    return minutesLeftInGag
+    return minutesLeftInMute
 end
 
-local function ulxGagPlayer( ply )
-    -- This is how ulx gags someone
-    ply.ulx_gagged = true
-    ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
+local function ulxMutePlayer( ply )
+    -- This is how ulx mutes someone
+    ply.ulx_muted = true
+    ply:SetNWBool( "ulx_muted", ply.ulx_muted )
 end
 
-local function ulxUngagPlayer( ply )
-    ply.ulx_gagged = false
-    ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
+local function ulxUnmutePlayer( ply )
+    ply.ulx_muted = false
+    ply:SetNWBool( "ulx_muted", ply.ulx_muted )
 end
 
-local function playerIsUlxGagged( ply )
-    return ply:GetNWBool( "ulx_gagged", false )
+local function playerIsUlxMuteged( ply )
+    return ply:GetNWBool( "ulx_muted", false )
 end
 
-local function gagPlayerUntil( ply, expirationTime, reason, fromDb )
+local function mutePlayerUntil( ply, expirationTime, reason, fromDb )
     if not isValidPlayer( ply ) then return end
 
-    -- Did this gag come directly from the database?
+    -- Did this mute come directly from the database?
     fromDb = fromDb or false
 
-    if not playerIsUlxGagged( ply ) then ulxGagPlayer( ply ) end
+    if not playerIsUlxMuteged( ply ) then ulxMutePlayer( ply ) end
 
     if not fromDb then
-        if playerIsGagged( ply ) then
-            updatePlayerGagInDatabase( ply, expirationTime, reason )
+        if playerIsMuteged( ply ) then
+            updatePlayerMuteInDatabase( ply, expirationTime, reason )
         else
-            createPlayerGagInDatabase( ply, expirationTime, reason )
+            createPlayerMuteInDatabase( ply, expirationTime, reason )
         end
     end
 
-    local minutesLeftInGag = getMinutesRemainingInGag( expirationTime )
+    local minutesLeftInMute = getMinutesRemainingInMute( expirationTime )
 
-    gagPrint( "Gagging '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) for " .. minutesLeftInGag .. " minutes!" )
+    mutePrint( "Muteging '" .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) for " .. minutesLeftInMute .. " minutes!" )
 
-    message = "You have a time gag that expires in " .. tostring( minutesLeftInGag ) .. " minutes."
+    message = "You have a time mute that expires in " .. tostring( minutesLeftInMute ) .. " minutes."
 
     if reason then message = message .. " Reason: " .. reason end
     ply:ChatPrint( message )
 
-    GaggedPlayers[ply] = expirationTime
+    MutegedPlayers[ply] = expirationTime
 end
 
-local function gagPlayerForTime( ply, minutesToGag, reason )
-    local expirationTime = getExpirationTime( minutesToGag )
+local function mutePlayerForTime( ply, minutesToMute, reason )
+    local expirationTime = getExpirationTime( minutesToMute )
 
-    gagPlayerUntil( ply, expirationTime, reason )
+    mutePlayerUntil( ply, expirationTime, reason )
 end
 
-local function ungagPlayer( ply )
+local function unmutePlayer( ply )
     if not isValidPlayer( ply ) then return end
 
-    if playerIsUlxGagged( ply ) then ulxUngagPlayer( ply ) end
+    if playerIsUlxMuteged( ply ) then ulxUnmutePlayer( ply ) end
 
-    GaggedPlayers[ply] = nil
+    MutegedPlayers[ply] = nil
 end
 
-local function getPlayerGagFromDatabase( ply )
+local function getPlayerMuteFromDatabase( ply )
     if not isValidPlayer( ply ) then return end
 
     -- Player is not in database
-    local expiration = getGagExpirationFromDatabase( ply )
+    local expiration = getMuteExpirationFromDatabase( ply )
     if expiration == nil then
-        GaggedPlayers[ply] = nil
+        MutegedPlayers[ply] = nil
         return
     end
 
-    if gagIsExpired( expiration ) then
-        removeGagFromDatabase( ply )
-        ungagPlayer( ply )
+    if muteIsExpired( expiration ) then
+        removeMuteFromDatabase( ply )
+        unmutePlayer( ply )
 
         return
     end
 
-    local reason = getGagReasonFromDatabase( ply )
+    local reason = getMuteReasonFromDatabase( ply )
 
-    gagPlayerUntil( ply, expiration, reason, true )
+    mutePlayerUntil( ply, expiration, reason, true )
 end
 
-local function initializeGaggedPlayers()
+local function initializeMutegedPlayers()
     for _, ply in pairs( player.GetHumans() ) do
-        getPlayerGagFromDatabase( ply )
+        getPlayerMuteFromDatabase( ply )
     end
 end
 
--- END GAG UTILITY FUNCTIONS --
+-- END MUTE UTILITY FUNCTIONS --
 
 
 
 -- ULX COMMAND SETUP --
 
-function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason, shouldUngag )
-    if shouldUngag then
+function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shouldUnmute )
+    if shouldUnmute then
         for _, ply in pairs( targetPlayers ) do
-            removeGagFromDatabase( ply )
-            ungagPlayer( ply )
+            removeMuteFromDatabase( ply )
+            unmutePlayer( ply )
         end
 
-        return ulx.fancyLogAdmin( callingPlayer, "#A ungagged #T!", targetPlayers )
+        return ulx.fancyLogAdmin( callingPlayer, "#A unmuteged #T!", targetPlayers )
     end
 
     -- time > 100 years
-    if minutesToGag == 0 then minutesToGag = 9999999999 end
+    if minutesToMute == 0 then minutesToMute = 9999999999 end
 
     for _, ply in pairs( targetPlayers ) do
-        gagPlayerForTime( ply, minutesToGag, reason )
+        mutePlayerForTime( ply, minutesToMute, reason )
     end
 
-    ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
+    ulx.fancyLogAdmin( callingPlayer, "#A muteged #T for #i minutes!", targetPlayers, minutesToMute )
 end
 
-local timeGagCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timegag", cmd.timeGag, "!tgag" )
-timeGagCommand:addParam{ type = ULib.cmds.PlayersArg }
-timeGagCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
-timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
-timeGagCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
-timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
-timeGagCommand:help( "Gags a user for a set amount of time" )
-timeGagCommand:setOpposite( "ulx untimegag", {_, _, _, _, true}, "!untgag" )
+local timeMuteCommand = ulx.command( ULX_CATEGORY_NAME, "ulx timemute", cmd.timeMute, "!tmute" )
+timeMuteCommand:addParam{ type = ULib.cmds.PlayersArg }
+timeMuteCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
+timeMuteCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+timeMuteCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
+timeMuteCommand:defaultAccess( ULib.ACCESS_ADMIN )
+timeMuteCommand:help( "Mutes a user for a set amount of time" )
+timeMuteCommand:setOpposite( "ulx untimemute", {_, _, _, _, true}, "!untmute" )
 
 -- END ULX COMMAND SETUP --
 
@@ -282,39 +282,39 @@ timeGagCommand:setOpposite( "ulx untimegag", {_, _, _, _, true}, "!untgag" )
 local function waitForPlayerToInitialize( ply )
     -- Timer because the steamId isn't available yet
     timer.Simple( INIT_WAIT_TIME, function()
-        getPlayerGagFromDatabase( ply )
+        getPlayerMuteFromDatabase( ply )
     end )
 end
-hook.Remove( "PlayerInitialSpawn", "CFC_GagCheck" )
-hook.Add( "PlayerInitialSpawn", "CFC_GagCheck", waitForPlayerToInitialize )
+hook.Remove( "PlayerInitialSpawn", "CFC_MuteCheck" )
+hook.Add( "PlayerInitialSpawn", "CFC_MuteCheck", waitForPlayerToInitialize )
 
 
 local function removeDisconnectedPlayer( ply )
-    if not playerIsGagged( ply ) then return end
+    if not playerIsMuteged( ply ) then return end
 
-    GaggedPlayers[ply] = nil
+    MutegedPlayers[ply] = nil
 end
-hook.Remove( "PlayerDisconnected", "CFC_GagRemove" )
-hook.Add( "PlayerDisconnected", "CFC_GagRemove", removeDisconnectedPlayer )
+hook.Remove( "PlayerDisconnected", "CFC_MuteRemove" )
+hook.Add( "PlayerDisconnected", "CFC_MuteRemove", removeDisconnectedPlayer )
 
-local function initializeGags()
+local function initializeMutes()
     createTable()
 
-    gagPrint( "Initializing Gags!" )
+    mutePrint( "Initializing Mutes!" )
 
-    initializeGaggedPlayers()
+    initializeMutegedPlayers()
 
-    gagsInitialized = true
+    mutesInitialized = true
 end
 
-local function updateGags()
-    if not gagsInitialized then initializeGags() end
+local function updateMutes()
+    if not mutesInitialized then initializeMutes() end
 
-    for ply, expiration in pairs( GaggedPlayers ) do
+    for ply, expiration in pairs( MutegedPlayers ) do
         if isValidPlayer( ply ) then
-            if gagIsExpired( expiration ) then
-                removeGagFromDatabase( ply )
-                ungagPlayer( ply )
+            if muteIsExpired( expiration ) then
+                removeMuteFromDatabase( ply )
+                unmutePlayer( ply )
             end
         else
             removeDisconnectedPlayer( ply )
@@ -322,10 +322,10 @@ local function updateGags()
     end
 end
 
-hook.Remove( "Initialize", "CFC_TimedGagInitialize" )
-hook.Add( "Initialize", "CFC_TimedGagInitialize", function()
-    initializeGags()
+hook.Remove( "Initialize", "CFC_TimedMuteInitialize" )
+hook.Add( "Initialize", "CFC_TimedMuteInitialize", function()
+    initializeMutes()
 
-    timer.Remove( "CFC_GagTimer" )
-    timer.Create( "CFC_GagTimer", GAG_CHECK_INTERVAL, 0, updateGags )
+    timer.Remove( "CFC_MuteTimer" )
+    timer.Create( "CFC_MuteTimer", MUTE_CHECK_INTERVAL, 0, updateMutes )
 end )
