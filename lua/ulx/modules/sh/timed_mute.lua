@@ -3,9 +3,9 @@ local cmd = CFCUlxCommands.timemute
 local CATEGORY_NAME = "Chat"
 
 if SERVER then
-    include( "autorun/server/cfc_timed_commands.lua" )
     CFCTimedCommands.types.timedMute = {}
     CFCTimedCommands.types.timedMute.name = "timedMute"
+    CFCTimedCommands.types.timedMute.pretty = "timed mute"
     CFCTimedCommands.createTable( CFCTimedCommands.types.timedMute.name )
 
     function CFCTimedCommands.types.timedMute.punish( ply )

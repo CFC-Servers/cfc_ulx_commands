@@ -50,8 +50,8 @@ local function catchTable( method )
     return tbl
 end
 
-local function getExpirationTime( minutesToGag )
-    local timeInSeconds = minutesToGag * 60
+local function getExpirationTime( minutesToPunish )
+    local timeInSeconds = minutesToPunish * 60
     local expirationTime = os.time() + timeInSeconds
 
     return expirationTime
