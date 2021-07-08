@@ -1,3 +1,4 @@
+if CLIENT then return end -- ULX has forced my hand here, server modules run after everything so im forced to use shared
 CFCTimedCommands = {}
 CFCTimedCommands.types = {}
 
@@ -163,7 +164,7 @@ local function punishPlayerUntil( ply, expirationTime, reason, method, fromDb )
 
     punishPrint( "Punishing " .. ply:Nick() .. "' ( " .. ply:SteamID() .. " ) with " .. tbl.name .. " for " .. minutesLeftInPunishment .. " minutes!" )
 
-    message = "You have a punishment " .. tbl.name .. " that expires in " .. tostring( minutesLeftInPunishment ) .. " minutes."
+    local message = "You have a " .. tbl.pretty .. " that expires in " .. tostring( minutesLeftInPunishment ) .. " minutes."
 
     if reason then message = message .. " Reason: " .. reason end
     ply:ChatPrint( message )
@@ -264,12 +265,18 @@ end
 local function updatePunishments()
     if not punishmentsInitialized then initializePunishments() end
 
-    for punishType in pairs( CFCTimedCommands.types ) do
+    local typeTable = CFCTimedCommands.types
+
+    for punishType in pairs( typeTable ) do
         for ply, expiration in pairs( punishedPlayers[punishType] ) do
             if isValidPlayer( ply ) then
                 if punishmentIsExpired( expiration ) then
-                    removePunishmentFromDatabase( ply, CFCTimedCommands.types[punishType] )
-                    CFCTimedCommands.types[punishType].unpunish( ply )
+                    removePunishmentFromDatabase( ply, typeTable[punishType].name )
+                    typeTable[punishType].unpunish( ply )
+                    punishedPlayers[punishType][ply] = nil
+
+                    local message = "Your " .. typeTable[punishType].pretty .. " has expired."
+                    ply:ChatPrint( message )
                 end
             else
                 removeDisconnectedPlayer( ply )
