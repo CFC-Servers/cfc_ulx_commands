@@ -53,32 +53,34 @@ function cmd.tpa( callingPlayer, targetPlayers )
     notif:SetTimed( true )
 
     function notif:OnButtonPressed( _, ind )
-        if ind == 1 then
-            local delay = GetConVar( "cfc_tpa_teleport_delay" ):GetInt()
-
-            local acceptNotif = CFCNotifications.new( "tpaClose", "Text", true )
-            acceptNotif:SetTitle( "TPA" )
-            acceptNotif:SetText( "Teleport request was accepted, teleporting shortly." )
-            acceptNotif:SetDisplayTime( delay )
-            acceptNotif:Send( callingPlayer )
-
-            timer.Simple( delay, function()
-                CFCNotifications.sendSimple( "tpaClose", "TPA", "Successfully teleported.", callingPlayer )
-                ulx.goto( callingPlayer, target )
-            end)
-        else
+        if ind ~= 1 then
             CFCNotifications.sendSimple( "tpaClose", "TPA", "The recipient has denied your teleport request.", callingPlayer )
             setDeclineCooldown( callingPlayer, target )
+            return
         end
+
+        local delay = GetConVar( "cfc_tpa_teleport_delay" ):GetInt()
+
+        local acceptNotif = CFCNotifications.new( "tpaClose", "Text", true )
+        acceptNotif:SetTitle( "TPA" )
+        acceptNotif:SetText( "Teleport request was accepted, teleporting shortly." )
+        acceptNotif:SetDisplayTime( delay )
+        acceptNotif:Send( callingPlayer )
+
+        timer.Simple( delay, function()
+            CFCNotifications.sendSimple( "tpaClose", "TPA", "Successfully teleported.", callingPlayer )
+            ulx.goto( callingPlayer, target )
+        end)
     end
 
     function notif:OnClose( wasTimeout )
         if wasTimeout then
             CFCNotifications.sendSimple( "tpaTimeout", "TPA", "The recipient didn't accept within the given time.", callingPlayer )
-        elseif not wasTimeout then
-            CFCNotifications.sendSimple( "tpaClose", "TPA", "The recipient has denied your teleport request.", callingPlayer )
-            setDeclineCooldown( callingPlayer, target )
+            return
         end
+
+        CFCNotifications.sendSimple( "tpaClose", "TPA", "The recipient has denied your teleport request.", callingPlayer )
+        setDeclineCooldown( callingPlayer, target )
     end
 
     notif:Send( target )
