@@ -20,7 +20,11 @@ function cmd.tpa( callingPlayer, targetPlayers )
         return
     end
 
-    if target.cfcTpaCooldownDecline and target.cfcTpaCooldownDecline[ callingPlayer ] and target.cfcTpaCooldownDecline[ callingPlayer ] > curtime then
+    local decline = target.cfcTpaCooldownDecline
+    local callerDecline = decline and decline[callingPlayer]
+    local callerDeclineTime = callerDecline or 0
+
+    if callerDeclineTime > curtime then
         CFCNotifications.sendSimple( "tpaDeclineCooldown", "TPA", "You cannot request a TPA to that player yet.", callingPlayer )
         return
     end
