@@ -2,6 +2,9 @@ CFCUlxCommands.tpa = CFCUlxCommands.tpa or {}
 local cmd = CFCUlxCommands.tpa
 local CATEGORY_NAME = "Teleport"
 
+local DECLINE_COLOR = Color( 0, 255, 0 )
+local ACCEPT_COLOR = Color( 255, 0, 0 )
+
 CreateConVar( "cfc_tpa_decline_cooldown", 10, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The time a person can't receive teleports from a player after declining.", 0 )
 CreateConVar( "cfc_tpa_cooldown", 5, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The cooldown between tpa request for any player.", 0 )
 CreateConVar( "cfc_tpa_teleport_delay", 0, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, "The delay for someone to teleport after getting accepted.", 0 )
@@ -43,8 +46,8 @@ function cmd.tpa( callingPlayer, targetPlayers )
     notif:SetTitle( "TPA" )
     notif:SetText( "Teleport request from " .. callingPlayer:GetName() )
 
-    notif:AddButton( "Accept", Color( 0, 255, 0 ), 1 )
-    notif:AddButton( "Deny", Color( 255, 0, 0 ), 2 )
+    notif:AddButton( "Accept", DECLINE_COLOR, 1 )
+    notif:AddButton( "Deny", ACCEPT_COLOR, 2 )
 
     notif:SetDisplayTime( 10 )
     notif:SetTimed( true )
