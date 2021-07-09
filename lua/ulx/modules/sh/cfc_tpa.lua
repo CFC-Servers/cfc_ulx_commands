@@ -13,23 +13,24 @@ end
 
 function cmd.tpa( callingPlayer, targetPlayers )
     local target = targetPlayers[1]
+    local curtime = CurTime()
 
     if target:GetInfoNum( "cfc_tpa_disable", 0 ) == 1 then
         CFCNotifications.sendSimple( "tpaNotAllowed", "TPA", "This player has tpa requests disabled.", callingPlayer )
         return
     end
 
-    if target.cfcTpaCooldownDecline and target.cfcTpaCooldownDecline[ callingPlayer ] and target.cfcTpaCooldownDecline[ callingPlayer ] > CurTime() then
+    if target.cfcTpaCooldownDecline and target.cfcTpaCooldownDecline[ callingPlayer ] and target.cfcTpaCooldownDecline[ callingPlayer ] > curtime then
         CFCNotifications.sendSimple( "tpaDeclineCooldown", "TPA", "You cannot request a TPA to that player yet.", callingPlayer )
         return
     end
 
-    if callingPlayer.cfcTpaCooldown and callingPlayer.cfcTpaCooldown > CurTime() then
+    if callingPlayer.cfcTpaCooldown and callingPlayer.cfcTpaCooldown > curtime then
         CFCNotifications.sendSimple( "tpaCooldown", "TPA", "You cannot send another teleport request yet.", callingPlayer )
         return
     end
 
-    callingPlayer.cfcTpaCooldown = CurTime() + GetConVar( "cfc_tpa_cooldown" ):GetInt()
+    callingPlayer.cfcTpaCooldown = curtime + GetConVar( "cfc_tpa_cooldown" ):GetInt()
 
     CFCNotifications.sendSimple( "tpaNotifCaller", "TPA", "Send teleport request.", callingPlayer )
 
