@@ -53,7 +53,10 @@ pvpbanCommand:help( "Bans the target for a certain time from entering pvp" )
 pvpbanCommand:setOpposite( "ulx unpvpban", {_, _, _, _, true}, "!unpvpban" )
 
 local function checkPvpBan( ply )
-    if ply.isPvpBanned then return false end
+    if ply.isPvpBanned then
+        ply:ChatPrint( "You cannot enter pvp because you're currently banned from pvp." )
+        return false
+    end
     return true
 end
 
