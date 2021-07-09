@@ -25,7 +25,7 @@ function cmd.tpa( callingPlayer, targetPlayers )
         return
     end
 
-    if callingPlayer.cfcTpaCooldown and callingPlayer.cfcTpaCooldown > curtime then
+    if ( callingPlayer.cfcTpaCooldown or 0 ) > curtime then
         CFCNotifications.sendSimple( "tpaCooldown", "TPA", "You cannot send another teleport request yet.", callingPlayer )
         return
     end
