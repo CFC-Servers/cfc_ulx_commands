@@ -4,7 +4,7 @@ local CATEGORY_NAME = "Chat"
 
 if SERVER then
     CFCTimedCommands.types.timedGag = {}
-    CFCTimedCommands.types.timedGag.name = "timedGag"
+    CFCTimedCommands.types.timedGag.name = "cfc_timed_gags"
     CFCTimedCommands.types.timedGag.pretty = "timed gag"
     CFCTimedCommands.createTable( CFCTimedCommands.types.timedGag.name )
 
