@@ -6,7 +6,7 @@ local CATEGORY_NAME = "Utility"
 
 if SERVER then
     CFCTimedCommands.types.pvpBan = {}
-    CFCTimedCommands.types.pvpBan.name = "pvpBan"
+    CFCTimedCommands.types.pvpBan.name = "cfc_timed_pvpbans"
     CFCTimedCommands.types.pvpBan.pretty = "timed pvp ban"
     CFCTimedCommands.createTable( CFCTimedCommands.types.pvpBan.name )
 
