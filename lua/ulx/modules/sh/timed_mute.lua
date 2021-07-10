@@ -4,7 +4,7 @@ local CATEGORY_NAME = "Chat"
 
 if SERVER then
     CFCTimedCommands.types.timedMute = {}
-    CFCTimedCommands.types.timedMute.name = "timedMute"
+    CFCTimedCommands.types.timedMute.name = "cfc_timed_mutes"
     CFCTimedCommands.types.timedMute.pretty = "timed mute"
     CFCTimedCommands.createTable( CFCTimedCommands.types.timedMute.name )
 
