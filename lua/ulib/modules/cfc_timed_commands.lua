@@ -196,6 +196,7 @@ end
 local function initializePunishedPlayers()
     for _, ply in pairs( player.GetHumans() ) do
         for punishType in pairs( CFCTimedCommands.types ) do
+            punishedPlayers[punishType] = {}
             getPlayerPunishmentsFromDatabase( ply, punishType )
         end
     end
