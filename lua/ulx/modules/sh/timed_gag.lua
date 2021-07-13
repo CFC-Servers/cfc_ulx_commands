@@ -3,22 +3,22 @@ local cmd = CFCUlxCommands.timegag
 local CATEGORY_NAME = "Chat"
 
 if SERVER then
-    CFCTimedCommands.types.timedGag = {}
-    CFCTimedCommands.types.timedGag.name = "cfc_timed_gags"
-    CFCTimedCommands.types.timedGag.pretty = "timed gag"
-    CFCTimedCommands.createTable( CFCTimedCommands.types.timedGag.name )
+    CFCTimedCommands.types.cfc_timed_gags = {}
+    CFCTimedCommands.types.cfc_timed_gags.name = "cfc_timed_gags"
+    CFCTimedCommands.types.cfc_timed_gags.pretty = "timed gag"
+    CFCTimedCommands.createTable( CFCTimedCommands.types.cfc_timed_gags.name )
 
-    function CFCTimedCommands.types.timedGag.punish( ply )
+    function CFCTimedCommands.types.cfc_timed_gags.punish( ply )
         ply.ulx_gagged = true
         ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
     end
 
-    function CFCTimedCommands.types.timedGag.unpunish( ply )
+    function CFCTimedCommands.types.cfc_timed_gags.unpunish( ply )
         ply.ulx_gagged = false
         ply:SetNWBool( "ulx_gagged", ply.ulx_gagged )
     end
 
-    function CFCTimedCommands.types.timedGag.check( ply )
+    function CFCTimedCommands.types.cfc_timed_gags.check( ply )
         return ply:GetNWBool( "ulx_gagged", false )
     end
 end
@@ -26,7 +26,7 @@ end
 function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason, shouldUnGag )
     if shouldUnGag then
         for _, ply in pairs( targetPlayers ) do
-            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.timedGag )
+            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.cfc_timed_gags )
         end
 
         return ulx.fancyLogAdmin( callingPlayer, "#A ungagged #T!", targetPlayers )
@@ -36,7 +36,7 @@ function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason, should
     if minutesToGag == 0 then minutesToGag = 9999999999 end
 
     for _, ply in pairs( targetPlayers ) do
-        CFCTimedCommands.punishPlayer( ply, minutesToGag, reason, CFCTimedCommands.types.timedGag )
+        CFCTimedCommands.punishPlayer( ply, minutesToGag, reason, CFCTimedCommands.types.cfc_timed_gags )
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A gagged #T for #i minutes!", targetPlayers, minutesToGag )
