@@ -5,20 +5,20 @@ local cmd = CFCUlxCommands.pvpban
 local CATEGORY_NAME = "Utility"
 
 if SERVER then
-    CFCTimedCommands.types.pvpBan = {}
-    CFCTimedCommands.types.pvpBan.name = "cfc_timed_pvpbans"
-    CFCTimedCommands.types.pvpBan.pretty = "timed pvp ban"
-    CFCTimedCommands.createTable( CFCTimedCommands.types.pvpBan.name )
+    CFCTimedCommands.types.cfc_timed_pvpbans = {}
+    CFCTimedCommands.types.cfc_timed_pvpbans.name = "cfc_timed_pvpbans"
+    CFCTimedCommands.types.cfc_timed_pvpbans.pretty = "timed pvp ban"
+    CFCTimedCommands.createTable( CFCTimedCommands.types.cfc_timed_pvpbans.name )
 
-    function CFCTimedCommands.types.pvpBan.punish( ply )
+    function CFCTimedCommands.types.cfc_timed_pvpbans.punish( ply )
         ply.isPvpBanned = true
     end
 
-    function CFCTimedCommands.types.pvpBan.unpunish( ply )
+    function CFCTimedCommands.types.cfc_timed_pvpbans.unpunish( ply )
         ply.isPvpBanned = false
     end
 
-    function CFCTimedCommands.types.pvpBan.check( ply )
+    function CFCTimedCommands.types.cfc_timed_pvpbans.check( ply )
         return ply.isPvpBanned or false
     end
 end
@@ -26,7 +26,7 @@ end
 function cmd.pvpban( callingPlayer, targetPlayers, minutesToPvpBan, reason, shouldUnPvpBan )
     if shouldUnPvpBan then
         for _, ply in pairs( targetPlayers ) do
-            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.pvpBan )
+            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.cfc_timed_pvpbans )
         end
 
         return ulx.fancyLogAdmin( callingPlayer, "#A unbanned #T from pvp!", targetPlayers )
@@ -37,7 +37,7 @@ function cmd.pvpban( callingPlayer, targetPlayers, minutesToPvpBan, reason, shou
 
     for _, ply in pairs( targetPlayers ) do
         CFCPvp.setPlayerBuild( ply )
-        CFCTimedCommands.punishPlayer( ply, minutesToPvpBan, reason, CFCTimedCommands.types.pvpBan )
+        CFCTimedCommands.punishPlayer( ply, minutesToPvpBan, reason, CFCTimedCommands.types.cfc_timed_pvpbans )
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A banned #T from pvp for #i minutes!", targetPlayers, minutesToPvpBan )

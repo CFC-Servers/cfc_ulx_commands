@@ -3,22 +3,22 @@ local cmd = CFCUlxCommands.timemute
 local CATEGORY_NAME = "Chat"
 
 if SERVER then
-    CFCTimedCommands.types.timedMute = {}
-    CFCTimedCommands.types.timedMute.name = "cfc_timed_mutes"
-    CFCTimedCommands.types.timedMute.pretty = "timed mute"
-    CFCTimedCommands.createTable( CFCTimedCommands.types.timedMute.name )
+    CFCTimedCommands.types.cfc_timed_mutes = {}
+    CFCTimedCommands.types.cfc_timed_mutes.name = "cfc_timed_mutes"
+    CFCTimedCommands.types.cfc_timed_mutes.pretty = "timed mute"
+    CFCTimedCommands.createTable( CFCTimedCommands.types.cfc_timed_mutes.name )
 
-    function CFCTimedCommands.types.timedMute.punish( ply )
+    function CFCTimedCommands.types.cfc_timed_mutes.punish( ply )
         ply.gimp = 2
         ply:SetNWBool( "ulx_muted", true )
     end
 
-    function CFCTimedCommands.types.timedMute.unpunish( ply )
+    function CFCTimedCommands.types.cfc_timed_mutes.unpunish( ply )
         ply.gimp = nil
         ply:SetNWBool( "ulx_muted", false )
     end
 
-    function CFCTimedCommands.types.timedMute.check( ply )
+    function CFCTimedCommands.types.cfc_timed_mutes.check( ply )
         return ply:GetNWBool( "ulx_muted", false )
     end
 end
@@ -26,7 +26,7 @@ end
 function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shouldUnMute )
     if shouldUnMute then
         for _, ply in pairs( targetPlayers ) do
-            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.timedMute )
+            CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.cfc_timed_mutes )
         end
 
         return ulx.fancyLogAdmin( callingPlayer, "#A unmuted #T!", targetPlayers )
@@ -36,7 +36,7 @@ function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shou
     if minutesToMute == 0 then minutesToMute = 9999999999 end
 
     for _, ply in pairs( targetPlayers ) do
-        CFCTimedCommands.punishPlayer( ply, minutesToMute, reason, CFCTimedCommands.types.timedMute )
+        CFCTimedCommands.punishPlayer( ply, minutesToMute, reason, CFCTimedCommands.types.cfc_timed_mutes )
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A muted #T for #i minutes!", targetPlayers, minutesToMute )
