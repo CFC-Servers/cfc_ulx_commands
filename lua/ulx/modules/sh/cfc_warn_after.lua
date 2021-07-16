@@ -28,7 +28,7 @@ kick:help( "Kicks target and warns them." )
 
 function cmd.warnBanId( calling_ply, steamid, minutes, reason )
     ulx.banid( calling_ply, steamid, minutes, reason )
-    local command = string.format( 'awarn_warn \"%s" "%s (%s ban)" ', steamid, reason, ULib.secondsToStringTime( minutes * 60 ) )
+    local command = string.format( "awarn_warn '%s' '%s (%s ban)' ", steamid, reason, ULib.secondsToStringTime( minutes * 60 ) )
     calling_ply:ConCommand( command )
 end
 
