@@ -25,3 +25,16 @@ kick:addParam{ type = ULib.cmds.PlayerArg }
 kick:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes = ulx.common_kick_reasons }
 kick:defaultAccess( ULib.ACCESS_ADMIN )
 kick:help( "Kicks target and warns them." )
+
+function cmd.warnBanId( calling_ply, steamid, minutes, reason )
+    ulx.banid( calling_ply, steamid, minutes, reason )
+    local command = string.format( 'awarn_warn \"%s" "%s (%s ban)" ', steamid, reason, ULib.secondsToStringTime( minutes * 60 ) )
+    calling_ply:ConCommand( command )
+end
+
+local banid = ulx.command( CATEGORY_NAME, "ulx warnbanid", cmd.warnBanId, "!warnbanid", false, false, true )
+banid:addParam{ type = ULib.cmds.StringArg, hint = "steamid" }
+banid:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.optional, ULib.cmds.allowTimeString, min = 0 }
+banid:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, ULib.cmds.takeRestOfLine, completes = ulx.common_kick_reasons }
+banid:defaultAccess( ULib.ACCESS_SUPERADMIN )
+banid:help( "Bans steamid and warns them." )
