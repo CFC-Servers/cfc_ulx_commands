@@ -14,11 +14,6 @@ local commandArgumentIndexes = {
         duration = 3,
         reason = 4,
     },
-    ["ulx banid"] = {
-        targets = 2,
-        duration = 3,
-        reason = 4,
-    },
     ["ulx ban"] = {
         target = 2,
         duration = 3,
