@@ -1,4 +1,9 @@
 local autoWarnCommands = {
+    ["ulx timegag"] = {
+        targets = 2,
+        duration = 3,
+        reason = 4,
+    },
     ["ulx ban"] = {
         target = 2,
         duration = 3,
@@ -21,7 +26,7 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     local reason = args[indexes.reason]
 
     for _, target in pairs( targets ) do
-        local command = string.format( 'awarn_warn \"%s" "%s (%s, %s)"', target:SteamID(), reason, commandName, ULib.secondsToStringTime( duration * 60 ) )
+        local command = string.format( 'awarn_warn "%s" "%s (%s %s)"', target:SteamID(), reason, commandName, ULib.secondsToStringTime( duration * 60 ) )
         caller:ConCommand( command )
     end
 end )
