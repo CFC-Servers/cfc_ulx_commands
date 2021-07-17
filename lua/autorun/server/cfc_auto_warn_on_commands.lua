@@ -1,4 +1,4 @@
-local autoWarnCommands = {
+local commandArgumentIndexes = {
     ["ulx timegag"] = {
         targets = 2,
         duration = 3,
@@ -12,7 +12,7 @@ local autoWarnCommands = {
 }
 
 hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( caller, commandName, args )
-    local indexes = autoWarnCommands[commandName]
+    local indexes = commandArgumentIndexes[commandName]
     if not indexes then return end
     
     local targets
