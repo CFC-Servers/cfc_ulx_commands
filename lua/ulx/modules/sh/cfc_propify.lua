@@ -337,7 +337,7 @@ local function struggle( ply, button )
     ply:SetNWInt( "propifyStruggle", struggleAmount )
 
     if struggleAmount >= struggleAmountMax then
-        local grabber = prop.propifyGrabber
+        local grabber = prop.propifyGrabber or ply
 
         DropEntityIfHeld( prop )
 
