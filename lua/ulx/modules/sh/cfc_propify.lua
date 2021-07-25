@@ -12,6 +12,7 @@ local STRUGGLE_LIMIT = CreateConVar( "cfc_ulx_propify_struggle_limit", 0.125, FC
 local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 10, FCVAR_NONE, "How long a propified player is invulnerable for after successfully escaping a grab (default 10)", 0, 50000 )
 local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500, FCVAR_NONE, "The strength that a propified player launches at when escaping a grab (default 500)", 0, 50000 )
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
+local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown", 1, FCVAR_NONE, "The cooldown on how frequently players can be told they are unable to pick up a recently-escaped propified player (default 1)", 0, 50000 )
 
 local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
@@ -276,7 +277,14 @@ local function detectPropifyPickup( ply, ent )
 
     if struggleAmountMax == 0 then return end
     if ent.propifyCantGrab then
-        ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
+        local lastDeny = ply.propifyLastPickupDeny or 0
+        local time = Realtime()
+
+        if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
+            ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
+
+            ply.propifyLastPickupDeny = time
+        end
 
         return false
     end
