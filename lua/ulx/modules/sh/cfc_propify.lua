@@ -278,7 +278,7 @@ local function detectPropifyPickup( ply, ent )
     if struggleAmountMax == 0 then return end
     if ent.propifyCantGrab then
         local lastDeny = ply.propifyLastPickupDeny or 0
-        local time = Realtime()
+        local time = RealTime()
 
         if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
             ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
