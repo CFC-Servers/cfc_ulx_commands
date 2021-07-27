@@ -15,9 +15,9 @@ function cmd.arrest( callingPlayer, targetPlayers )
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
         if owner and entCounts[owner] then
             if ent:GetClass() == "gmod_wire_expression2" then
-                ent:PCallHook("destruct")
+                ent:PCallHook( "destruct" )
                 ent:ResetContext()
-                ent:PCallHook("construct")
+                ent:PCallHook( "construct" )
                 ent:Error( ent.name .. ": Halted by ULX" )
             end
 
@@ -31,7 +31,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
                 physicsObj:EnableMotion( false )
                 physicsObj:Sleep()
                 entCount = entCount + 1
-                entCounts[owner] = entCounts[owner] + 1
+                entCounts[owner] = ( entCounts[owner] or 0 ) + 1
             end
         end
     end
