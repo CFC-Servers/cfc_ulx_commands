@@ -2,38 +2,41 @@ CFCUlxCommands.ropecheck = CFCUlxCommands.ropecheck or {}
 local cmd = CFCUlxCommands.ropecheck
 local CATEGORY_NAME = "Utility"
 local IsValid = IsValid
+local rawget = rawget
+local rawset = rawset
 
 function cmd.ropecheck( callingPlayer )
-    local ropeCount = {}
-    local totalRopeCount = 0
-    local entities = ents.GetAll()
-    local players = player.GetHumans()
-
-    for _, ply in ipairs( players ) do
-        ropeCount[ply] = 0
-    end
-
-    for _, ent in ipairs( entities ) do
-        if ent:GetClass() == "keyframe_rope" then
-            local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-            if owner and ropeCount[owner] then
-                ropeCount[owner] = ropeCount[owner] + 1
-                totalRopeCount = totalRopeCount + 1
-            end
-        end
-    end
+    local ropes = ents.FindByClass( "keyframe_rope" )
+    local ropeCount = #ropes
 
     if ropeCount == 0 then
-        ulx.fancyLogAdmin( callingPlayer, true, "#A checked the ropecount there are currently, no ropes on the map" )
+        ulx.fancyLogAdmin( callingPlayer, true, "#A checked the ropecount: There are currently no ropes on the map" )
         return
     end
 
-    for _, ply in pairs( players ) do
-        if not ropeCount[ply] or ropeCount[ply] < 0 then return end
-        callingPlayer:ChatPrint( ply:GetName() .. " owns: " .. ropeCount[ply] .. " ropes." )
+    local players = player.GetHumans()
+    local playerRopes = {}
+
+    for i = 1, ropeCount do
+        local rope = rawget( ropes, i )
+        local owner = rope.CPPIGetOwner and rope:CPPIGetOwner()
+
+        if IsValid( owner ) then
+            local plyCount = rawget( playerRopes, owner )
+            local new = ( plyCount or 0 ) + 1
+            rawset( playerRopes, owner, new )
+        end
     end
 
-    ulx.fancyLogAdmin( callingPlayer, true, "#A checked the copecount there are currently, " .. totalRopeCount .. " ropes in total on the map" )
+    for _, ply in ipairs( players ) do
+        local plyCount = rawget( playerRopes, ply )
+
+        if plyCount then
+            callingPlayer:ChatPrint( ply:GetName() .. " owns: " .. plyCount .. " ropes" )
+        end
+    end
+
+    ulx.fancyLogAdmin( callingPlayer, true, "#A checked the ropecount: There are currently " .. ropeCount .. " ropes on the map" )
 end
 
 local ropecheckCommand = ulx.command( CATEGORY_NAME, "ulx ropecheck", cmd.ropecheck, "!ropecheck" )
