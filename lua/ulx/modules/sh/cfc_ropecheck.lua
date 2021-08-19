@@ -22,6 +22,7 @@ function cmd.ropecheck( callingPlayer )
             end
         end
     end
+
     if ropeCount == 0 then
         ulx.fancyLogAdmin( callingPlayer, true, "#A checked the ropecount there are currently, no ropes on the map" )
         return
