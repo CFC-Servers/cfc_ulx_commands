@@ -37,4 +37,4 @@ end
 
 local ropecheckCommand = ulx.command( CATEGORY_NAME, "ulx ropecheck", cmd.ropecheck, "!ropecheck" )
 ropecheckCommand:defaultAccess( ULib.ACCESS_ADMIN )
-ropecheckCommand:help( "Clear all the weapons currently on the ground." )
+ropecheckCommand:help( "Clear all the ropes currently on the ground." )
