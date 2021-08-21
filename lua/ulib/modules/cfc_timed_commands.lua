@@ -205,7 +205,7 @@ end
 
 -- GLOBAL FUNCTIONS
 
-function CFCTimedCommands.punishPlayer( ply, minutes, reason ,tbl )
+function CFCTimedCommands.punishPlayer( ply, minutes, reason, tbl )
     local expirationTime = getExpirationTime( minutes )
 
     punishPlayerUntil( ply, expirationTime, reason, tbl, false )

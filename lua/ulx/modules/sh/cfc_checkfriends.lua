@@ -11,13 +11,13 @@ end
 local awaitingResponse = {}
 
 local function sendResponse( ply, friendTable, caller )
-    caller:PrintMessage( 2 , "\n=======================" )
-    caller:PrintMessage( 2 , ply:Name() .. "'s friends:" )
-    caller:PrintMessage( 2 , "-----------------------" )
+    caller:PrintMessage( 2, "\n=======================" )
+    caller:PrintMessage( 2, ply:Name() .. "'s friends:" )
+    caller:PrintMessage( 2, "-----------------------" )
     for target, status in pairs( friendTable ) do
-        caller:PrintMessage( 2 , target:Name() .. " : " .. status )
+        caller:PrintMessage( 2, target:Name() .. " : " .. status )
     end
-    caller:PrintMessage( 2 , "=======================" )
+    caller:PrintMessage( 2, "=======================" )
 end
 
 net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
@@ -26,14 +26,14 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
 
     local caller = awaitingResponse[ply]
     if table.IsEmpty(friendTable) then
-        ulx.fancyLogAdmin( caller, true, "#A checked #T's friends, they have currently no friends playing on this server" , ply )
+        ulx.fancyLogAdmin( caller, true, "#A checked #T's friends, they have currently no friends playing on this server", ply )
         return
     end
 
     sendResponse( ply, friendTable, caller )
 
     awaitingResponse[ply] = nil
-    ulx.fancyLogAdmin( caller, true, "#A checked #T's friends." )
+    ulx.fancyLogAdmin( caller, true, "#A checked #T's friends.", ply )
 end )
 
 function cmd.checkfriendsPlayers( callingPlayer, targetPlayers )
