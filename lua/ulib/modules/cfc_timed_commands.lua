@@ -152,12 +152,10 @@ local function punishPlayerUntil( ply, expirationTime, reason, method, fromDb )
     local tbl = catchTable( method )
     if not tbl.check( ply ) then tbl.punish( ply ) end
 
-    if not fromDb then
-        if tbl.check( ply ) then
-            updatePlayerPunishmentInDatabase( ply, expirationTime, reason, tbl )
-        else
-            createPlayerPunishmentInDatabase( ply, expirationTime, reason, tbl )
-        end
+    if getPunishExpirationFromDatabase( ply, method.name ) then
+        updatePlayerPunishmentInDatabase( ply, expirationTime, reason, tbl )
+    else
+        createPlayerPunishmentInDatabase( ply, expirationTime, reason, tbl )
     end
 
     local minutesLeftInPunishment = getMinutesRemainingInPunishment( expirationTime )
@@ -205,7 +203,7 @@ end
 
 -- GLOBAL FUNCTIONS
 
-function CFCTimedCommands.punishPlayer( ply, minutes, reason, tbl )
+function CFCTimedCommands.punishPlayer( ply, minutes, reason ,tbl )
     local expirationTime = getExpirationTime( minutes )
 
     punishPlayerUntil( ply, expirationTime, reason, tbl, false )
