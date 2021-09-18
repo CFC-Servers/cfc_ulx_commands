@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.removeShadows = CFCUlxCommands.removeShadows or {}
 local cmd = CFCUlxCommands.removeShadows
 

@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.clearpac = CFCUlxCommands.clearpac or {}
 local cmd = CFCUlxCommands.clearpac
 local CATEGORY_NAME = "Utility"

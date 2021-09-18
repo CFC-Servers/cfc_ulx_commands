@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.cleanup = CFCUlxCommands.cleanup or {}
 local cmd = CFCUlxCommands.cleanup
 

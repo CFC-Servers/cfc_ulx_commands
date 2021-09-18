@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.brazil = CFCUlxCommands.brazil or {}
 local cmd = CFCUlxCommands.brazil
 

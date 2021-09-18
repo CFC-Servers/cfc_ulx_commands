@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.cheese = CFCUlxCommands.cheese or {}
 local cmd = CFCUlxCommands.cheese
 

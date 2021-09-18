@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.weprem = CFCUlxCommands.weprem or {}
 local cmd = CFCUlxCommands.weprem
 local CATEGORY_NAME = "Utility"

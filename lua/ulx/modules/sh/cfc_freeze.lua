@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.freezeProps = CFCUlxCommands.freezeProps or {}
 local cmd = CFCUlxCommands.freezeProps
 

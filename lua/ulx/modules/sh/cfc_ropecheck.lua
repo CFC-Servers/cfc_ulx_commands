@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.ropecheck = CFCUlxCommands.ropecheck or {}
 local cmd = CFCUlxCommands.ropecheck
 local CATEGORY_NAME = "Utility"

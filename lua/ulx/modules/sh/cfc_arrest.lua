@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.arrest = CFCUlxCommands.arrest or {}
 local cmd = CFCUlxCommands.arrest
 

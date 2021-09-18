@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.trainfuck = CFCUlxCommands.trainfuck or {}
 local cmd = CFCUlxCommands.trainfuck
 

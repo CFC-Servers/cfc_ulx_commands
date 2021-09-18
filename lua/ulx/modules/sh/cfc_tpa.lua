@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.tpa = CFCUlxCommands.tpa or {}
 local cmd = CFCUlxCommands.tpa
 local CATEGORY_NAME = "Teleport"

@@ -1,3 +1,5 @@
+if engine.ActiveGamemode() == "terrortown" then return end
+
 CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
