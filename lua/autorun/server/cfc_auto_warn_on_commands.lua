@@ -3,16 +3,17 @@ local commandArgumentIndexes = {
         targets = 2,
         duration = 3,
         reason = 4,
+        minDuration = 60 * 60
     },
     ["ulx timemute"] = {
         targets = 2,
         duration = 3,
-        reason = 4,
+        reason = 4
     },
     ["ulx pvpban"] = {
         targets = 2,
         duration = 3,
-        reason = 4,
+        reason = 4
     },
     ["ulx ban"] = {
         target = 2,
@@ -31,7 +32,12 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     if not indexes then return end
 
     local duration = args[indexes.duration]
+    local minDuration = indexes.minDuration
     local reason = args[indexes.reason]
+
+    if minDuration then
+        if duration < minDuration then return end
+    end
 
     local targets
     if indexes.targets then
@@ -43,6 +49,7 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
 
         local command = string.format( 'awarn_warn "%s" "%s (%s %s)"', targetId, reason, commandName, ULib.secondsToStringTime( duration * 60 ) )
         caller:ConCommand( command )
+
         return
     end
 

@@ -24,6 +24,8 @@ if SERVER then
 end
 
 function cmd.timeGag( callingPlayer, targetPlayers, minutesToGag, reason, shouldUnGag )
+    reason = reason or ""
+
     if shouldUnGag then
         for _, ply in pairs( targetPlayers ) do
             CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.cfc_timed_gags )
@@ -45,7 +47,7 @@ end
 local timeGagCommand = ulx.command( CATEGORY_NAME, "ulx timegag", cmd.timeGag, "!tgag" )
 timeGagCommand:addParam{ type = ULib.cmds.PlayersArg }
 timeGagCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
-timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+timeGagCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
 timeGagCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 timeGagCommand:defaultAccess( ULib.ACCESS_ADMIN )
 timeGagCommand:help( "Gags a user for a set amount of time" )
