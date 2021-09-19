@@ -24,6 +24,8 @@ if SERVER then
 end
 
 function cmd.timeMute( callingPlayer, targetPlayers, minutesToMute, reason, shouldUnMute )
+    reason = reason or ""
+
     if shouldUnMute then
         for _, ply in pairs( targetPlayers ) do
             CFCTimedCommands.unpunishPlayer( ply, CFCTimedCommands.types.cfc_timed_mutes )
@@ -45,7 +47,7 @@ end
 local timeMuteCommand = ulx.command( CATEGORY_NAME, "ulx timemute", cmd.timeMute, "!tmute" )
 timeMuteCommand:addParam{ type = ULib.cmds.PlayersArg }
 timeMuteCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
-timeMuteCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+timeMuteCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine, ULib.cmds.optional }
 timeMuteCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 timeMuteCommand:defaultAccess( ULib.ACCESS_ADMIN )
 timeMuteCommand:help( "Mutes a user for a set amount of time" )

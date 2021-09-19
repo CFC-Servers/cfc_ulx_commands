@@ -32,8 +32,8 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     if not indexes then return end
 
     local duration = args[indexes.duration]
-    local minDuration = indexes.minDuration
     local reason = args[indexes.reason]
+    local minDuration = indexes.minDuration
 
     if minDuration then
         if duration < minDuration then return end
