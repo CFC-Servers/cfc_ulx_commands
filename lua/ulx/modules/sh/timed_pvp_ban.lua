@@ -57,7 +57,6 @@ local function checkPvpBan( ply )
         ply:ChatPrint( "You cannot enter pvp because you're currently banned from pvp." )
         return false
     end
-    return true
 end
 
 hook.Add( "CFC_PvP_PlayerWillEnterPvp", "ULX_PVPBan_RestrictPvp", checkPvpBan )

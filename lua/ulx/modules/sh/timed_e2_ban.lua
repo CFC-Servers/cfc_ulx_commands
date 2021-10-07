@@ -54,7 +54,6 @@ local function checkE2Ban( ply )
         ply:ChatPrint( "You cannot use E2 because you're currently E2 banned." )
         return false
     end
-    return true
 end
 
 hook.Add( "CanTool", "ULX_E2Ban_RestrictE2", function( ply, _, toolName )
