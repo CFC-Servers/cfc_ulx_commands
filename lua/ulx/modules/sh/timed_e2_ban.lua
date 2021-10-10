@@ -57,6 +57,6 @@ local function checkE2Ban( ply )
 end
 
 hook.Add( "CanTool", "ULX_E2Ban_RestrictE2", function( ply, _, toolName )
-    if toolName ~= "gmod_wire_expression2" then return end
+    if toolName ~= "wire_expression2" then return end
     return checkE2Ban( ply )
 end, HOOK_MONITOR_HIGH )
