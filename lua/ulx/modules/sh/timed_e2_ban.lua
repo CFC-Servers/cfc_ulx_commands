@@ -49,14 +49,23 @@ e2BanCommand:defaultAccess( ULib.ACCESS_ADMIN )
 e2BanCommand:help( "Bans the target for a certain time from using E2" )
 e2BanCommand:setOpposite( "ulx une2ban", {_, _, _, _, true}, "!une2ban" )
 
-local function checkE2Ban( ply )
-    if ply.isE2Banned then
-        ply:ChatPrint( "You cannot use E2 because you're currently E2 banned." )
-        return false
+
+local function setup()
+    if not MakeWireExpression2 then
+        ErrorNoHalt( "Couldn't find MakeWireExpression2, E2 ban can't function")
+        return
+    end
+
+    _MakeWireExpression2 = _MakeWireExpression2 or MakeWireExpression2
+
+    MakeWireExpression2 = function( ply, ... )
+        if ply.isE2Banned then
+            ply:ChatPrint( "You can't spawn E2s because you're currently E2 banned" )
+            return false
+        end
+
+        return _MakeWireExpression2( ply, ... )
     end
 end
 
-hook.Add( "CanTool", "ULX_E2Ban_RestrictE2", function( ply, _, toolName )
-    if toolName ~= "wire_expression2" then return end
-    return checkE2Ban( ply )
-end, HOOK_MONITOR_HIGH )
+hook.Add( "Initialize", "E2BanSetup", setup )
