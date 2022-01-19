@@ -45,16 +45,31 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     elseif indexes.target then
         targets = { args[indexes.target] }
     elseif indexes.targetId then
-        local targetId = args[indexes.targetId] 
+        local targetId = args[indexes.targetId]
 
-        local command = string.format( 'awarn_warn "%s" "%s (%s %s)"', targetId, reason, commandName, ULib.secondsToStringTime( duration * 60 ) )
-        caller:ConCommand( command )
+        local stringTime = ULib.secondsToStringTime( duration * 60 )
+        local reasonArg = string.format( '%s (%s %s)', reason, commandName, stringTime )
+
+        if IsValid( caller ) then
+            local command = string.format( 'awarn_warn "%s" "%s"', targetId, reasonArg )
+            caller:ConCommand( command )
+        else
+            RunConsoleCommand( "awarn_warn", targetId, reasonArg )
+        end
 
         return
     end
 
     for _, target in pairs( targets ) do
-        local command = string.format( 'awarn_warn "%s" "%s (%s %s)"', target:SteamID(), reason, commandName, ULib.secondsToStringTime( duration * 60 ) )
-        caller:ConCommand( command )
+        local targetId = target:SteamID()
+        local stringTime = ULib.secondsToStringTime( duration * 60 )
+        local reasonArg = string.format( '%s (%s %s)', reason, commandName, stringTime )
+
+        if IsValid( caller ) then
+            local command = string.format( 'awarn_warn "%s" "%s"', targetId, reasonArg )
+            caller:ConCommand( command )
+        else
+            RunConsoleCommand( "awarn_warn", targetId, reasonArg )
+        end
     end
 end )
