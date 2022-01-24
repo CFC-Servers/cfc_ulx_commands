@@ -1,3 +1,5 @@
+if CLIENT then return end
+
 require "logger"
 local IsValid = IsValid
 
@@ -7,7 +9,6 @@ TimedPunishments = {
     MakeULXCommands = include( "cfc_ulx_commands/timed_punishments/ulx.lua" )( logger ),
     Punishments = {}
 }
-
 
 local TP = TimedPunishments
 local logger = TP.logger
