@@ -65,7 +65,7 @@ function Data:removeExpired()
         DELETE FROM
             cfc_timed_punishments
         WHERE
-            expiration < %u
+            expiration <= %u
     ]], now )
 end
 
