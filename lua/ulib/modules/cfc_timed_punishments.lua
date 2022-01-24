@@ -2,10 +2,12 @@ require "logger"
 local IsValid = IsValid
 
 TimedPunishments = {
-    logger = Logger( "ULX_TimedCommands" ),
-    Data = include( "cfc_ulx_commands/server/timed_commands/data.lua" )( logger ),
+    logger = Logger( "ULX_TimedPunishments" ),
+    Data = include( "cfc_ulx_commands/timed_punishments/server/data.lua" )( logger ),
+    MakeULXCommands = include( "cfc_ulx_commands/timed_punishments/ulx.lua" )( logger ),
     Punishments = {}
 }
+
 
 local TP = TimedPunishments
 local logger = TP.logger
