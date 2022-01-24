@@ -15,6 +15,11 @@ local logger = TP.logger
 local Data = TP.Data
 local Punishments = TP.Punishments
 
+local function try( f, ... )
+    local success, err = pcall( f )
+    if not success then ErrorNoHaltWithStack( err, ... ) end
+end
+
 function TP.Register( punishment, enable, disable )
     logger:info( "Registering new punishment type: ", punishment )
 
@@ -30,7 +35,7 @@ function TP.Punish( steamID64, punishment, expiration, issuer, reason )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
-    Punishments[punishment].enable( ply )
+    try( function() Punishments[punishment].enable( ply ) end, ply, punishment )
 end
 
 function TP.Unpunish( steamID64, punishment )
@@ -39,7 +44,7 @@ function TP.Unpunish( steamID64, punishment )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
-    Punishments[punishment].disable( ply )
+    try( function() Punishments[punishment].disable( ply ) end, ply, punishment )
 end
 
 hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
@@ -47,8 +52,7 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local punishments = Data:getPunishments( steamID64 )
 
     for punishment, expiration in pairs( punishments ) do
-        local success, err = pcall( function() Punishments[punishments].enable( ply ) end )
-        if not success then ErrorNoHaltWithStack( ply, punishment, err ) end
+        try( function() Punishments[punishments].enable( ply ) end, ply, punishment )
     end
 
     ply.TimedPunishments = punishments
@@ -64,7 +68,7 @@ hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
 
             for punishment, expiration in pairs( ply.TimedPunishments ) do
                 if expiration <= now then
-                    TP.Unpunish( steamID64, punishment )
+                    try( function() TP.Unpunish( steamID64, punishment ) end, punishment )
                 end
             end
 
@@ -76,5 +80,5 @@ hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
         end
     end
 
-    tiemr.Create( "CFC_TimedPunishments_ExpirationChecker", PUNISH_CHECK_INTERVAL, 0, checkExpirations )
+    tiemr.Create( "CFC_TimedPunishments_ExpirationChecker", PUNISH_CHECK_INTERVAL, 0, function() try( checkExpirations ) end )
 end )
