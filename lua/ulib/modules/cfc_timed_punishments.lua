@@ -67,7 +67,7 @@ hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
             local expired = {}
 
             for punishment, expiration in pairs( ply.TimedPunishments ) do
-                if expiration <= now then
+                if expiration > 0 and expiration <= now then
                     try( function() TP.Unpunish( steamID64, punishment ) end, punishment )
                 end
             end
