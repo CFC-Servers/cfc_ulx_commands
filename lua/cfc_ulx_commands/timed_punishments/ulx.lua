@@ -1,20 +1,52 @@
 -- Makes the ULX commands
 
+-- Returns a generator function with logger context
 return function( logger )
     logger = logger:scope( "UlxMaker" )
 
+    -- ==== ULX Command Maker ====
+    --
+    -- This function will automatically generate four ulx commands:
+    --  - ulx [name] (for targeting players)
+    --  - ulx [name]id (for targeting Steam IDs)
+    --  - ulx un[name]
+    --  - ulx un[name]id
+    --
+    -- The created chat commands are the exact same as the created commands
+    -- (i.e. "testban" would result in `ulx testban` and `!testban`)
+    --
+    -- Params:
+    --   name:
+    --     The name of the action. This is used for:
+    --        - Key in CFCUlxCommands
+    --        - The ulx command, (i.e. "testban" would result in `ulx testban` and `!testban`)
+    --        - The punishment name in the database
+    --
+    --   action:
+    --     A special format string to print when the action is complete.
+    --     This uses a special placeholder, "##" which will be turned into "#T" for player targets and "%s" for steamid targets
+    --     (i.e. "time blinded ##" would result in "#A time blinded #T for %i minutes!" for player targets)
+    --
+    --   inverseAction:
+    --     A special format string to print when the action is undone
+    --     This is the reverse of `action` with all of the same caveats
+    --
+    --   category:
+    --     The ULX Command Category to create the commands under
+    --     (i.e. "Fun", "Utility", etc.)
+    --
+    --   help:
+    --     The ULX Command help text to display with the created commands
+
     return function( name, action, inverseAction, category, help )
+
         CFCUlxCommands[name] = CFCUlxCommands[name] or {}
         local cmd = CFCUlxCommands[name]
-        local nameID = name .. "id"
 
-        local ulxCommand
-        local actionStr
-        local inverseActionStr
-
+        -- == Player Target ==
         do
-            actionStr = string.Replace( action, "##", "#T" )
-            inverseActionStr = string.Replace( inverseAction, "##", "#T" )
+            local actionStr = "#A " .. string.Replace( action, "##", "#T" )
+            local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "#T" )
 
             cmd[name] = function( callingPly, targetPlys, minutes, reason, shouldInverse )
                 reason = reason or ""
@@ -24,33 +56,46 @@ return function( logger )
                         TimedPunishments.Unpunish( ply:SteamID64(), name )
                     end
 
-                    return ulx.fancyLogAdmin( callingPlayer, "#A " .. inverseActionStr, targetPlayers )
+                    ulx.fancyLogAdmin( callingPly, inverseAction, targetPlys )
                 end
 
-                -- time > 100 years
-                if minutes == 0 then minutes = 9999999999 end
-                local expiration = os.time() + ( minutes * 60 )
-                local issuer = callingPlayer and callingPlayer:SteamID64() or "Console"
+                local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
+                local issuer = callingPly and callingPly:SteamID64() or "Console"
 
-                for _, ply in pairs( targetPlayers ) do
+                for _, ply in pairs( targetPlys ) do
                     TimedPunishments.Punish( ply:SteamID64(), name, expiration, issuer, reason )
                 end
 
-                ulx.fancyLogAdmin( callingPlayer, "#A " .. actionStr .. " for #i minutes! (%s)", targetPlayers, minutes, reason )
+                if minutes == 0 then
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (%s)", targetPlys, reason )
+                else
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (%s)", targetPlys, minutes, reason )
+                end
             end
-            ulxCommand = ulx.command( category, "ulx " .. name, cmd[name], "!" .. name )
+
+            local consoleCommand = "ulx " .. name
+            local inverseConsoleCommand = "ulx un" .. name
+
+            local chatCommand = "!" .. name
+            local inverseChatCommand = "!un" .. name
+
+            local ulxCommand = ulx.command( category, consoleCommand, cmd[name], chatCommand )
             ulxCommand:addParam{ type = ULib.cmds.PlayersArg }
             ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
-            ulxCommand:setOpposite( "ulx un" .. name, {_, _, _, _, true}, "!un" .. name )
+            ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
+
+            logger:info( "Created: ", consoleCommand, chatCommand, inverseConsoleCommand, inverseChatCommand )
         end
 
+        -- == SteamID Target ==
         do
-            actionStr = string.Replace( action, "##", "%s" )
-            inverseActionStr = string.Replace( inverseAction, "##", "%s" )
+            local nameID = name .. "id"
+            local actionStr = "#A " .. string.Replace( action, "##", "%s" )
+            local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "%s" )
 
             cmd[nameID] = function( callingPly, target, minutes, reason, shouldInverse )
                 reason = reason or ""
@@ -59,29 +104,39 @@ return function( logger )
                 if shouldInverse then
                     TimedPunishments.Unpunish( steamID64, name )
 
-                    return ulx.fancyLogAdmin( callingPlayer, "#A " .. inverseActionStr, target )
+                    return ulx.fancyLogAdmin( callingPly, inverseActionStr, target )
                 end
 
-                -- time > 100 years
-                if minutes == 0 then minutes = 9999999999 end
-                local expiration = os.time() + ( minutes * 60 )
-                local issuer = callingPlayer and callingPlayer:SteamID64() or "Console"
+                local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
+                local issuer = callingPly and callingPly:SteamID64() or "Console"
 
                 TimedPunishments.Punish( steamID64, name, expiration, issuer, reason )
 
-                ulx.fancyLogAdmin( callingPlayer, "#A " .. actionStr .. " for #i minutes! (%s)", target, minutes, reason )
+                if minutes == 0 then
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (%s)", target, reason )
+                else
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (%s)", target, minutes, reason )
+                end
+
+                ulx.fancyLogAdmin( callingPly, actionStr, target, minutes, reason )
             end
 
-            ulxCommand = ulx.command( CATEGORY_NAME, "ulx " .. nameID, cmd[nameID], "!" .. nameID )
+            local consoleCommand = "ulx " .. nameID
+            local inverseConsoleCommand = "ulx un" .. nameID
+
+            local chatCommand = "!" .. nameID
+            local inverseChatCommand = "!un" .. nameID
+
+            local ulxCommand = ulx.command( CATEGORY_NAME, consoleCommand, cmd[nameID], chatCommand )
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "steamid" }
             ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
-            ulxCommand:setOpposite( "ulx un" .. nameID, {_, _, _, _, true}, "!un" .. nameID )
-        end
+            ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
 
-        logger:info( "Created: ", name, nameID, "un" .. name, "un" .. nameID )
+            logger:info( "Created: ", consoleCommand, chatCommand, inverseConsoleCommand, inverseChatCommand )
+        end
     end
 end

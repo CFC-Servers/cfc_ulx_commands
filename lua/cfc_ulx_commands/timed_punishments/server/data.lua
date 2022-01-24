@@ -8,9 +8,9 @@ local function escapeArg( arg )
     end
 end
 
-local function queryFormat( query, ... )
+local function query( query, ... )
     local args = {}
-    for i, arg in ipairs{ ... } do
+    for i, arg in ipairs( { ... } ) do
         args[i] = escapeArg( arg )
     end
 
@@ -23,18 +23,18 @@ local Data = {}
 function Data:setupTables()
     sql.Begin()
 
-    queryFormat( [[
+    query( [[
         CREATE TABLE IF NOT EXISTS cfc_timed_punishments(
         id          INTEGER       PRIMARY KEY,
         steamid64   TEXT          NOT NULL,
-        expiration  BIGINT        NOT NULL,
+        expiration  INTEGER       NOT NULL,
         issuer      TEXT          NOT NULL,
         punishment  TEXT          NOT NULL,
         reason      TEXT
     )
     ]] )
 
-    queryFormat( [[
+    query( [[
         CREATE UNIQUE INDEX IF NOT EXISTS
             player_punishments
         ON
@@ -46,13 +46,15 @@ end
 
 function Data:removeExpired()
     local now = os.time()
-    local expired = queryFormat( [[
+    local expired = query( [[
         SELECT
             punishment, COUNT(*)
         FROM
             cfc_timed_punishments
         WHERE
             expiration <= %u
+        AND
+            expiration > 0
         GROUP BY
             punishment
     ]], now )
@@ -61,16 +63,18 @@ function Data:removeExpired()
         self.logger:debug( "Deleting " .. p["COUNT(*)"] .. " expired punishments of type '" .. p.punishment .. "'" )
     end
 
-    queryFormat( [[
+    query( [[
         DELETE FROM
             cfc_timed_punishments
         WHERE
             expiration <= %u
+        AND
+            expiration > 0
     ]], now )
 end
 
 function Data:createPunishment( punishment, steamID64, expiration, issuer, reason )
-    queryFormat( [[
+    query( [[
         INSERT OR REPLACE INTO
             cfc_timed_punishments (steamid64, expiration, issuer, punishment, reason )
         VALUES
@@ -79,7 +83,7 @@ function Data:createPunishment( punishment, steamID64, expiration, issuer, reaso
 end
 
 function Data:removePunishment( punishment, steamID64 )
-    queryFormat( [[
+    query( [[
         DELETE FROM
             cfc_timed_punishments
         WHERE
@@ -90,7 +94,7 @@ function Data:removePunishment( punishment, steamID64 )
 end
 
 function Data:getPunishments( steamID64 )
-    local result = queryFormat( [[
+    local result = query( [[
         SELECT
             expiration, punishment
         FROM
