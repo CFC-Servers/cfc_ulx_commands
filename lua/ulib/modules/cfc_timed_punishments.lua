@@ -1,14 +1,15 @@
-if CLIENT then return end
 
 require "logger"
 local IsValid = IsValid
 
 TimedPunishments = {
     logger = Logger( "ULX_TimedPunishments" ),
-    Data = include( "cfc_ulx_commands/timed_punishments/server/data.lua" )( logger ),
+    Data = SERVER and include( "cfc_ulx_commands/timed_punishments/server/data.lua" )( logger ),
     MakeULXCommands = include( "cfc_ulx_commands/timed_punishments/ulx.lua" )( logger ),
     Punishments = {}
 }
+
+if CLIENT then return end
 
 local TP = TimedPunishments
 local logger = TP.logger
