@@ -59,6 +59,8 @@ function Data:removeExpired()
             punishment
     ]], now )
 
+    if not expired then return end
+
     for _, p in ipairs( expired ) do
         self.logger:debug( "Deleting " .. p["COUNT(*)"] .. " expired punishments of type '" .. p.punishment .. "'" )
     end
