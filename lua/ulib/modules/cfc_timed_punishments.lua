@@ -1,9 +1,11 @@
-
 require "logger"
+AddCSLuaFile( "cfc_ulx_commands/timed_punishments/ulx.lua" )
+
 local IsValid = IsValid
+local logger = Logger( "ULX_TimedPunishments" )
 
 TimedPunishments = {
-    logger = Logger( "ULX_TimedPunishments" ),
+    logger = logger,
     Data = SERVER and include( "cfc_ulx_commands/timed_punishments/server/data.lua" )( logger ),
     MakeULXCommands = include( "cfc_ulx_commands/timed_punishments/ulx.lua" )( logger ),
     Punishments = {}
@@ -12,14 +14,8 @@ TimedPunishments = {
 if CLIENT then return end
 
 local TP = TimedPunishments
-local logger = TP.logger
 local Data = TP.Data
 local Punishments = TP.Punishments
-
-local function try( f, ... )
-    local success, err = pcall( f )
-    if not success then ErrorNoHaltWithStack( err, ... ) end
-end
 
 function TP.Register( punishment, enable, disable )
     logger:info( "Registering new punishment type: ", punishment )
@@ -36,7 +32,7 @@ function TP.Punish( steamID64, punishment, expiration, issuer, reason )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
-    try( function() Punishments[punishment].enable( ply ) end, ply, punishment )
+    Punishments[punishment].enable( ply )
 end
 
 function TP.Unpunish( steamID64, punishment )
@@ -45,15 +41,17 @@ function TP.Unpunish( steamID64, punishment )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
-    try( function() Punishments[punishment].disable( ply ) end, ply, punishment )
+    Punishments[punishment].disable( ply )
 end
+
+local none = {}
 
 hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local steamID64 = ply:SteamID64()
     local punishments = Data:getPunishments( steamID64 )
 
-    for punishment, expiration in pairs( punishments ) do
-        try( function() Punishments[punishments].enable( ply ) end, ply, punishment )
+    for punishment, expiration in pairs( punishments or none ) do
+        Punishments[punishments].enable( ply )
     end
 
     ply.TimedPunishments = punishments
@@ -65,21 +63,16 @@ hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
 
         for _, ply in ipairs( player.GetHumans() ) do
             local steamID64 = ply:SteamID64()
-            local expired = {}
+            local punishments = ply.TimedPunishments or none
 
-            for punishment, expiration in pairs( ply.TimedPunishments ) do
+            for punishment, expiration in pairs( punishments ) do
                 if expiration > 0 and expiration <= now then
-                    try( function() TP.Unpunish( steamID64, punishment ) end, punishment )
-                end
-            end
-
-            if table.Count( expired ) > 0 then
-                for punishment in pairs( expired ) do
                     ply.TimedPunishments[punishment] = nil
+                    TP.Unpunish( steamID64, punishment )
                 end
             end
         end
     end
 
-    tiemr.Create( "CFC_TimedPunishments_ExpirationChecker", PUNISH_CHECK_INTERVAL, 0, function() try( checkExpirations ) end )
+    timer.Create( "CFC_TimedPunishments_ExpirationChecker", 1, 0, checkExpirations )
 end )
