@@ -24,7 +24,7 @@ return function( logger )
     --
     --   action:
     --     A special format string to print when the action is complete.
-    --     This uses a special placeholder, "##" which will be turned into "#T" for player targets and "%s" for steamid targets
+    --     This uses a special placeholder, "##" which will be turned into "#T" for player targets and "#s" for steamid targets
     --     (i.e. "time blinded ##" would result in "#A time blinded #T for %i minutes!" for player targets)
     --
     --   inverseAction:
@@ -67,9 +67,9 @@ return function( logger )
                 end
 
                 if minutes == 0 then
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (%s)", targetPlys, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", targetPlys, reason )
                 else
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (%s)", targetPlys, minutes, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (#s)", targetPlys, minutes, reason )
                 end
             end
 
@@ -94,8 +94,8 @@ return function( logger )
         -- == SteamID Target ==
         do
             local nameID = name .. "id"
-            local actionStr = "#A " .. string.Replace( action, "##", "%s" )
-            local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "%s" )
+            local actionStr = "#A " .. string.Replace( action, "##", "#s" )
+            local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "#s" )
 
             cmd[nameID] = function( callingPly, target, minutes, reason, shouldInverse )
                 reason = reason or ""
@@ -113,9 +113,9 @@ return function( logger )
                 TimedPunishments.Punish( steamID64, name, expiration, issuer, reason )
 
                 if minutes == 0 then
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (%s)", target, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", target, reason )
                 else
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (%s)", target, minutes, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (#s)", target, minutes, reason )
                 end
 
                 ulx.fancyLogAdmin( callingPly, actionStr, target, minutes, reason )
