@@ -58,14 +58,6 @@ if CLIENT then
         subMsg( TOTAL_COLOR, "Total: ", COUNT_COLOR, totalCount, "\n" )
     end
 
-    local function writeAlertData( alerts )
-        msg( HEADER_COLOR, "Alerts:" )
-
-        for _, alert in ipairs( alerts ) do
-            subMsg( ALERT_COLOR, " - ", alert )
-        end
-    end
-
     local function writePlayerData( plyName, data )
         -- Padded with newlines for surround spacing
         msg( "\n\n", INTRO_COLOR, "Building summary for: '" .. plyName .. "'", "\n" )
@@ -73,8 +65,7 @@ if CLIENT then
         writeCountData( "Props by model", data.props )
         writeCountData( "Constraints by class", data.constraints )
         writeCountData( "Ents by class", data.ents )
-
-        writeAlertData( data.alerts )
+        writeCountData( "Alerts", data.alerts )
     end
 
     net.Receive( "CFC_ULX_BuildCheckResults", function()
@@ -90,11 +81,11 @@ if CLIENT then
     end )
 end
 
--- Insert alerts into the alerts table
+-- TODO: alerts is a countTable ( { total = 0, items = { <alert> = <count>} )
 local function addEntAlerts( ent, alerts )
 end
 
--- Insert alerts into the plyData.alerts table
+-- TODO: plyData.alerts is a countTable ( { total = 0, items = { <alert> = <count>} )
 local function plyAlerts( plyData )
 end
 
@@ -150,7 +141,7 @@ local function categoryTable()
         constraints = countTable(),
         props = countTable(),
         ents = countTable(),
-        alerts = {}
+        alerts = countTable()
     }
 end
 
