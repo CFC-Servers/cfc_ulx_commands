@@ -51,11 +51,11 @@ if CLIENT then
         local total = data.total
 
         for identifier, count in pairs( SortedPairsByValue( data.items, true ) ) do
+            local color = getCountColor( total, count )
             subMsg( CLASS_COLOR, identifier, ": ", COUNT_COLOR, count )
-            totalCount = totalCount + count
         end
 
-        subMsg( TOTAL_COLOR, "Total: ", COUNT_COLOR, totalCount, "\n" )
+        subMsg( TOTAL_COLOR, "Total: ", COUNT_COLOR, total, "\n" )
     end
 
     local function writePlayerData( plyName, data )
