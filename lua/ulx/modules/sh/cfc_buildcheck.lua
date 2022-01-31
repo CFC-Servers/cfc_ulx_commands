@@ -109,6 +109,7 @@ end
 
 local function tallyEnt( ent, trackedPlayers, playerData, unknownData )
     local ent = rawget( allEnts, i )
+    -- TODO: Make a more robust method to get owners (i.e. for wire holograms, npcs, grenades, etc.)
     local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
     local validOwner = IsValid( owner )
 
