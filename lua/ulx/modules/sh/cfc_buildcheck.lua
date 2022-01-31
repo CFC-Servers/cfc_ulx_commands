@@ -11,26 +11,45 @@ if SERVER then
 end
 
 if CLIENT then
-    local MsgC = MsgC
     -- TODO: Choose the colors
-    local INTRO_COLOR = Color( 175, 175, 235 )
-    local HEADER_COLOR = Color( 175, 235, 175 )
-    local CLASS_COLOR = Color( 235, 235, 175 )
+    local INTRO_COLOR = Color( 145, 145, 245 )
+    local HEADER_COLOR = Color( 145, 245, 145 )
+    local CLASS_COLOR = Color( 245, 245, 145 )
+    local DEFAULT_COLOR = Color( 245, 245, 245 )
 
     -- These are vectors so we can lerp them
-    local MOST_COUNT_COLOR = Vector( 255, 0, 0 ) -- If a single count makes up 100% of the total count
-    local LEAST_COUNT_COLOR = Vector( 0, 255, 0 ) -- If a single count make sup 0% of the total count
+    local MOST_COUNT_COLOR = Vector( 1, 0, 0 ) -- If a single count makes up 100% of the total count
+    local MID_COUNT_COLOR = Vector( 1, 1, 0 ) -- If a single count makes up 50% of the total count
+    local LEAST_COUNT_COLOR = Vector( 0, 1, 0 ) -- If a single count make sup 0% of the total count
+
+    -- TODO: Create some way of scaling the total counts
+    local function getTotalColor( total, category )
+    end
 
     -- Returns a dynamic color between MOST_COUNT and
     -- LEAST_COUNT colors based on how much of the total is
     -- made up by the given count
     local function getCountColor( total, count )
-        return LerpVector( count / total, LEAST_COUNT_COLOR, MOST_COUNT_COLOR ):ToColor()
+        local fraction = count / total
+
+        local min, max
+        if fraction <= 0.5 then
+            fraction = math.Remap( fraction, 0, 0.5, 0, 1 )
+            min = LEAST_COUNT_COLOR
+            max = MID_COUNT_COLOR
+        else
+            min = MID_COUNT_COLOR
+            max = MOST_COUNT_COLOR
+        end
+
+        return LerpVector( fraction, min, max ):ToColor()
     end
 
     -- MsgC with prefix and auto-newlining
-    local consolePrint = function( prefix, ... )
-        MsgC( prefix, ... , "\n" )
+    consolePrint = function( prefix, ... )
+        MsgC( prefix )
+        MsgC( ... )
+        MsgC( "\n" )
     end
 
     -- consolePrint with no prefix
@@ -46,16 +65,16 @@ if CLIENT then
 
     -- Writes a table of <identifier>=<count>
     local function writeCountData( header, data )
-        msg( HEADER_COLOR, header, ":")
+        msg( HEADER_COLOR, header, ":" )
 
         local total = data.total
 
-        for identifier, count in pairs( SortedPairsByValue( data.items, true ) ) do
-            local color = getCountColor( total, count )
-            subMsg( CLASS_COLOR, identifier, ": ", COUNT_COLOR, count )
+        for identifier, count in SortedPairsByValue( data.items, true ) do
+            local col = getCountColor( total, count )
+            subMsg( CLASS_COLOR, identifier, ": ", col, count )
         end
 
-        subMsg( TOTAL_COLOR, "Total: ", COUNT_COLOR, total, "\n" )
+        subMsg( CLASS_COLOR, "Total: ", INTRO_COLOR, total, "\n" )
     end
 
     local function writePlayerData( plyName, data )
@@ -69,8 +88,11 @@ if CLIENT then
     end
 
     net.Receive( "CFC_ULX_BuildCheckResults", function()
-        local json = util.Decompress( net.ReadData() )
+        local dataLen = net.ReadUInt( 32 )
+        local json = util.Decompress( net.ReadData( dataLen ) )
         local data = util.JSONToTable( json )
+
+        PrintTable( data )
 
         for plyName, data in pairs( data.players ) do
             writePlayerData( plyName, data )
@@ -86,7 +108,7 @@ local function addEntAlerts( ent, alerts )
 end
 
 -- TODO: plyData.alerts is a countTable ( { total = 0, items = { <alert> = <count>} )
-local function plyAlerts( plyData )
+local function addPlyAlerts( plyData )
 end
 
 -- Returns <category>,<identifier>
@@ -108,7 +130,6 @@ local function entCategory( ent )
 end
 
 local function tallyEnt( ent, trackedPlayers, playerData, unknownData )
-    local ent = rawget( allEnts, i )
     -- TODO: Make a more robust method to get owners (i.e. for wire holograms, npcs, grenades, etc.)
     local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
     local validOwner = IsValid( owner )
@@ -163,7 +184,7 @@ function cmd.buildCheck( caller, targets )
         players = {}
     }
 
-    for i = 1, targets do
+    for i = 1, targetsCount do
         local ply = rawget( targets, i )
         buildData.players[ply] = categoryTable()
     end
@@ -173,6 +194,7 @@ function cmd.buildCheck( caller, targets )
 
     local unknownData = buildData.unknown
     local playerData = buildData.players
+    PrintTable( playerData )
 
     for i = 1, entsCount do
         local ent = rawget( allEnts, i )
@@ -180,20 +202,26 @@ function cmd.buildCheck( caller, targets )
     end
 
     for ply, data in pairs( playerData ) do
-        -- Check for player alerts
-        addPlyAlerts( data )
+        if not isstring( ply ) then
+            -- Check for player alerts
+            addPlyAlerts( data )
 
-        -- Convert keys to the player's name and steamid
-        local plyString = ply:Nick() .. "<" .. ply:SteamID() .. ">"
-        playerData[plyString] = data
-        playerData[ply] = nil
+            -- Convert keys to the player's name and steamid
+            local plyString = ply:Nick() .. "<" .. ply:SteamID() .. ">"
+            playerData[plyString] = data
+            playerData[ply] = nil
+        end
     end
+
+    PrintTable( buildData )
 
     local json = util.TableToJSON( buildData )
     local compress = util.Compress( json )
 
+    -- TODO: Figure out a more reasonable number for this UInt
     net.Start( "CFC_ULX_BuildCheckResults" )
-    net.WriteData( compress )
+    net.WriteUInt( #compress, 32 )
+    net.WriteData( compress, #compress )
     net.Send( caller )
 
     -- TODO: Fancylogadmin some highlights from the data here
