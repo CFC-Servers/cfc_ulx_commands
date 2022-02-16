@@ -52,7 +52,9 @@ e2BanCommand:setOpposite( "ulx une2ban", {_, _, _, _, true}, "!une2ban" )
 
 local function setup()
     if not MakeWireExpression2 then
-        ErrorNoHalt( "Couldn't find MakeWireExpression2, E2 ban can't function")
+        if SERVER then
+            ErrorNoHalt( "Couldn't find MakeWireExpression2, E2 ban can't function")
+        end
         return
     end
 
