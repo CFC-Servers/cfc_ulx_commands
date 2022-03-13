@@ -1,4 +1,5 @@
 -- Makes the ULX commands
+local IsValid = IsValid
 
 -- Returns a generator function with logger context
 return function( logger )
@@ -60,7 +61,7 @@ return function( logger )
                 end
 
                 local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
-                local issuer = callingPly and callingPly:SteamID64() or "Console"
+                local issuer = IsValid( callingPly ) and callingPly:SteamID64() or "Console"
 
                 for _, ply in pairs( targetPlys ) do
                     TimedPunishments.Punish( ply:SteamID64(), name, expiration, issuer, reason )
@@ -108,7 +109,7 @@ return function( logger )
                 end
 
                 local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
-                local issuer = callingPly and callingPly:SteamID64() or "Console"
+                local issuer = IsValid( callingPly ) and callingPly:SteamID64() or "Console"
 
                 TimedPunishments.Punish( steamID64, name, expiration, issuer, reason )
 
