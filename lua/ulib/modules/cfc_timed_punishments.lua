@@ -51,7 +51,7 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local punishments = Data:getPunishments( steamID64 )
 
     for punishment, expiration in pairs( punishments or none ) do
-        Punishments[punishments].enable( ply )
+        Punishments[punishment].enable( ply )
     end
 
     ply.TimedPunishments = punishments
