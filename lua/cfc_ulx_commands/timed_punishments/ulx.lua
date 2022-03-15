@@ -117,8 +117,6 @@ return function( logger )
                 else
                     ulx.fancyLogAdmin( callingPly, actionStr .. " for #i minutes! (#s)", target, minutes, reason )
                 end
-
-                ulx.fancyLogAdmin( callingPly, actionStr, target, minutes, reason )
             end
 
             local consoleCommand = "ulx " .. nameID
