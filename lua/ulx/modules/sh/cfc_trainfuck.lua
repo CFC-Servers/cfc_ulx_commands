@@ -20,6 +20,7 @@ function cmd.trainFuck( ply )
 
         local removeTime = math.random( 2, 4 )
         timer.Simple( removeTime, function()
+            if not IsValid( train ) then return end
             train:Remove()
         end)
     end
