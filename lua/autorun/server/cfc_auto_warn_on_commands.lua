@@ -9,6 +9,21 @@ local defaultArgIndices = {
     reason = 4
 }
 
+-- Available keys for each command
+--  - indices
+--    - table
+--    - explain the index of targets, duration, and reason for the given command
+--
+--  - skipEmptyReason
+--    - boolean
+--
+--  - minDuration
+--    - int
+--
+--  - usesSeconds
+--    - bool
+--    - set to true if the command uses seconds for its duration
+--
 local enabledCommands = {
     -- Timegag
     ["ulx timegag"] = { skipEmptyReason = true },
@@ -35,7 +50,7 @@ local function buildReason( reason, commandName, duration )
     local info = commandName
 
     if duration then
-        info = info .. " " .. ULib.secondsToStringTime( duration * 60 )
+        info = info .. " " .. ULib.secondsToStringTime( duration )
     end
 
     info = "(" .. info .. ")"
@@ -99,6 +114,10 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     local duration, reason, targets = parseCommand( cmd, args )
 
     if not shouldWarn( cmd, duration, reason ) then return end
+
+    if not cmd.usesSeconds then
+        duration = duration * 60
+    end
 
     for _, target in ipairs( targets ) do
         reason = buildReason( reason, commandName, duration )
