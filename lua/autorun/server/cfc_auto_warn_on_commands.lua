@@ -91,6 +91,8 @@ local function parseCommand( cmd, args )
 end
 
 hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( caller, commandName, args )
+    if not ULib.ucl.query( caller, commandName ) then return end
+
     local cmd = enabledCommands[commandName]
     if not cmd then return end
 
