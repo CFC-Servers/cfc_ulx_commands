@@ -5,16 +5,28 @@ local concat = table.concat
 
 local defaultArgIndices = {
     targets = 2,
-    duraiton = 3,
+    duration = 3,
     reason = 4
 }
 
 local enabledCommands = {
-    ["ulx timegag"] = {
-        dontWarnOnEmptyReason = true
-    },
-    ["ulx timemute"] = {},
-    ["ulx pvpban"] = {},
+    -- Timegag
+    ["ulx timegag"] = { skipEmptyReason = true },
+    ["ulx timegagid"] = {},
+
+    -- Timemute
+    ["ulx timemute"] = { skipEmptyReason = true },
+    ["ulx timemuteid"] = {},
+
+    -- PvPBan
+    ["ulx pvpban"] = { skipEmptyReason = true },
+    ["ulx pvpbanid"] = {},
+
+    -- Chipban
+    ["ulx chipban"] = { skipEmptyReason = true },
+    ["ulx chipbanid"] = {},
+
+    -- Ban
     ["ulx ban"] = {},
     ["ulx banid"] = {}
 }
@@ -55,8 +67,10 @@ local function getTargets( indices, args )
 end
 
 local function shouldWarn( cmd, duration, reason )
-    if cmd.dontWarnOnEmptyReason then
-        if not reason or reason == "" then return false end
+    if cmd.skipEmptyReason then
+        if not reason then return false end
+        if reason == "" then return false end
+        if reason == "No reason specified" then return false end
     end
 
     if cmd.minDuration then
