@@ -61,7 +61,7 @@ if SERVER then
 
     local function setupStarfall()
         local starfall = scripted_ents.GetStored( "starfall_processor" ).t
-        starfall._ChipBan_SetupFiles = starfall._ChipBan_SetupFiles or starfall.SetupFilers
+        starfall._ChipBan_SetupFiles = starfall._ChipBan_SetupFiles or starfall.SetupFiles
 
         starfall.SetupFiles = function( chip, sfdata )
             local ply = sfdata.owner
