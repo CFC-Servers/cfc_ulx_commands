@@ -8,7 +8,6 @@ if SERVER then
     local function enable( ply )
         ply:DisallowNoclip( true )
         ply:DisallowSpawning( true )
-        ply:DisallowVehicles( true )
 
         ply:StripWeapons()
         cleanup.CC_Cleanup( ply, "gmod_cleanup", {} )
@@ -17,7 +16,6 @@ if SERVER then
     local function disable( ply )
         ply:DisallowNoclip( false )
         ply:DisallowSpawning( false )
-        ply:DisallowVehicles( false )
     end
 
     TimedPunishments.Register( PUNISHMENT, enable, disable )
