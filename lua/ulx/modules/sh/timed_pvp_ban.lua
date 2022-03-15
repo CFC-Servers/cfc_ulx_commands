@@ -20,8 +20,8 @@ if SERVER then
     TimedPunishments.Register( PUNISHMENT, enable, disable )
 end
 
-local action = "banned ## from pvp"
-local inverseAction = "unbanned ## from pvp"
+local action = "banned ## from PvP"
+local inverseAction = "unbanned ## from PvP"
 TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NAME, HELP )
 
 local function checkPvpBan( ply )
