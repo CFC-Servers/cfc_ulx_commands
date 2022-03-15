@@ -1,5 +1,5 @@
 local function escapeArg( arg )
-    if arg == SQL_NULL then
+    if arg == nil then
         return "NULL"
     elseif type( arg ) == "number" then
         return arg
@@ -80,7 +80,7 @@ function Data:createPunishment( punishment, steamID64, expiration, issuer, reaso
         INSERT OR REPLACE INTO
             cfc_timed_punishments (steamid64, expiration, issuer, punishment, reason )
         VALUES
-            (%s, %s, %s, %s %s)
+            (%s, %s, %s, %s, %s)
     ]], steamID64, expiration, issuer, punishment, reason )
 end
 

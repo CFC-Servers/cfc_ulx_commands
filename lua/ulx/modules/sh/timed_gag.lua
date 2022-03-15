@@ -19,6 +19,6 @@ if SERVER then
 end
 
 local action = "gagged ##"
-local inverseAction = "ungagged ##"
+local inverseAction = "removed ##'s time gag"
 TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NAME, HELP )
 

@@ -19,6 +19,6 @@ if SERVER then
 end
 
 local action = "muted ##"
-local inverseAction = "unmuted ##"
+local inverseAction = "removed ##'s time mute"
 TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NAME, HELP )
 

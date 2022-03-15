@@ -50,16 +50,15 @@ return function( logger )
             local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "#T" )
 
             cmd[name] = function( callingPly, targetPlys, minutes, reason, shouldInverse )
-                reason = reason or ""
-
                 if shouldInverse then
                     for _, ply in ipairs( targetPlys ) do
                         TimedPunishments.Unpunish( ply:SteamID64(), name )
                     end
 
-                    ulx.fancyLogAdmin( callingPly, inverseAction, targetPlys )
+                    return ulx.fancyLogAdmin( callingPly, inverseActionStr, targetPlys )
                 end
 
+                reason = reason or ""
                 local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
                 local issuer = IsValid( callingPly ) and callingPly:SteamID64() or "Console"
 
@@ -82,14 +81,15 @@ return function( logger )
 
             local ulxCommand = ulx.command( category, consoleCommand, cmd[name], chatCommand )
             ulxCommand:addParam{ type = ULib.cmds.PlayersArg }
-            ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
-            ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+            ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, ULib.cmds.optional, min = 0, default = 15 }
+            ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, default = "No reason specified" }
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
             ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
 
-            logger:info( "Created: ", consoleCommand, chatCommand, inverseConsoleCommand, inverseChatCommand )
+            logger:debug( "Created: ", consoleCommand, chatCommand )
+            logger:debug( "Created: ", inverseConsoleCommand, inverseChatCommand )
         end
 
         -- == SteamID Target ==
@@ -99,7 +99,6 @@ return function( logger )
             local inverseActionStr = "#A " .. string.Replace( inverseAction, "##", "#s" )
 
             cmd[nameID] = function( callingPly, target, minutes, reason, shouldInverse )
-                reason = reason or ""
                 local steamID64 = util.SteamIDTo64( target )
 
                 if shouldInverse then
@@ -130,14 +129,15 @@ return function( logger )
 
             local ulxCommand = ulx.command( CATEGORY_NAME, consoleCommand, cmd[nameID], chatCommand )
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "steamid" }
-            ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, min = 0 }
-            ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.takeRestOfLine }
+            ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, ULib.cmds.optional, min = 0, default = 15 }
+            ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, default = "No reason specified" }
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
             ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
 
-            logger:info( "Created: ", consoleCommand, chatCommand, inverseConsoleCommand, inverseChatCommand )
+            logger:debug( "Created: ", consoleCommand, chatCommand )
+            logger:debug( "Created: ", inverseConsoleCommand, inverseChatCommand )
         end
     end
 end
