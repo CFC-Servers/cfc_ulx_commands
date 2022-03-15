@@ -55,7 +55,7 @@ if SERVER then
                 return false
             end
 
-            return chip:_ChipBan_Setup( ... )
+            return e2Meta:_ChipBan_Setup( chip, ... )
         end
     end
 
@@ -72,7 +72,7 @@ if SERVER then
                 return false
             end
 
-            return chip:_ChipBan_SetupFiles( sfdata )
+            return starfall:_ChipBan_SetupFiles( chip, sfdata )
         end
     end
 
