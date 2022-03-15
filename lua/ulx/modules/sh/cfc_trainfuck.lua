@@ -3,22 +3,11 @@ local cmd = CFCUlxCommands.trainfuck
 
 CATEGORY_NAME = "Fun"
 
-local trainSounds = {
-    "ambient/alarms/razortrain_horn1.wav",
-    "ambient/machines/usetoilet_flush1.wav",
-    "ambient/machines/wall_crash1.wav",
-    "garrysmod/balloon_pop_cute.wav",
-    "garrysmod/save_load1.wav"
-}
-
 function cmd.trainFuck( ply )
-    local soundPlay = trainSounds[math.random( 1, 5 )]
-
     local train = ents.Create( "train_fucked" )
     train:SetPos( ply:GetPos() - ply:GetForward() * 500 + Vector( 0, 0, 150 ) )
     train:SetAngles( ply:EyeAngles() - Angle( 0, 90, 0 ) )
     train:Spawn()
-    train:EmitSound( soundPlay, 180, 1, CHAN_BODY )
     local phys = train:GetPhysicsObject()
 
     if IsValid( phys ) then
@@ -27,10 +16,10 @@ function cmd.trainFuck( ply )
         end
         ply:ExitVehicle()
 
-        phys:ApplyForceCenter( ( ply:GetPos() - train:GetPos() ) * 1000000000 )
+        phys:ApplyForceCenter( ( ply:GetPos() - train:GetPos() ) * 100000000 )
 
-        timer.Simple( 1.5, function()
-            train:StopSound( soundPlay )
+        local removeTime = math.random( 2, 4 )
+        timer.Simple( removeTime, function()
             train:Remove()
         end)
     end
