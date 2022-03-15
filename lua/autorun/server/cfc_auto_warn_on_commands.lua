@@ -85,6 +85,7 @@ local function shouldWarn( cmd, duration, reason )
     if cmd.skipEmptyReason then
         if not reason then return false end
         if reason == "" then return false end
+        if reason == "reason" then return false end
         if reason == "No reason specified" then return false end
     end
 
