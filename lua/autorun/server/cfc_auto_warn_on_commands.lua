@@ -35,7 +35,7 @@ local function buildReason( reason, commandName, duration )
     local info = commandName
 
     if duration then
-        info = info .. " " .. ULib.secondsToStringTime( duration )
+        info = info .. " " .. ULib.secondsToStringTime( duration * 60 )
     end
 
     info = "(" .. info .. ")"
@@ -99,7 +99,7 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     if not shouldWarn( cmd, duration, reason ) then return end
 
     for _, target in ipairs( targets ) do
-        reason = buildReason( target, reason, commandName, duration )
+        reason = buildReason( reason, commandName, duration )
         warn( caller, target, reason )
     end
 end )
