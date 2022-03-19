@@ -22,13 +22,17 @@ function ENT:PhysicsCollide( colData )
     timer.Simple( 0, function()
         if not IsValid( ply ) then return end
         if not IsValid( self ) then return end
-        local dmg = DamageInfo()
-        dmg:SetAttacker( self )
-        dmg:SetInflictor( self )
-        dmg:SetDamage( 1000 )
 
         ply:KillSilent()
         hook.Run( "DoPlayerDeath", ply, self, dmg )
-        hook.Run( "PlayerDeath", ply, self, self )
+        if not ply.TrainfuckTookDamage then
+            hook.Run( "PlayerDeath", ply, self, self )
+        end
+        ply.TrainfuckTookDamage = nil
     end)
 end
+
+hook.Add( "PlayerShouldTakeDamage", "TrainfuckWasDamaged", function( ply, ent )
+    if ent:GetClass() ~= "train_fucked" then return end
+    ply.TrainfuckTookDamage = true
+end)
