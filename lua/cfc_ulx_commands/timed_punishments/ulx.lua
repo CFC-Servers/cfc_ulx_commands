@@ -125,7 +125,7 @@ return function( logger )
             local chatCommand = "!" .. nameID
             local inverseChatCommand = "!un" .. nameID
 
-            local ulxCommand = ulx.command( CATEGORY_NAME, consoleCommand, cmd[nameID], chatCommand )
+            local ulxCommand = ulx.command( category, consoleCommand, cmd[nameID], chatCommand )
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "steamid" }
             ulxCommand:addParam{ type = ULib.cmds.NumArg, hint = "minutes, 0 for perma", ULib.cmds.allowTimeString, ULib.cmds.optional, min = 0, default = 15 }
             ulxCommand:addParam{ type = ULib.cmds.StringArg, hint = "reason", ULib.cmds.optional, default = "No reason specified" }
