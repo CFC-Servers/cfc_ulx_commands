@@ -396,6 +396,7 @@ local function struggle( ply, button )
     if struggleAmount >= struggleAmountMax then
         local grabber = prop.propifyGrabber or ply
 
+        grabber:DropObject()
         DropEntityIfHeld( prop )
 
         timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
