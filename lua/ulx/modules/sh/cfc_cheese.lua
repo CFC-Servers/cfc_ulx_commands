@@ -10,7 +10,7 @@ cmd.CHEESE_MODELS = {
 }
 
 local function overridePrint( isUnpropifying )
-    if isUnpropifying then return "#A uncheesified #T"
+    if isUnpropifying then return "#A uncheesified #T" end
     return "#A cheesified #T"
 end
 

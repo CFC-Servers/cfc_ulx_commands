@@ -80,6 +80,8 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
     ply.propifyCanStruggle = nil
+    ply.propifyHopPress = nil
+    ply.propifyHopCooldown = nil
     ply:SetNWBool( "propifyGrabbed", false )
     timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
 
@@ -103,7 +105,7 @@ function cmd.unpropifyPlayer( ply )
 end
 
 function cmd.printDefault( isUnpropifying )
-    if isUnpropifying then return "#A unpropified #T"
+    if isUnpropifying then return "#A unpropified #T" end
     return "#A propified #T"
 end
 
@@ -207,13 +209,13 @@ local function handleHopPress( ply, key, state )
 
     if nextHopTime > CurTime() then return end
 
-    local hopFunc = ply.propifyHopPress
+    local hopFunc = ply.propifyHopPress or cmd.propHopDefault
     local moveDir = getRelativeHopDir( ply:EyeAngles(), key )
     local applyCooldown = hopFunc( ply, ply.ragdoll, key, state, moveDir )
 
     if not applyCooldown then return end
 
-    local cooldown = ply.propifyHopCooldown
+    local cooldown = ply.propifyHopCooldown or cmd.propHopCooldownDefault
 
     if type( cooldown ) == "function" then
         cooldown = cooldown( ply, key, state, HOP_COOLDOWN:GetFloat() )
