@@ -14,7 +14,17 @@ local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown", 1, FCVAR_NONE, "The cooldown on how frequently players can be told they are unable to pick up a recently-escaped propified player (default 1)", 0, 50000 )
 
-local function propifyPlayer( caller, ply, modelPath )
+cmd.relativeDirFuncs = {
+    [IN_FORWARD] = function( ang ) return ang:Forward() end,
+    [IN_BACK] = function( ang ) return -ang:Forward() end,
+    [IN_MOVERIGHT] = function( ang ) return ang:Right() end,
+    [IN_MOVELEFT] = function( ang ) return -ang:Right() end,
+    [IN_JUMP] = function() return Vector( 0, 0, 1 ) end
+}
+local relativeDirFuncs = cmd.relativeDirFuncs
+
+
+local function propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
@@ -51,6 +61,8 @@ local function propifyPlayer( caller, ply, modelPath )
     ply:DisallowSpawning( true )
 
     ply.ragdoll = prop
+    ply.propifyHopPress = overrideHopPress or cmd.propHopDefault
+    ply.propifyHopCooldown = overrideHopCooldown or cmd.propHopCooldownDefault
     ulx.setExclusive( ply, "ragdolled" )
 
     return nil, prop
@@ -89,7 +101,23 @@ function cmd.unpropifyPlayer( ply )
     ulx.clearExclusive( ply )
 end
 
-function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
+function cmd.printDefault( isUnpropifying )
+    if isUnpropifying then return "#A unpropified #T"
+    return "#A propified #T"
+end
+
+--[[
+    Special args:
+        overridePrint (optional): - function( isUnpropifying )
+            - Overrides the print string, using ulx formatting
+        overrideHopPress (optional): - function( ply, prop, key, state, moveDir )
+            - Overrides hop movement, gets called for every IN_KEY press/release other than IN_USE
+            - Return true to apply hop cooldown
+        overrideHopCooldown (optional): - NUMBER or function( ply, key, state, cvCooldown )
+            - Determines how long to put the hop function on cooldown, if the cooldown is currently getting applied
+            - cvCooldown = HOP_COOLDOWN:GetFloat() - Useful for having something based off the cooldown convar, like a multiplier or clamp
+--]]
+function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown )
     local affectedPlys = {}
     local props = {}
 
@@ -100,7 +128,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
             elseif not ply:Alive() then
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
-                local err, prop = propifyPlayer( caller, ply, modelPath )
+                local err, prop = propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
 
                 if not err then
                     table.insert( affectedPlys, ply )
@@ -117,11 +145,9 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
 
     if not IsValid( caller ) then return props end
 
-    if not shouldUnpropify then
-        ulx.fancyLogAdmin( caller, "#A propified #T", affectedPlys )
-    else
-        ulx.fancyLogAdmin( caller, "#A unpropified #T", affectedPlys )
-    end
+    local printStr = ( overridePrint or cmd.printDefault )( shouldUnpropify )
+
+    ulx.fancyLogAdmin( caller, printStr, affectedPlys )
 
     return props
 end
@@ -164,21 +190,53 @@ end
 hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 
 --Player movement:
-local function propHop( ply, keyNum )
+local function getRelativeHopDir( eyeAngles, key )
+    local dirFunc = relativeDirFuncs[key]
+
+    if not dirFunc then return eyeAngles:Forward() end
+
+    return dirFunc( eyeAngles )
+end
+
+local function handleHopPress( ply, key, state )
     if not IsValid( ply.ragdoll ) then return end
-    if ply.ragdoll.propifyNoHop then return end
+    if key == IN_USE then return end
 
-    local prop = ply.ragdoll
+    local nextHopTime = ply.propifyNextHopTime or 0
+
+    if nextHopTime > CurTime() then return end
+
+    local hopFunc = ply.propifyHopPress
+    local moveDir = getRelativeHopDir( ply:EyeAngles(), key )
+    local applyCooldown = hopFunc( ply, ply.ragdoll, key, state, moveDir )
+
+    if not applyCooldown then return end
+
+    local cooldown = ply.propifyHopCooldown
+
+    if type( cooldown ) == "function" then
+        cooldown = cooldown( ply, key, state, HOP_COOLDOWN:GetFloat() )
+    end
+
+    ply.propifyNextHopTime = CurTime() + cooldown
+end
+hook.Add( "KeyPress", "CFC_ULX_PropHopPress", function( ply, key )
+    handleHopPress( ply, key, true )
+end )
+hook.Add( "KeyRelease", "CFC_ULX_PropHopRelease", function( ply, key )
+    handleHopPress( ply, key, false )
+end )
+
+function cmd.propHopCooldownDefault( _, _, _, cvCooldown )
+    return cvCooldown
+end
+
+function cmd.propHopDefault( ply, prop, key, state, moveDir )
+    if not state or not relativeDirFuncs[key] then return end
+
     local isRagdoll = prop:GetClass() == "prop_ragdoll"
-    ply.propifyLastHop = ply.propifyLastHop or 0
-
-    if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
-
-    ply.propifyLastHop = CurTime()
-
     local phys = prop:GetPhysicsObject()
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
-    local eyeAngles = ply:EyeAngles()
 
     if isRagdoll then
         local boneID = prop:LookupBone( "ValveBiped.Bip01_Spine2" )
@@ -189,21 +247,12 @@ local function propHop( ply, keyNum )
         end
     end
 
-    if not phys then return end
+    if not IsValid( phys ) then return end
 
-    if keyNum == IN_FORWARD then
-        phys:ApplyForceCenter( eyeAngles:Forward() * hopStrength )
-    elseif keyNum == IN_BACK then
-        phys:ApplyForceCenter( -eyeAngles:Forward() * hopStrength )
-    elseif keyNum == IN_MOVERIGHT then
-        phys:ApplyForceCenter( eyeAngles:Right() * hopStrength )
-    elseif keyNum == IN_MOVELEFT then
-        phys:ApplyForceCenter( -eyeAngles:Right() * hopStrength )
-    elseif keyNum == IN_JUMP then
-        phys:ApplyForceCenter( Vector( 0, 0, hopStrength ) )
-    end
+    phys:ApplyForceCenter( moveDir * hopStrength )
+
+    return true
 end
-hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
 local function manualUseTrace( ply )
     local prop = ply.ragdoll
