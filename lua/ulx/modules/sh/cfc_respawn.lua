@@ -13,4 +13,4 @@ end
 local respawnCommand = ulx.command( CATEGORY_NAME, "ulx respawn", cmd.respawn, "!respawn" )
 respawnCommand:addParam{ type = ULib.cmds.PlayersArg }
 respawnCommand:defaultAccess( ULib.ACCESS_ADMIN )
-respawnCommand:help( "Respawn the target(s)." )
+respawnCommand:help( "Respawns player target(s)." )
