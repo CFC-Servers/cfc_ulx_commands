@@ -16,6 +16,7 @@ local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown
 
 local function propifyPlayer( caller, ply, modelPath )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
+    if not IsValid( ply ) then return "Invalid player!" end
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
 
