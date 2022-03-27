@@ -23,6 +23,11 @@ function ENT:PhysicsCollide( colData )
         if not IsValid( ply ) then return end
         if not IsValid( self ) then return end
 
+        local dmg = DamageInfo()
+        dmg:SetAttacker( self )
+        dmg:SetInflictor( self )
+        dmg:SetDamage( 1000 )
+
         ply:KillSilent()
         hook.Run( "DoPlayerDeath", ply, self, dmg )
         if not ply.TrainfuckTookDamage then
