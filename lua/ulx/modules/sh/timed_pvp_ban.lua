@@ -10,7 +10,7 @@ local HELP = "Bans the target for a certain time from entering pvp"
 if SERVER then
     local function enable( ply )
         ply.isPvpBanned = true
-        CFCPvp.setPlayerBuild( ply )
+        if ply:isInPvp() then CFCPvp.setPlayerBuild( ply ) end
     end
 
     local function disable( ply )
