@@ -15,7 +15,7 @@ if SERVER then
         if not forcedBuddies then return og_setbuddy( ply, command, args ) end
 
         local target = tonumber( args[1] ) and Player( tonumber( args[1] ) )
-        if forcedBuddies[target:SteamID64()] then return end
+        if IsValid( target ) and forcedBuddies[target:SteamID64()] then return end
 
         return og_setbuddy( ply, command, args )
     end
