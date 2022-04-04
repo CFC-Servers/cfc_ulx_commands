@@ -15,7 +15,7 @@ if SERVER then
         if not forcedBuddies then return og_setbuddy( ply, command, args ) end
 
         local target = tonumber( args[1] ) and Player( tonumber( args[1] ) )
-        if forcedBuddies[target] then return end
+        if forcedBuddies[target:SteamID64()] then return end
 
         return og_setbuddy( ply, command, args )
     end
@@ -25,6 +25,7 @@ function cmd.forceBuddy( callingPlayer, targetPlayers, reason )
     -- Doesn't work from console
     if not IsValid( callingPlayer ) then return end
 
+    local callingSteamID = callingPlayer:SteamID64()
     local callingID = callingPlayer:UserID()
 
     for _, ply in ipairs( targetPlayers ) do
@@ -34,7 +35,17 @@ function cmd.forceBuddy( callingPlayer, targetPlayers, reason )
         og_setbuddy( ply, "fpp_setbuddy", { callingID, 1, 1, 1, 1, 1, 1 } )
     end
 
-    ulx.fancyLogAdmin( callingPlayer, "#A forced #T to grant them prop protection access (#s)", targetPlayers, reason )
+    timer.Simple( 10 * 60, function()
+        for _, ply in ipairs( targetPlayers ) do
+            if IsValid( ply ) and ply.ForcedBuddies then
+                -- TODO: If a player already has some buddy perms, we should set them back, not override them
+                ply.ForcedBuddies[callingSteamID] = nil
+                og_setbuddy( ply, "fpp_setbuddy", { callingID, 0, 0, 0, 0, 0, 0 } )
+            end
+        end
+    end )
+
+    ulx.fancyLogAdmin( callingPlayer, "#A forced #T to grant them prop protection access for 10 minutes (#s)", targetPlayers, reason )
 end
 
 local forceBuddyCommand = ulx.command( CATEGORY_NAME, "ulx forcebuddy", cmd.forceBuddy, "!forcebuddy" )
