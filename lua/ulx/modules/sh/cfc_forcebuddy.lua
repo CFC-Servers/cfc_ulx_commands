@@ -30,7 +30,7 @@ function cmd.forceBuddy( callingPlayer, targetPlayers, reason )
 
     for _, ply in ipairs( targetPlayers ) do
         ply.ForcedBuddies = ply.ForcedBuddies or {}
-        ply.ForcedBuddies[callingPlayer] = true
+        ply.ForcedBuddies[callingSteamID] = true
 
         og_setbuddy( ply, "fpp_setbuddy", { callingID, 1, 1, 1, 1, 1, 1 } )
     end
