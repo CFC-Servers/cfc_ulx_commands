@@ -1,7 +1,5 @@
-local IsValid = IsValid
 local istable = istable
 local isentity = isentity
-local concat = table.concat
 
 local defaultArgIndices = {
     targets = 2,
@@ -59,10 +57,6 @@ local function buildReason( reason, commandName, duration )
     return reason
 end
 
-local function quoteWrap( s )
-    return '"' .. s .. '"'
-end
-
 local function warn( caller, target, reason )
     if isentity( target ) then
         target = target:SteamID()
@@ -89,9 +83,7 @@ local function shouldWarn( cmd, duration, reason )
         if reason == "No reason specified" then return false end
     end
 
-    if cmd.minDuration then
-        if reason > cmd.minDuration then return false end
-    end
+    if duration < (cmd.minDuration or 0) then return false end
 
     return true
 end
