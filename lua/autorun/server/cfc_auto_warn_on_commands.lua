@@ -59,7 +59,7 @@ end
 
 local function warn( caller, target, reason )
     if isentity( target ) then
-        target = target:SteamID()
+        target = target:SteamID64()
     end
 
     awarn_warnplayerid( caller, target, reason )
