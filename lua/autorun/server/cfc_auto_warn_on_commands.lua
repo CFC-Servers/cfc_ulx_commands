@@ -60,6 +60,8 @@ end
 local function warn( caller, target, reason )
     if isentity( target ) then
         target = target:SteamID64()
+    elseif string.sub( target, 1, 5 ) == "STEAM" then
+        target = util.SteamIDTo64( target )
     end
 
     awarn_warnplayerid( caller, target, reason )
