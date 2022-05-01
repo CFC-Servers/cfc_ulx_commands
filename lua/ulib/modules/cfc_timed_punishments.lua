@@ -26,13 +26,13 @@ function TP.Register( punishment, enable, disable )
     }
 end
 
-function TP.Punish( steamID64, punishment, expiration, issuer, reason )
-    Data:createPunishment( punishment, steamID64, expiration, issuer, reason )
+function TP.Punish( steamID64, punishment, expiration, issuer, reason, extraData )
+    Data:createPunishment( punishment, steamID64, expiration, issuer, reason, extraData )
 
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
-    Punishments[punishment].enable( ply )
+    Punishments[punishment].enable( ply, extraData )
 end
 
 function TP.Unpunish( steamID64, punishment )
@@ -50,8 +50,15 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local steamID64 = ply:SteamID64()
     local punishments = Data:getPunishments( steamID64 )
 
-    for punishment, expiration in pairs( punishments or none ) do
-        Punishments[punishment].enable( ply )
+    local now = os.time()
+
+    for punishment, fields in pairs( punishments or none ) do
+        local expiration = fields.expiration
+
+        if expiration == 0 or expiration > now then
+            local extraData = fields.extraData
+            Punishments[punishment].enable( ply, extraData )
+        end
     end
 
     ply.TimedPunishments = punishments
@@ -65,7 +72,9 @@ hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
             local steamID64 = ply:SteamID64()
             local punishments = ply.TimedPunishments or none
 
-            for punishment, expiration in pairs( punishments ) do
+            for punishment, fields in pairs( punishments ) do
+                local expiration = fields.expiration
+
                 if expiration > 0 and expiration <= now then
                     ply.TimedPunishments[punishment] = nil
                     TP.Unpunish( steamID64, punishment )

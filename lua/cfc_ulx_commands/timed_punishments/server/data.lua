@@ -26,11 +26,12 @@ function Data:setupTables()
     query( [[
         CREATE TABLE IF NOT EXISTS cfc_timed_punishments(
         id          INTEGER       PRIMARY KEY,
-        steamid64   TEXT          NOT NULL,
-        expiration  INTEGER       NOT NULL,
-        issuer      TEXT          NOT NULL,
-        punishment  TEXT          NOT NULL,
-        reason      TEXT
+        steamid64   TEXT          NOT NULL   ,
+        expiration  INTEGER       NOT NULL   ,
+        issuer      TEXT          NOT NULL   ,
+        punishment  TEXT          NOT NULL   ,
+        reason      TEXT                     ,
+        extraData   TEXT                     ,
     )
     ]] )
 
@@ -75,13 +76,13 @@ function Data:removeExpired()
     ]], now )
 end
 
-function Data:createPunishment( punishment, steamID64, expiration, issuer, reason )
+function Data:createPunishment( punishment, steamID64, expiration, issuer, reason, extraData )
     query( [[
         INSERT OR REPLACE INTO
-            cfc_timed_punishments (steamid64, expiration, issuer, punishment, reason )
+            cfc_timed_punishments (steamid64, expiration, issuer, punishment, reason, extraData )
         VALUES
             (%s, %s, %s, %s, %s)
-    ]], steamID64, expiration, issuer, punishment, reason )
+    ]], steamID64, expiration, issuer, punishment, reason, extraData )
 end
 
 function Data:removePunishment( punishment, steamID64 )
@@ -98,7 +99,7 @@ end
 function Data:getPunishments( steamID64 )
     local result = query( [[
         SELECT
-            expiration, punishment
+            expiration, punishment, extraData
         FROM
             cfc_timed_punishments
         WHERE
@@ -110,7 +111,15 @@ function Data:getPunishments( steamID64 )
     if result == false then return ErrorNoHaltWithStack( steamID64 ) end
 
     for _, p in ipairs( result ) do
-        punishments[p.punishment] = tonumber( p.expiration )
+        local extraData = p.extraData
+        if extraData then
+            extraData = util.JSONToTable( extraData )
+        end
+
+        punishments[p.punishment] = {
+            expiration = tonumber( p.expiration ),
+            extraData = extraData
+        }
     end
 
     return punishments
