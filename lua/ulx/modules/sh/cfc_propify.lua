@@ -320,25 +320,31 @@ local function propifyForceTryUse( ply, button )
 end
 hook.Add( "KeyPress", "CFC_ULX_PropifyForceTryUse", propifyForceTryUse )
 
-local function detectPropifyPickup( ply, ent )
+local function detectPropifyPickup( ply, ent, onlyRequest, onlyTrack )
     local ragdolledPly = ent.ragdolledPly
 
     if not ragdolledPly then return end
 
-    local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
+    if onlyRequest or onlyTrack == nil then -- hook is only doing a request check, or is doing both
+        local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
 
-    if struggleAmountMax == 0 then return end
-    if ent.propifyCantGrab then
-        local lastDeny = ply.propifyLastPickupDeny or 0
-        local time = RealTime()
+        if struggleAmountMax == 0 then return end
+        if ent.propifyCantGrab then
+            local lastDeny = ply.propifyLastPickupDeny or 0
+            local time = RealTime()
 
-        if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
-            ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
+            if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
+                ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
 
-            ply.propifyLastPickupDeny = time
+                ply.propifyLastPickupDeny = time
+            end
+
+            return false
         end
 
-        return false
+        if onlyRequest then -- Break early for request-only calls
+            return true
+        end
     end
 
     ragdolledPly:SetNWBool( "propifyGrabbed", true )
@@ -366,7 +372,12 @@ local function detectPropifyPickup( ply, ent )
     end )
 end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
-hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
+hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyBlockPickupAttempt", function( ply, ent )
+    detectPropifyPickup( ply, ent, true, false )
+end )
+hook.Add( "GravGunOnPickedUp", "CFC_ULX_PropifyDetectPickup", function( ply, ent )
+    detectPropifyPickup( ply, ent, false, true )
+end )
 
 local function detectPropifyDrop( _, ent )
     if not IsValid( ent ) then return end
@@ -375,11 +386,9 @@ local function detectPropifyDrop( _, ent )
 
     if not IsValid( ragdolledPly ) then return end
 
-    if ragdolledPly:GetNWBool( "propifyGrabbed" ) then
-        ragdolledPly:SetNWBool( "propifyGrabbed", false )
-        ent.ragdolledPly.propifyCanStruggle = nil
-        ent.propifyGrabber = nil
-    end
+    ragdolledPly:SetNWBool( "propifyGrabbed", false )
+    ragdolledPly.propifyCanStruggle = nil
+    ent.propifyGrabber = nil
 end
 hook.Add( "OnPlayerPhysicsDrop", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
 hook.Add( "GravGunOnDropped", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
