@@ -433,8 +433,6 @@ local function struggle( ply, button )
         prop:EmitSound( "physics/body/body_medium_impact_soft" .. math.random( 1, 7 ) .. ".wav" )
 
         timer.Simple( STRUGGLE_LIMIT:GetFloat(), function()
-            local prop = ply.ragdoll
-
             if not IsValid( prop ) or not ply:GetNWBool( "propifyGrabbed" ) then return end
 
             ply.propifyCanStruggle = true
