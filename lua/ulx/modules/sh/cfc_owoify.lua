@@ -133,7 +133,7 @@ local function isNovelEgg( message, eggTable )
     return eggTable[2]
 end
 
-local function doEasterEgg( message )  
+local function checkIfEasterEggIsValidElseReturnNormal( message )  
     local out = message
     for _, eggTable in pairs( EASTER_EGGS ) do
         local novelEgg = isNovelEgg( message, eggTable )
@@ -153,8 +153,8 @@ local function owoifyMessage( message )
         owoifiedMessage = string.Replace( owoifiedMessage, old, new )
         owoifiedMessage = string.Replace( owoifiedMessage, string.upper( old ), string.upper( new ) )
     end
-    local owoifiedMessage = doEasterEgg( owoifiedMessage )
-    local owoifiedMessage = owoifiedMessage .. PHRASES_TO_APPEND[math.random( 1, #PHRASES_TO_APPEND )]
+    owoifiedMessage = checkIfEasterEggIsValidElseReturnNormal( owoifiedMessage )
+    owoifiedMessage = owoifiedMessage .. PHRASES_TO_APPEND[math.random( 1, #PHRASES_TO_APPEND )]
 
     return owoifiedMessage
 end
