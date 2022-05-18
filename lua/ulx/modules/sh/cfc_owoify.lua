@@ -112,7 +112,7 @@ local PHRASES_TO_REPLACE = {
     { "tion", "shun" },
     { "wha", "wa" },
     { "whe", "we" },
-    { "whi", "wi" },
+    { "whi", "wi" }
 }
 local EASTER_EGGS = {
     { "owo", "owo what IS this??" }, 
@@ -126,20 +126,20 @@ local EASTER_EGGS = {
 local SPOILED_EGGS = {}
 local ID_OWO = 3
 
-local function isNovelEgg( message, item )
-    if message ~= item[1] then return end
+local function isNovelEgg( message, eggTable )
+    if message ~= eggTable[1] then return end
     if SPOILED_EGGS[message] then return end
     if math.random( 0, 100 ) < 75 then return end
-    return item[2]
+    return eggTable[2]
 end
 
 local function doEasterEgg( message )  
     local out = message
-    for _, item in pairs( EASTER_EGGS ) do
-        local novelEgg = isNovelEgg( message, item )
+    for _, eggTable in pairs( EASTER_EGGS ) do
+        local novelEgg = isNovelEgg( message, eggTable )
         if novelEgg then
             SPOILED_EGGS[message] = true
-            out = novelEgg
+            return novelEgg
         end
     end
     return out
@@ -161,19 +161,19 @@ end
 
 local function onPlayerSay( ply, message )
     if ply.gimp ~= ID_OWO then return end
+    local oldMessage = ply.lastOwoifyMessageSent or ""
     local nextMessage = ply.nextOwoifySameMessage or 0
-    if ply.lastOwoifyMessageSent == message and nextMessage > CurTime() then -- dumb spam filter to prevent minges from just speedspamming nothing
+    if oldMessage == message and nextMessage > CurTime() then -- dumb spam filter to prevent minges from just speedspamming nothing
         return ""
     end
-    local scale = math.random( 0, 8 ) -- sometimes no delay to keep em on their toes
-    local time = 1 * scale
+    local time = math.random( 0, 5 ) -- sometimes no delay to keep em on their toes
     ply.lastOwoifyMessageSent = message
     ply.nextOwoifySameMessage = CurTime() + time
 
     return owoifyMessage( message )
 end
 
-function cmd.owoifyCommand( caller, targets, shouldUnowoify )
+function cmd.chatOWOifyCommand( caller, targets, shouldUnowoify )
     local shouldOwoify = not shouldUnowoify
 
     for _, ply in ipairs( targets ) do
