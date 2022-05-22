@@ -239,6 +239,13 @@ function cmd.propHopDefault( ply, prop, key, state, moveDir )
 
     local isRagdoll = prop:GetClass() == "prop_ragdoll"
     local phys = prop:GetPhysicsObject()
+
+    if not IsValid( phys ) then
+        cmd.unpropifyPlayer( ply )
+
+        return
+    end
+
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
 
     if isRagdoll then
