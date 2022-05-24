@@ -20,7 +20,7 @@ cmd.relativeDirFuncs = {
     [IN_BACK] = function( ang ) return -ang:Forward() end,
     [IN_MOVERIGHT] = function( ang ) return ang:Right() end,
     [IN_MOVELEFT] = function( ang ) return -ang:Right() end,
-    [IN_JUMP] = function() jumpVector end
+    [IN_JUMP] = function() return jumpVector end
 }
 local relativeDirFuncs = cmd.relativeDirFuncs
 
