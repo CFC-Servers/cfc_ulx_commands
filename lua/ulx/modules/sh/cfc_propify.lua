@@ -14,12 +14,13 @@ local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown", 1, FCVAR_NONE, "The cooldown on how frequently players can be told they are unable to pick up a recently-escaped propified player (default 1)", 0, 50000 )
 
+local jumpVector = Vector( 0, 0, 1 )
 cmd.relativeDirFuncs = {
     [IN_FORWARD] = function( ang ) return ang:Forward() end,
     [IN_BACK] = function( ang ) return -ang:Forward() end,
     [IN_MOVERIGHT] = function( ang ) return ang:Right() end,
     [IN_MOVELEFT] = function( ang ) return -ang:Right() end,
-    [IN_JUMP] = function() return Vector( 0, 0, 1 ) end
+    [IN_JUMP] = function() jumpVector end
 }
 local relativeDirFuncs = cmd.relativeDirFuncs
 
