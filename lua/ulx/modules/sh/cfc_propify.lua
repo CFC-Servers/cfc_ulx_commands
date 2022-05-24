@@ -2,7 +2,6 @@ CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
 local CATEGORY_NAME = "Fun"
-local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
 local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE, "The max radius allowed for propify models (default 150)", 0, 50000 )
 local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
 local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
@@ -13,6 +12,17 @@ local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 10, FCV
 local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500, FCVAR_NONE, "The strength that a propified player launches at when escaping a grab (default 500)", 0, 50000 )
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown", 1, FCVAR_NONE, "The cooldown on how frequently players can be told they are unable to pick up a recently-escaped propified player (default 1)", 0, 50000 )
+local PROP_DEFAULT_MODELS = {
+    "models/props_c17/oildrum001.mdl",
+    "models/props_c17/FurnitureSink001a.mdl",
+    "models/props_borealis/bluebarrel001.mdl",
+    "models/props_c17/gravestone003a.mdl",
+    "models/props_lab/filecabinet02.mdl",
+    "models/props_lab/monitor01a.mdl",
+    "models/props_junk/TrashBin01a.mdl",
+    "models/props_c17/suitcase001a.mdl"
+}
+local PROP_DEFAULT_MODEL_COUNT = #PROP_DEFAULT_MODELS
 
 local jumpVector = Vector( 0, 0, 1 )
 cmd.relativeDirFuncs = {
@@ -29,6 +39,11 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
     if not IsValid( ply ) then return "Invalid player!" end
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
+
+    if modelPath == "random" then
+        modelPath = PROP_DEFAULT_MODELS[math.random( 1, PROP_DEFAULT_MODEL_COUNT )]
+    end
+
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
 
     if ply:InVehicle() then
@@ -158,7 +173,7 @@ end
 
 local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.propifyTargets, "!propify" )
 propifyCommand:addParam{ type = ULib.cmds.PlayersArg }
-propifyCommand:addParam{ type = ULib.cmds.StringArg, default = PROP_DEFAULT_MODEL, ULib.cmds.optional }
+propifyCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional }
 propifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 propifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 propifyCommand:help( "Turns the target(s) into a prop with the given model." )
