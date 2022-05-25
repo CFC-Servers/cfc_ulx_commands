@@ -1,31 +1,21 @@
 CFCUlxCommands.e2ban = CFCUlxCommands.e2ban or {}
-local cmd = CFCUlxCommands.e2ban
 local CATEGORY_NAME = "Utility"
 local PUNISHMENT = "chipban"
 local HELP = "Bans the target for a certain time from using E2/Starfall"
 
 if SERVER then
-    local chips = {
-        gmod_wire_expression2 = true,
-        starfall_processor = true
-    }
-
     local function enable( ply )
         ply.isChipBanned = true
 
         for _, ent in ipairs( ents.GetAll() ) do
             local entClass = ent:GetClass()
 
-            if entClass == "gmod_wire_expression2" then
-                if ent.player == ply then
-                    ent:Remove()
-                end
+            if entClass == "gmod_wire_expression2" and ent.player == ply then
+                ent:Remove()
             end
 
-            if entClass == "starfall_processor" then
-                if ent.owner == ply then
-                    ent:Remove()
-                end
+            if entClass == "starfall_processor" and ent.owner == ply then
+                ent:Remove()
             end
         end
     end
