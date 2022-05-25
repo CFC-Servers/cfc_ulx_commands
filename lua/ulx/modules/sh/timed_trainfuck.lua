@@ -1,5 +1,4 @@
 CFCUlxCommands.timedtrainfuck = CFCUlxCommands.timedtrainfuck or {}
-local cmd = CFCUlxCommands.timedtrainfuck
 local CATEGORY_NAME = "Fun"
 local PUNISHMENT = "timedtrainfuck"
 local HELP = "Curse a user to be trainfucked at random intervals"
