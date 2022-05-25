@@ -1,5 +1,4 @@
 CFCUlxCommands.timedDarkRP = CFCUlxCommands.timedDarkRP or {}
-local cmd = CFCUlxCommands.timedDarkRP
 local CATEGORY_NAME = "Fun"
 local PUNISHMENT = "timeddarkrp"
 local HELP = "Prevents the target(s) from spawning anything at all"

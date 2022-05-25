@@ -1,5 +1,4 @@
 CFCUlxCommands.timegag = CFCUlxCommands.timegag or {}
-local cmd = CFCUlxCommands.timegag
 local CATEGORY_NAME = "Chat"
 local PUNISHMENT = "timegag"
 local HELP = "Gags a user for a set amount of time"
