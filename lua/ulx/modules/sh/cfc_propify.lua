@@ -381,7 +381,7 @@ local function detectPropifyPickup( ply, ent, onlyRequest, onlyTrack )
 end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
 hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyBlockPickupAttempt", function( ply, ent )
-    detectPropifyPickup( ply, ent, true, false )
+    return detectPropifyPickup( ply, ent, true, false )
 end )
 hook.Add( "GravGunOnPickedUp", "CFC_ULX_PropifyDetectPickup", function( ply, ent )
     detectPropifyPickup( ply, ent, false, true )
