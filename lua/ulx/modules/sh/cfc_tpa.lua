@@ -69,7 +69,7 @@ function cmd.tpa( callingPlayer, targetPlayers )
 
         timer.Simple( delay, function()
             CFCNotifications.sendSimple( "tpaClose", "TPA", "Successfully teleported.", callingPlayer )
-            ulx["goto"]( callingPlayer, target ) -- using [] to avoid glualint being angy
+            ulx["goto"]( callingPlayer, target )
         end )
     end
 
