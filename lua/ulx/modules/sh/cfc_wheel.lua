@@ -149,7 +149,7 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
             local spindownMult = turnTorque and WHEEL_TURN_ASSIST_SPINDOWN_MULT or 1 -- Assist turning by reducing forwards spin
             local rightDotAim = wheelRight:Dot( plyForward )
 
-            if mAbs( rightDotAim ) > WHEEL_TURN_ASSIST_REORIENT_THRESHOLD then
+            if mAbs( rightDotAim ) > WHEEL_TURN_ASSIST_REORIENT_THRESHOLD then -- Gently turn wheel towards player's aim
                 spinTorque = -VEC_UP * WHEEL_TURN_STRENGTH:GetFloat() * mSignNoZero( rightDotAim )
             end
 
