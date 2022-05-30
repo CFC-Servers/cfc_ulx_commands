@@ -26,8 +26,8 @@ cmd.wheelPropCount = wheelPropCount
 cmd.relativeDirFuncsWheel = {
     [IN_FORWARD] = function( ang ) return -ang:Right() end,
     [IN_BACK] = function( ang ) return ang:Right() end,
-    [IN_MOVERIGHT] = function( ang ) return -VEC_UP end,
-    [IN_MOVELEFT] = function( ang ) return VEC_UP end,
+    [IN_MOVERIGHT] = function() return -VEC_UP end,
+    [IN_MOVELEFT] = function() return VEC_UP end,
     [IN_JUMP] = function() return VEC_UP end
 }
 local relativeDirFuncsWheel = cmd.relativeDirFuncsWheel
