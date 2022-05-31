@@ -9,12 +9,12 @@ local WHEEL_MODEL = "models/props_vehicles/carparts_wheel01a.mdl"
 local WHEEL_GROUND_TRACE_OFFSET
 local WHEEL_JUMP_COOLDOWN = 0.3
 local WHEEL_UPRIGHT_STRENGTH = 230
+local WHEEL_UPRIGHT_STABILIZE = 0.9
 local WHEEL_UPRIGHT_THRESHOLD = 0.07
 local WHEEL_HORIZONTAL_THRESHOLD = 0.99
 local WHEEL_ASSIST_GROUND_MULT = 3
 local WHEEL_TURN_ASSIST_SPINDOWN_MULT = 0.5
 local WHEEL_TURN_ASSIST_REORIENT_THRESHOLD = 0.35
-local WHEEL_UPRIGHT_STABILIZE = Vector( 0.9, 0, 0 )
 local WHEEL_SPIN_STRENGTH = CreateConVar( "cfc_ulx_wheel_spin_strength", 30, FCVAR_NONE, "The speed that propify wheel players can move at", 0, 50000 )
 local WHEEL_TURN_STRENGTH = CreateConVar( "cfc_ulx_wheel_turn_strength", 10, FCVAR_NONE, "The speed that propify wheel players can turn at", 0, 50000 )
 
@@ -172,13 +172,14 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
         end
 
         local rightDot = isHorizontal and mSignNoZero( wheelRightZOriginal ) or VEC_UP:Dot( wheelRight )
-        local angVel = phys:GetAngleVelocity()
-        local forwardEff = wheelRight:Angle():Right()
+        local angVel = phys:LocalToWorldVector( phys:GetAngleVelocity() )
+        local forwardEff = -( wheelRight:Angle():Right() )
+        local torque = rightDot * forwardEff * WHEEL_UPRIGHT_STRENGTH
+        local torqueStabilize = -forwardEff * forwardEff:Dot( angVel ) * WHEEL_UPRIGHT_STABILIZE
 
-        local torque = phys:WorldToLocalVector( -WHEEL_UPRIGHT_STRENGTH * rightDot * forwardEff )
-        torque = torque - angVel * WHEEL_UPRIGHT_STABILIZE
+        local torqueApplied = phys:WorldToLocalVector( torque + torqueStabilize )
 
-        phys:AddAngleVelocity( torque )
+        phys:AddAngleVelocity( torqueApplied )
     end
 end )
 
