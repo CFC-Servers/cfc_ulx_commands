@@ -15,6 +15,8 @@ local WHEEL_HORIZONTAL_THRESHOLD = 0.99
 local WHEEL_ASSIST_GROUND_MULT = 3
 local WHEEL_TURN_ASSIST_SPINDOWN_MULT = 0.5
 local WHEEL_TURN_ASSIST_REORIENT_THRESHOLD = 0.35
+local WHEEL_TURN_ASSIST_STRENGTH = 2
+local WHEEL_TURN_ASSIST_STABILIZE = 0.1
 local WHEEL_SPIN_STRENGTH = CreateConVar( "cfc_ulx_wheel_spin_strength", 30, FCVAR_NONE, "The speed that propify wheel players can move at", 0, 50000 )
 local WHEEL_TURN_STRENGTH = CreateConVar( "cfc_ulx_wheel_turn_strength", 10, FCVAR_NONE, "The speed that propify wheel players can turn at", 0, 50000 )
 
@@ -141,6 +143,7 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
         local wheelRightZAbs = mAbs( wheelRightZ )
         local wheelRightZOriginal = wheelRightZ
         local isHorizontal = wheelRightZAbs > WHEEL_HORIZONTAL_THRESHOLD
+        local angVel = phys:LocalToWorldVector( phys:GetAngleVelocity() )
         local plyEyeAngles = ply:EyeAngles()
         local plyForward = plyEyeAngles:Forward()
         local spinKey = wheel.propifyWheelSpinKey
@@ -154,7 +157,8 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
             local rightDotAim = wheelRight:Dot( plyForward )
 
             if mAbs( rightDotAim ) > WHEEL_TURN_ASSIST_REORIENT_THRESHOLD then -- Gently turn wheel towards player's aim
-                spinTorque = -VEC_UP * WHEEL_TURN_STRENGTH:GetFloat() * mSignNoZero( rightDotAim )
+                spinTorque = -VEC_UP * mSignNoZero( rightDotAim ) * WHEEL_TURN_STRENGTH:GetFloat() * WHEEL_TURN_ASSIST_STRENGTH
+                spinTorque = spinTorque + VEC_UP * angVel:Dot( -VEC_UP ) * WHEEL_TURN_ASSIST_STABILIZE
             end
 
             phys:AddAngleVelocity( phys:WorldToLocalVector( spinTorque * groundMult * spindownMult ) )
@@ -172,10 +176,9 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
         end
 
         local rightDot = isHorizontal and mSignNoZero( wheelRightZOriginal ) or VEC_UP:Dot( wheelRight )
-        local angVel = phys:LocalToWorldVector( phys:GetAngleVelocity() )
         local forwardEff = -( wheelRight:Angle():Right() )
         local torque = rightDot * forwardEff * WHEEL_UPRIGHT_STRENGTH
-        local torqueStabilize = -forwardEff * forwardEff:Dot( angVel ) * WHEEL_UPRIGHT_STABILIZE
+        local torqueStabilize = -forwardEff * angVel:Dot( forwardEff ) * WHEEL_UPRIGHT_STABILIZE
 
         local torqueApplied = phys:WorldToLocalVector( torque + torqueStabilize )
 
