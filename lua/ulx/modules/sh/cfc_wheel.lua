@@ -102,7 +102,8 @@ function cmd.propHopOverride( ply, prop, key, state, moveDir )
     if isTurning then
         prop.propifyWheelTurning = moveDirWheel * rotStrength
     else
-        prop.propifyWheelSpinning = moveDirWheel * rotStrength
+        prop.propifyWheelSpinning = rotStrength
+        prop.propifyWheelSpinKey = key
     end
 
     return false
@@ -140,8 +141,11 @@ hook.Add( "Think", "CFC_ULX_WheelKeepUpright", function()
         local wheelRightZAbs = mAbs( wheelRightZ )
         local wheelRightZOriginal = wheelRightZ
         local isHorizontal = wheelRightZAbs > WHEEL_HORIZONTAL_THRESHOLD
-        local plyForward = ply:GetAimVector()
+        local plyEyeAngles = ply:EyeAngles()
+        local plyForward = plyEyeAngles:Forward()
+        local spinKey = wheel.propifyWheelSpinKey
         local spinTorque = wheel.propifyWheelSpinning
+        spinTorque = spinTorque and ( spinTorque * relativeDirFuncsWheel[spinKey]( plyEyeAngles ) ) -- Update based on current aim direction
         local turnTorque = wheel.propifyWheelTurning
         local groundMult = wheel:IsOnGround() and WHEEL_ASSIST_GROUND_MULT or 1
 
