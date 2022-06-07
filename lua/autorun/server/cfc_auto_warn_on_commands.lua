@@ -41,7 +41,11 @@ local enabledCommands = {
 
     -- Ban
     ["ulx ban"] = {},
-    ["ulx banid"] = {}
+    ["ulx banid"] = {},
+
+    -- Ban
+    ["ulx kick"] = {},
+    ["ulx kickid"] = {}
 }
 
 local function buildReason( reason, commandName, duration )
