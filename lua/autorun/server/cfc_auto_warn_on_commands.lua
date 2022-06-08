@@ -2,6 +2,7 @@ local istable = istable
 local isentity = isentity
 
 local defaultArgIndices = {
+    caller = 1,
     targets = 2,
     duration = 3,
     reason = 4
@@ -51,7 +52,7 @@ local enabledCommands = {
 local function buildReason( reason, commandName, duration )
     local info = commandName
 
-    if duration then
+    if duration and duration ~= -1 then
         info = info .. " " .. ULib.secondsToStringTime( duration )
     end
 
@@ -89,7 +90,8 @@ local function shouldWarn( cmd, duration, reason )
         if reason == "No reason specified" then return false end
     end
 
-    if duration < (cmd.minDuration or 0) then return false end
+    if duration == -1 then return true end
+    if duration < ( cmd.minDuration or 0 ) then return false end
 
     return true
 end
@@ -100,6 +102,11 @@ local function parseCommand( cmd, args )
     local duration = args[indices.duration]
     local reason = args[indices.reason]
     local targets = getTargets( indices, args )
+
+    if not isnumber( duration ) then
+        reason = duration
+        duration = -1
+    end
 
     return duration, reason, targets
 end
@@ -114,7 +121,7 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
 
     if not shouldWarn( cmd, duration, reason ) then return end
 
-    if not cmd.usesSeconds then
+    if not cmd.usesSeconds and duration ~= -1 then
         duration = duration * 60
     end
 
