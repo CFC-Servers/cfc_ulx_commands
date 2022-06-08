@@ -69,7 +69,9 @@ local function warn( caller, target, reason )
         target = util.SteamIDTo64( target )
     end
 
-    awarn_warnplayerid( caller, target, reason )
+    if isfunction( awarn_warnplayerid ) then
+        awarn_warnplayerid( caller, target, reason )
+    end
 end
 
 local function getTargets( indices, args )
