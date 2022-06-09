@@ -43,9 +43,20 @@ local enabledCommands = {
     ["ulx ban"] = {},
     ["ulx banid"] = {},
 
-    -- Ban
-    ["ulx kick"] = {},
-    ["ulx kickid"] = {}
+    -- Kick
+    ["ulx kick"] = {
+        skipEmptyReason = true,
+        indices = {
+            targets = 2,
+            reason = 3
+        }
+    },
+    ["ulx kickid"] = {
+        indices = {
+            targest = 2,
+            reason = 3
+        }
+    }
 }
 
 local function buildReason( reason, commandName, duration )
@@ -89,7 +100,7 @@ local function shouldWarn( cmd, duration, reason )
         if reason == "No reason specified" then return false end
     end
 
-    if duration < (cmd.minDuration or 0) then return false end
+    if duration and duration < ( cmd.minDuration or 0 ) then return false end
 
     return true
 end
@@ -97,7 +108,7 @@ end
 local function parseCommand( cmd, args )
     local indices = cmd.indices or defaultArgIndices
 
-    local duration = args[indices.duration]
+    local duration = indices.duration and args[indices.duration] or nil
     local reason = args[indices.reason]
     local targets = getTargets( indices, args )
 
@@ -113,10 +124,7 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     local duration, reason, targets = parseCommand( cmd, args )
 
     if not shouldWarn( cmd, duration, reason ) then return end
-
-    if not cmd.usesSeconds then
-        duration = duration * 60
-    end
+    if not cmd.usesSeconds then duration = duration * 60 end
 
     for _, target in ipairs( targets ) do
         reason = buildReason( reason, commandName, duration )
