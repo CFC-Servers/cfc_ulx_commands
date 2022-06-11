@@ -39,7 +39,6 @@ return {
 
                 local _isentity = isentity
                 stub( _G, "isentity" ).with( function( o, ... )
-                    print("running stubbed isentity", o == ent, o, ...)
                     if o == ent then return true end
                     return _isentity( o )
                 end )
