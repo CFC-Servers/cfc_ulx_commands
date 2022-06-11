@@ -1,6 +1,3 @@
-local istable = istable
-local isentity = isentity
-
 CFCUlxCommands.AutoWarner = {}
 local AW = CFCUlxCommands.AutoWarner
 
