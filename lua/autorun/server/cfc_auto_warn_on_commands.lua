@@ -124,7 +124,9 @@ hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( 
     local duration, reason, targets = parseCommand( cmd, args )
 
     if not shouldWarn( cmd, duration, reason ) then return end
-    if not cmd.usesSeconds then duration = duration * 60 end
+    if not cmd.usesSeconds then
+        duration = duration and duration * 60
+    end
 
     for _, target in ipairs( targets ) do
         reason = buildReason( reason, commandName, duration )
