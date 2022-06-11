@@ -109,7 +109,7 @@ function AW.shouldWarn( cmd, duration, reason )
 end
 
 function AW.parseCommand( cmd, args )
-    local indices = cmd.indices or defaultArgIndices
+    local indices = cmd.indices or AW.defaultArgIndices
 
     local duration = indices.duration and args[indices.duration] or nil
     local reason = args[indices.reason]
