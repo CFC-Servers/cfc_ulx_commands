@@ -6,6 +6,5 @@ on:
     jobs:
       run-tests:
         uses: CFC-Servers/GLuaTest/.github/workflows/run_tests.yml@main
-
-    with:
-      requirements: lua/tests/cfc_ulx_commands/requirements.txt
+        with:
+          requirements: lua/tests/cfc_ulx_commands/requirements.txt
