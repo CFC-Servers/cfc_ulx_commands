@@ -7,7 +7,7 @@ local entsToClear = {
 
 if CLIENT then
     net.Receive( "ulx_clean_decals", function()
-        for _,ent in pairs( ents.GetAll() ) do
+        for _, ent in pairs( ents.GetAll() ) do
             if entsToClear[ent:GetClass()] then
                 ent:Remove()
             end
