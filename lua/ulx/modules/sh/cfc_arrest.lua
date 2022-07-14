@@ -10,7 +10,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
 
     for _, ent in ipairs( entities ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-        if owner and entCounts[owner] then
+        if owner then
             if ent:GetClass() == "gmod_wire_expression2" then
                 ent:PCallHook( "destruct" )
                 ent:ResetContext()
@@ -19,7 +19,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
             end
 
             if ent:GetClass() == "starfall_processor" then
-                ent:Error( SF.MakeError( ent.name .. ": Halted by ULX", 1, true, true) )
+                ent:Error( SF.MakeError( ent.name .. ": Halted by ULX", 1, true, true ) )
             end
 
             local canFreeze = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )
