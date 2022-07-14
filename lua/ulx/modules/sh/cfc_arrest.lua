@@ -3,6 +3,16 @@ local cmd = CFCUlxCommands.arrest
 
 CATEGORY_NAME = "Cleanup"
 
+local function isTargetPlayer( ply, targetPlayers )
+    for _, p in pairs( targetPlayers ) do
+        if p == ply then
+            return true
+        end
+    end
+
+    return false
+end
+
 function cmd.arrest( callingPlayer, targetPlayers )
     local entities = ents.GetAll()
     local entCount = 0
@@ -10,7 +20,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
 
     for _, ent in ipairs( entities ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-        if owner then
+        if owner and isTargetPlayer(owner) then
             if ent:GetClass() == "gmod_wire_expression2" then
                 ent:PCallHook( "destruct" )
                 ent:ResetContext()
