@@ -20,10 +20,10 @@ end
 function cmd.decals( callingPlayer )
     for _, ply in ipairs( player.GetHumans() ) do
         ply:ConCommand( "r_cleardecals" )
-
-        net.Start( "ulx_clean_decals" )
-        net.Broadcast()
     end
+
+    net.Start( "ulx_clean_decals" )
+    net.Broadcast()
 
     ulx.fancyLogAdmin( callingPlayer, "#A cleaned up decals." )
 end
