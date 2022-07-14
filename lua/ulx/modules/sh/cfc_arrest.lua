@@ -20,7 +20,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
 
     for _, ent in ipairs( entities ) do
         local owner = ent.CPPIGetOwner and ent:CPPIGetOwner()
-        if owner and isTargetPlayer(owner) then
+        if owner and isTargetPlayer( owner ) then
             if ent:GetClass() == "gmod_wire_expression2" then
                 ent:PCallHook( "destruct" )
                 ent:ResetContext()
