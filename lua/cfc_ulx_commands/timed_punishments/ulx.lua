@@ -117,7 +117,7 @@ return function( logger )
                     ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", target, reason )
                 else
                     local timeStr = ULib.secondsToStringTime( minutes * 60 )
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", targetPlys, timeStr, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", target, timeStr, reason )
                 end
             end
 
