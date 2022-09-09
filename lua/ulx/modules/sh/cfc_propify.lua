@@ -2,7 +2,6 @@ CFCUlxCommands.propify = CFCUlxCommands.propify or {}
 local cmd = CFCUlxCommands.propify
 
 local CATEGORY_NAME = "Fun"
-local PROP_DEFAULT_MODEL = "models/props_c17/oildrum001.mdl"
 local PROP_MAX_SIZE = CreateConVar( "cfc_ulx_propify_max_size", 150, FCVAR_NONE, "The max radius allowed for propify models (default 150)", 0, 50000 )
 local HOP_STRENGTH = CreateConVar( "cfc_ulx_propify_hop_strength", 400, FCVAR_NONE, "The strength of propify hops (default 400)", 0, 50000 )
 local HOP_COOLDOWN = CreateConVar( "cfc_ulx_propify_hop_cooldown", 2, FCVAR_NONE, "The cooldown between propify hops in seconds (default 2)", 0, 50000 )
@@ -13,10 +12,38 @@ local STRUGGLE_SAFETY = CreateConVar( "cfc_ulx_propify_struggle_safety", 10, FCV
 local STRUGGLE_STRENGTH = CreateConVar( "cfc_ulx_propify_struggle_strength", 500, FCVAR_NONE, "The strength that a propified player launches at when escaping a grab (default 500)", 0, 50000 )
 local STRUGGLE_FLEE_RANDOM = CreateConVar( "cfc_ulx_propify_struggle_flee_random", 45, FCVAR_NONE, "How many degrees in any direction that a propified player will randomly launch towards when escaping a grab (default 45)", 0, 180 )
 local PICKUP_DENY_COOLDOWN = CreateConVar( "cfc_ulx_propify_pickup_deny_cooldown", 1, FCVAR_NONE, "The cooldown on how frequently players can be told they are unable to pick up a recently-escaped propified player (default 1)", 0, 50000 )
+local PROP_DEFAULT_MODELS = {
+    "models/props_c17/oildrum001.mdl",
+    "models/props_c17/FurnitureSink001a.mdl",
+    "models/props_borealis/bluebarrel001.mdl",
+    "models/props_c17/gravestone003a.mdl",
+    "models/props_lab/filecabinet02.mdl",
+    "models/props_lab/monitor01a.mdl",
+    "models/props_junk/TrashBin01a.mdl",
+    "models/props_c17/suitcase001a.mdl"
+}
+local PROP_DEFAULT_MODEL_COUNT = #PROP_DEFAULT_MODELS
 
-local function propifyPlayer( caller, ply, modelPath )
+local jumpVector = Vector( 0, 0, 1 )
+cmd.relativeDirFuncs = {
+    [IN_FORWARD] = function( ang ) return ang:Forward() end,
+    [IN_BACK] = function( ang ) return -ang:Forward() end,
+    [IN_MOVERIGHT] = function( ang ) return ang:Right() end,
+    [IN_MOVELEFT] = function( ang ) return -ang:Right() end,
+    [IN_JUMP] = function() return jumpVector end
+}
+local relativeDirFuncs = cmd.relativeDirFuncs
+
+
+local function propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
+    if not IsValid( ply ) then return "Invalid player!" end
     if not canPropify then return ply:GetNick() .. " cannot be propified!" end
+
+    if modelPath == "random" then
+        modelPath = PROP_DEFAULT_MODELS[math.random( 1, PROP_DEFAULT_MODEL_COUNT )]
+    end
+
     if not util.IsValidModel( modelPath ) then return "Invalid model!" end
 
     if ply:InVehicle() then
@@ -51,6 +78,8 @@ local function propifyPlayer( caller, ply, modelPath )
     ply:DisallowSpawning( true )
 
     ply.ragdoll = prop
+    ply.propifyHopPress = overrideHopPress or cmd.propHopDefault
+    ply.propifyHopCooldown = overrideHopCooldown or cmd.propHopCooldownDefault
     ulx.setExclusive( ply, "ragdolled" )
 
     return nil, prop
@@ -67,6 +96,8 @@ function cmd.unpropifyPlayer( ply )
     local prop = ply.ragdoll
     ply.ragdoll = nil
     ply.propifyCanStruggle = nil
+    ply.propifyHopPress = nil
+    ply.propifyHopCooldown = nil
     ply:SetNWBool( "propifyGrabbed", false )
     timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
 
@@ -89,7 +120,23 @@ function cmd.unpropifyPlayer( ply )
     ulx.clearExclusive( ply )
 end
 
-function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
+function cmd.printDefault( isUnpropifying )
+    if isUnpropifying then return "#A unpropified #T" end
+    return "#A propified #T"
+end
+
+--[[
+    Special args:
+        overridePrint (optional): - function( isUnpropifying )
+            - Overrides the print string, using ulx formatting
+        overrideHopPress (optional): - function( ply, prop, key, state, moveDir )
+            - Overrides hop movement, gets called for every IN_KEY press/release other than IN_USE
+            - Return true to apply hop cooldown
+        overrideHopCooldown (optional): - NUMBER or function( ply, key, state, cvCooldown )
+            - Determines how long to put the hop function on cooldown, if the cooldown is currently getting applied
+            - cvCooldown = HOP_COOLDOWN:GetFloat() - Useful for having something based off the cooldown convar, like a multiplier or clamp
+--]]
+function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown )
     local affectedPlys = {}
     local props = {}
 
@@ -100,7 +147,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
             elseif not ply:Alive() then
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
             else
-                local err, prop = propifyPlayer( caller, ply, modelPath )
+                local err, prop = propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
 
                 if not err then
                     table.insert( affectedPlys, ply )
@@ -117,18 +164,16 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify )
 
     if not IsValid( caller ) then return props end
 
-    if not shouldUnpropify then
-        ulx.fancyLogAdmin( caller, "#A propified #T", affectedPlys )
-    else
-        ulx.fancyLogAdmin( caller, "#A unpropified #T", affectedPlys )
-    end
+    local printStr = ( overridePrint or cmd.printDefault )( shouldUnpropify )
+
+    ulx.fancyLogAdmin( caller, printStr, affectedPlys )
 
     return props
 end
 
 local propifyCommand = ulx.command( CATEGORY_NAME, "ulx propify", cmd.propifyTargets, "!propify" )
 propifyCommand:addParam{ type = ULib.cmds.PlayersArg }
-propifyCommand:addParam{ type = ULib.cmds.StringArg, default = PROP_DEFAULT_MODEL, ULib.cmds.optional }
+propifyCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional }
 propifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 propifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 propifyCommand:help( "Turns the target(s) into a prop with the given model." )
@@ -164,21 +209,60 @@ end
 hook.Add( "PostCleanupMap", "CFC_ULX_PropAfterCleanup", createPropAfterCleanup )
 
 --Player movement:
-local function propHop( ply, keyNum )
+local function getRelativeHopDir( eyeAngles, key )
+    local dirFunc = relativeDirFuncs[key]
+
+    if not dirFunc then return eyeAngles:Forward() end
+
+    return dirFunc( eyeAngles )
+end
+
+local function handleHopPress( ply, key, state )
     if not IsValid( ply.ragdoll ) then return end
-    if ply.ragdoll.propifyNoHop then return end
+    if key == IN_USE then return end
 
-    local prop = ply.ragdoll
+    local nextHopTime = ply.propifyNextHopTime or 0
+
+    if nextHopTime > CurTime() then return end
+
+    local hopFunc = ply.propifyHopPress or cmd.propHopDefault
+    local moveDir = getRelativeHopDir( ply:EyeAngles(), key )
+    local applyCooldown = hopFunc( ply, ply.ragdoll, key, state, moveDir )
+
+    if not applyCooldown then return end
+
+    local cooldown = ply.propifyHopCooldown or cmd.propHopCooldownDefault
+
+    if type( cooldown ) == "function" then
+        cooldown = cooldown( ply, key, state, HOP_COOLDOWN:GetFloat() )
+    end
+
+    ply.propifyNextHopTime = CurTime() + cooldown
+end
+hook.Add( "KeyPress", "CFC_ULX_PropHopPress", function( ply, key )
+    handleHopPress( ply, key, true )
+end )
+hook.Add( "KeyRelease", "CFC_ULX_PropHopRelease", function( ply, key )
+    handleHopPress( ply, key, false )
+end )
+
+function cmd.propHopCooldownDefault( _, _, _, cvCooldown )
+    return cvCooldown
+end
+
+function cmd.propHopDefault( ply, prop, key, state, moveDir )
+    if not state or not relativeDirFuncs[key] then return end
+
     local isRagdoll = prop:GetClass() == "prop_ragdoll"
-    ply.propifyLastHop = ply.propifyLastHop or 0
-
-    if ply.propifyLastHop + HOP_COOLDOWN:GetFloat() > CurTime() then return end
-
-    ply.propifyLastHop = CurTime()
-
     local phys = prop:GetPhysicsObject()
+
+    if not IsValid( phys ) then
+        cmd.unpropifyPlayer( ply )
+
+        return
+    end
+
     local hopStrength = HOP_STRENGTH:GetFloat() * phys:GetMass()
-    local eyeAngles = ply:EyeAngles()
 
     if isRagdoll then
         local boneID = prop:LookupBone( "ValveBiped.Bip01_Spine2" )
@@ -189,21 +273,12 @@ local function propHop( ply, keyNum )
         end
     end
 
-    if not phys then return end
+    if not IsValid( phys ) then return end
 
-    if keyNum == IN_FORWARD then
-        phys:ApplyForceCenter( eyeAngles:Forward() * hopStrength )
-    elseif keyNum == IN_BACK then
-        phys:ApplyForceCenter( -eyeAngles:Forward() * hopStrength )
-    elseif keyNum == IN_MOVERIGHT then
-        phys:ApplyForceCenter( eyeAngles:Right() * hopStrength )
-    elseif keyNum == IN_MOVELEFT then
-        phys:ApplyForceCenter( -eyeAngles:Right() * hopStrength )
-    elseif keyNum == IN_JUMP then
-        phys:ApplyForceCenter( Vector( 0, 0, hopStrength ) )
-    end
+    phys:ApplyForceCenter( moveDir * hopStrength )
+
+    return true
 end
-hook.Add( "KeyPress", "CFC_ULX_PropHop", propHop )
 
 local function manualUseTrace( ply )
     local prop = ply.ragdoll
@@ -268,25 +343,31 @@ local function propifyForceTryUse( ply, button )
 end
 hook.Add( "KeyPress", "CFC_ULX_PropifyForceTryUse", propifyForceTryUse )
 
-local function detectPropifyPickup( ply, ent )
+local function detectPropifyPickup( ply, ent, onlyRequest, onlyTrack )
     local ragdolledPly = ent.ragdolledPly
 
     if not ragdolledPly then return end
 
-    local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
+    if onlyRequest or onlyTrack == nil then -- hook is only doing a request check, or is doing both
+        local struggleAmountMax = STRUGGLE_AMOUNT:GetInt()
 
-    if struggleAmountMax == 0 then return end
-    if ent.propifyCantGrab then
-        local lastDeny = ply.propifyLastPickupDeny or 0
-        local time = RealTime()
+        if struggleAmountMax == 0 then return end
+        if ent.propifyCantGrab then
+            local lastDeny = ply.propifyLastPickupDeny or 0
+            local time = RealTime()
 
-        if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
-            ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
+            if time - lastDeny >= PICKUP_DENY_COOLDOWN:GetFloat() then
+                ULib.tsayError( ply, "That propified player cannot be picked up right now!", true )
 
-            ply.propifyLastPickupDeny = time
+                ply.propifyLastPickupDeny = time
+            end
+
+            return false
         end
 
-        return false
+        if onlyRequest then -- Break early for request-only calls
+            return true
+        end
     end
 
     ragdolledPly:SetNWBool( "propifyGrabbed", true )
@@ -314,7 +395,12 @@ local function detectPropifyPickup( ply, ent )
     end )
 end
 hook.Add( "AllowPlayerPickup", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
-hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyDetectPickup", detectPropifyPickup )
+hook.Add( "GravGunPickupAllowed", "CFC_ULX_PropifyBlockPickupAttempt", function( ply, ent )
+    return detectPropifyPickup( ply, ent, true, false )
+end )
+hook.Add( "GravGunOnPickedUp", "CFC_ULX_PropifyDetectPickup", function( ply, ent )
+    detectPropifyPickup( ply, ent, false, true )
+end )
 
 local function detectPropifyDrop( _, ent )
     if not IsValid( ent ) then return end
@@ -323,11 +409,9 @@ local function detectPropifyDrop( _, ent )
 
     if not IsValid( ragdolledPly ) then return end
 
-    if ragdolledPly:GetNWBool( "propifyGrabbed" ) then
-        ragdolledPly:SetNWBool( "propifyGrabbed", false )
-        ent.ragdolledPly.propifyCanStruggle = nil
-        ent.propifyGrabber = nil
-    end
+    ragdolledPly:SetNWBool( "propifyGrabbed", false )
+    ragdolledPly.propifyCanStruggle = nil
+    ent.propifyGrabber = nil
 end
 hook.Add( "OnPlayerPhysicsDrop", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
 hook.Add( "GravGunOnDropped", "CFC_ULX_PropifyDetectDrop", detectPropifyDrop )
@@ -347,6 +431,7 @@ local function struggle( ply, button )
     if struggleAmount >= struggleAmountMax then
         local grabber = prop.propifyGrabber or ply
 
+        grabber:DropObject()
         DropEntityIfHeld( prop )
 
         timer.Remove( "CFC_ULX_PropifyStruggleDecay_" .. ply:SteamID() )
@@ -369,6 +454,7 @@ local function struggle( ply, button )
         ply.propifyCanStruggle = nil
         prop.propifyGrabber = nil
         ply:SetNWInt( "propifyStruggle", 0 )
+        ply:SetNWBool( "propifyGrabbed", false )
 
         timer.Simple( STRUGGLE_SAFETY:GetFloat(), function()
             if IsValid( prop ) then
@@ -379,8 +465,6 @@ local function struggle( ply, button )
         prop:EmitSound( "physics/body/body_medium_impact_soft" .. math.random( 1, 7 ) .. ".wav" )
 
         timer.Simple( STRUGGLE_LIMIT:GetFloat(), function()
-            local prop = ply.ragdoll
-
             if not IsValid( prop ) or not ply:GetNWBool( "propifyGrabbed" ) then return end
 
             ply.propifyCanStruggle = true

@@ -1,5 +1,4 @@
 CFCUlxCommands.timemute = CFCUlxCommands.timemute or {}
-local cmd = CFCUlxCommands.timemute
 local CATEGORY_NAME = "Chat"
 local PUNISHMENT = "timemute"
 local HELP = "Mutes a user for a set amount of time"

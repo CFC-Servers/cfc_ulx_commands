@@ -69,8 +69,8 @@ function cmd.tpa( callingPlayer, targetPlayers )
 
         timer.Simple( delay, function()
             CFCNotifications.sendSimple( "tpaClose", "TPA", "Successfully teleported.", callingPlayer )
-            ulx.goto( callingPlayer, target )
-        end)
+            ulx["goto"]( callingPlayer, target )
+        end )
     end
 
     function notif:OnClose( wasTimeout )
@@ -97,11 +97,11 @@ if CLIENT then
 
     hook.Add( "AddToolMenuCategories", "CFC_TPA_AddToolMenuCategories", function()
         spawnmenu.AddToolCategory( "Options", "CFC", "#CFC" )
-    end)
+    end )
 
     hook.Add( "PopulateToolMenu", "CFC_TPA_PopulateToolMenu", function()
         spawnmenu.AddToolMenuOption( "Options", "CFC", "cfc_tpa", "#TPA", "", "", function( panel )
             panel:CheckBox( "Disable tpa's from all players", "cfc_tpa_disable" )
-        end)
-    end)
+        end )
+    end )
 end

@@ -1,31 +1,21 @@
 CFCUlxCommands.e2ban = CFCUlxCommands.e2ban or {}
-local cmd = CFCUlxCommands.e2ban
 local CATEGORY_NAME = "Utility"
 local PUNISHMENT = "chipban"
 local HELP = "Bans the target for a certain time from using E2/Starfall"
 
 if SERVER then
-    local chips = {
-        gmod_wire_expression2 = true,
-        starfall_processor = true
-    }
-
     local function enable( ply )
         ply.isChipBanned = true
 
         for _, ent in ipairs( ents.GetAll() ) do
             local entClass = ent:GetClass()
 
-            if entClass == "gmod_wire_expression2" then
-                if ent.player == ply then
-                    ent:Remove()
-                end
+            if entClass == "gmod_wire_expression2" and ent.player == ply then
+                ent:Remove()
             end
 
-            if entClass == "starfall_processor" then
-                if ent.owner == ply then
-                    ent:Remove()
-                end
+            if entClass == "starfall_processor" and ent.owner == ply then
+                ent:Remove()
             end
         end
     end
@@ -43,6 +33,7 @@ TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NA
 
 if SERVER then
     local function setupE2()
+        if not WireAddon then return end
         local e2Meta = scripted_ents.GetStored( "gmod_wire_expression2" ).t
         e2Meta._ChipBan_Setup = e2Meta._ChipBan_Setup or e2Meta.Setup
 
@@ -60,6 +51,7 @@ if SERVER then
     end
 
     local function setupStarfall()
+        if not istable( SF ) then return end
         local starfall = scripted_ents.GetStored( "starfall_processor" ).t
         starfall._ChipBan_SetupFiles = starfall._ChipBan_SetupFiles or starfall.SetupFiles
 
