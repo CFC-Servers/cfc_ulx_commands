@@ -38,7 +38,7 @@ local relativeDirFuncs = cmd.relativeDirFuncs
 local function propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
     local canPropify = hook.Run( "CFC_ULX_PropifyPlayer", caller, ply, false ) ~= false
     if not IsValid( ply ) then return "Invalid player!" end
-    if not canPropify then return ply:GetNick() .. " cannot be propified!" end
+    if not canPropify then return ply:Nick() .. " cannot be propified!" end
 
     if modelPath == "random" then
         modelPath = PROP_DEFAULT_MODELS[math.random( 1, PROP_DEFAULT_MODEL_COUNT )]
