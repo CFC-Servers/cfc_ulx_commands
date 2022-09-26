@@ -34,10 +34,10 @@ function ENT:PhysicsCollide( colData )
             hook.Run( "PlayerDeath", ply, self, self )
         end
         ply.TrainfuckTookDamage = nil
-    end)
+    end )
 end
 
 hook.Add( "PlayerShouldTakeDamage", "TrainfuckWasDamaged", function( ply, ent )
     if ent:GetClass() ~= "train_fucked" then return end
     ply.TrainfuckTookDamage = true
-end)
+end )

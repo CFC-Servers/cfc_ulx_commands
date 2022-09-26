@@ -1,1 +1,1 @@
-AddCSLuaFile("autorun/client/cfc_propify.lua")
+AddCSLuaFile( "autorun/client/cfc_propify.lua" )
