@@ -22,7 +22,7 @@ function cmd.trainFuck( ply )
         timer.Simple( removeTime, function()
             if not IsValid( train ) then return end
             train:Remove()
-        end)
+        end )
     end
 end
 
