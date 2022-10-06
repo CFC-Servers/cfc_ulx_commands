@@ -198,4 +198,4 @@ owoifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 owoifyCommand:help( "Owoifies target(s) so they are unable to chat normally." )
 owoifyCommand:addParam{ type = ULib.cmds.PlayersArg }
 owoifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
-owoifyCommand:setOpposite( "ulx unowoify", {_, _, true}, { "!unowoify", "!unowo" } )
+owoifyCommand:setOpposite( "ulx unowoify", { _, _, true }, { "!unowoify", "!unowo" } )

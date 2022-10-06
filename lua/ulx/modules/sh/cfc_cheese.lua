@@ -9,9 +9,14 @@ cmd.CHEESE_MODELS = {
     "models/props_c17/playgroundtick-tack-toe_block01a.mdl"
 }
 
+local function overridePrint( isUnpropifying )
+    if isUnpropifying then return "#A uncheesified #T" end
+    return "#A cheesified #T"
+end
+
 function cmd.cheeseTargets( caller, targets, shouldUncheese )
     local model = cmd.CHEESE_MODELS[math.random( #cmd.CHEESE_MODELS )]
-    local props = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese )
+    local props = CFCUlxCommands.propify.propifyTargets( caller, targets, model, shouldUncheese, overridePrint )
 
     if table.IsEmpty( props ) then return end
 

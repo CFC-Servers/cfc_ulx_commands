@@ -19,7 +19,7 @@ function cmd.arrest( callingPlayer, targetPlayers )
             end
 
             if ent:GetClass() == "starfall_processor" then
-                ent:Error( SF.MakeError( ent.name .. ": Halted by ULX", 1, true, true) )
+                ent:Error( SF.MakeError( ent.name .. ": Halted by ULX", 1, true, true ) )
             end
 
             local canFreeze = not ( ent:IsWeapon() or ent:GetUnFreezable() or ent:IsPlayer() )

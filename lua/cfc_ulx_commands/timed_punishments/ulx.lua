@@ -87,7 +87,7 @@ return function( logger )
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
-            ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
+            ulxCommand:setOpposite( inverseConsoleCommand, { _, _, _, _, true }, inverseChatCommand )
 
             logger:debug( "Created: ", consoleCommand, chatCommand )
             logger:debug( "Created: ", inverseConsoleCommand, inverseChatCommand )
@@ -117,7 +117,7 @@ return function( logger )
                     ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", target, reason )
                 else
                     local timeStr = ULib.secondsToStringTime( minutes * 60 )
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", targetPlys, timeStr, reason )
+                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", target, timeStr, reason )
                 end
             end
 
@@ -134,7 +134,7 @@ return function( logger )
             ulxCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
             ulxCommand:defaultAccess( ULib.ACCESS_ADMIN )
             ulxCommand:help( help )
-            ulxCommand:setOpposite( inverseConsoleCommand, {_, _, _, _, true}, inverseChatCommand )
+            ulxCommand:setOpposite( inverseConsoleCommand, { _, _, _, _, true }, inverseChatCommand )
 
             logger:debug( "Created: ", consoleCommand, chatCommand )
             logger:debug( "Created: ", inverseConsoleCommand, inverseChatCommand )

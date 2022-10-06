@@ -1,7 +1,7 @@
-local istable = istable
-local isentity = isentity
+CFCUlxCommands.AutoWarner = {}
+local AW = CFCUlxCommands.AutoWarner
 
-local defaultArgIndices = {
+AW.defaultArgIndices = {
     targets = 2,
     duration = 3,
     reason = 4
@@ -22,7 +22,7 @@ local defaultArgIndices = {
 --    - bool
 --    - set to true if the command uses seconds for its duration
 --
-local enabledCommands = {
+AW.enabledCommands = {
     -- Timegag
     ["ulx timegag"] = { skipEmptyReason = true },
     ["ulx timegagid"] = {},
@@ -41,10 +41,25 @@ local enabledCommands = {
 
     -- Ban
     ["ulx ban"] = {},
-    ["ulx banid"] = {}
+    ["ulx banid"] = {},
+
+    -- Kick
+    ["ulx kick"] = {
+        skipEmptyReason = true,
+        indices = {
+            targets = 2,
+            reason = 3
+        }
+    },
+    ["ulx kickid"] = {
+        indices = {
+            targest = 2,
+            reason = 3
+        }
+    }
 }
 
-local function buildReason( reason, commandName, duration )
+function AW.buildReason( reason, commandName, duration )
     local info = commandName
 
     if duration then
@@ -57,7 +72,7 @@ local function buildReason( reason, commandName, duration )
     return reason
 end
 
-local function warn( caller, target, reason )
+function AW.warn( caller, target, reason )
     if isentity( target ) then
         target = target:SteamID64()
     else
@@ -67,7 +82,7 @@ local function warn( caller, target, reason )
     awarn_warnplayerid( caller, target, reason )
 end
 
-local function getTargets( indices, args )
+function AW.getTargets( indices, args )
     local targets = args[indices.targets]
 
     if not istable( targets ) then
@@ -77,7 +92,7 @@ local function getTargets( indices, args )
     return targets
 end
 
-local function shouldWarn( cmd, duration, reason )
+function AW.shouldWarn( cmd, duration, reason )
     if cmd.skipEmptyReason then
         if not reason then return false end
         if reason == "" then return false end
@@ -85,37 +100,38 @@ local function shouldWarn( cmd, duration, reason )
         if reason == "No reason specified" then return false end
     end
 
-    if duration < (cmd.minDuration or 0) then return false end
+    if duration and duration < ( cmd.minDuration or 0 ) then return false end
 
     return true
 end
 
-local function parseCommand( cmd, args )
-    local indices = cmd.indices or defaultArgIndices
+function AW.parseCommand( cmd, args )
+    local indices = cmd.indices or AW.defaultArgIndices
 
-    local duration = args[indices.duration]
+    local duration = indices.duration and args[indices.duration] or nil
     local reason = args[indices.reason]
-    local targets = getTargets( indices, args )
+    local targets = AW.getTargets( indices, args )
 
     return duration, reason, targets
 end
 
-hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", function( caller, commandName, args )
+function AW.CommandWatcher( caller, commandName, args )
     if not ULib.ucl.query( caller, commandName ) then return end
 
-    local cmd = enabledCommands[commandName]
+    local cmd = AW.enabledCommands[commandName]
     if not cmd then return end
 
-    local duration, reason, targets = parseCommand( cmd, args )
+    local duration, reason, targets = AW.parseCommand( cmd, args )
 
-    if not shouldWarn( cmd, duration, reason ) then return end
-
+    if not AW.shouldWarn( cmd, duration, reason ) then return end
     if not cmd.usesSeconds then
-        duration = duration * 60
+        duration = duration and duration * 60
     end
 
     for _, target in ipairs( targets ) do
-        reason = buildReason( reason, commandName, duration )
-        warn( caller, target, reason )
+        reason = AW.buildReason( reason, commandName, duration )
+        AW.warn( caller, target, reason )
     end
-end )
+end
+
+hook.Add( "ULibPostTranslatedCommand", "CFC_AutoWarn_WarnOnCommands", AW.CommandWatcher )
