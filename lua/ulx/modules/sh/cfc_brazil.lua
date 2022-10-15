@@ -132,7 +132,10 @@ local function sendToPos( caller, targets, message, doSlap )
 
             if doSlap then
                 ULib.slap( ply, 0, 700, false )
-                timer.Simple( 0.5, function() ply:SetPos( pos ) end )
+                timer.Simple( 0.5, function()
+                    if not IsValid( ply ) then return end
+                    ply:SetPos( pos )
+                end )
             else
                 ply:SetPos( pos )
             end
