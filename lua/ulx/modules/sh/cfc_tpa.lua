@@ -11,7 +11,7 @@ CreateConVar( "cfc_tpa_teleport_delay", 0, { FCVAR_REPLICATED, FCVAR_ARCHIVE }, 
 
 local function setDeclineCooldown( caller, target )
     target.cfcTpaCooldownDecline = target.cfcTpaCooldownDecline or {}
-    target.cfcTpaCooldownDecline[ caller ] = CurTime() + GetConVar( "cfc_tpa_decline_cooldown" ):GetInt()
+    target.cfcTpaCooldownDecline[caller] = CurTime() + GetConVar( "cfc_tpa_decline_cooldown" ):GetInt()
 end
 
 function cmd.tpa( callingPlayer, targetPlayers )
