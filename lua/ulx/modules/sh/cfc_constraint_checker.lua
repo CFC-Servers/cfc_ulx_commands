@@ -88,9 +88,11 @@ local function countConstraints( plys )
 end
 
 local function printConstraintResults( caller, ply, constraintCounts )
-    caller:PrintMessage( 2, "\n=======================" )
-    caller:PrintMessage( 2, ply:Name() .. "'s constraints:" )
-    caller:PrintMessage( 2, "-----------------------" )
+    local decorLength = 25
+    local nl = "\n"
+    local divider, nameDivider = string.rep( "=", decorLength ), string.rep( "-", decorLength )
+    local title = nl .. divider .. nl .. ply:Name() .. "'s constraints:" .. nl .. nameDivider
+    caller:PrintMessage( 2, title )
 
     -- Print the tocal count first
     local totalConstraints = constraintCounts.Total
@@ -102,8 +104,9 @@ local function printConstraintResults( caller, ply, constraintCounts )
         caller:PrintMessage( 2, constrType .. " : " .. count )
     end
 
-    caller:PrintMessage( 2, "=======================" )
-    constraintCounts.Total = totalConstraints -- Preserve original status of the table. Technically not necessary for this system, but doing it by convention.
+    caller:PrintMessage( 2, divider )
+    -- Preserve original status of the table. Technically not necessary for this system, but doing it by convention.
+    constraintCounts.Total = totalConstraints
 end
 
 
