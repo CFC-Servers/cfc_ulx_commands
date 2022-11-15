@@ -95,18 +95,16 @@ local function printConstraintResults( caller, ply, constraintCounts )
     caller:PrintMessage( 2, title )
 
     -- Print the tocal count first
-    local totalConstraints = constraintCounts.Total
-    constraintCounts.Total = nil
-    caller:PrintMessage( 2, "TOTAL : " .. totalConstraints )
+    caller:PrintMessage( 2, "TOTAL : " .. constraintCounts.Total )
 
     -- Print the rest of the counts
     for constrType, count in pairs( constraintCounts ) do
-        caller:PrintMessage( 2, constrType .. " : " .. count )
+        if constrType ~= "Total" then
+            caller:PrintMessage( 2, constrType .. " : " .. count )
+        end
     end
 
     caller:PrintMessage( 2, divider )
-    -- Preserve original status of the table. Technically not necessary for this system, but doing it by convention.
-    constraintCounts.Total = totalConstraints
 end
 
 
