@@ -91,11 +91,9 @@ local function printConstraintResults( caller, ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
     local divider, nameDivider = string.rep( "=", decorLength ), string.rep( "-", decorLength )
-    local title = nl .. divider .. nl .. ply:Name() .. "'s constraints:" .. nl .. nameDivider
-    caller:PrintMessage( 2, title )
-
-    -- Print the tocal count first
-    caller:PrintMessage( 2, "TOTAL : " .. constraintCounts.Total )
+    local totalCount = "TOTAL : " .. constraintCounts.Total
+    local topBlock = nl .. divider .. nl .. ply:Name() .. "'s constraints:" .. nl .. nameDivider .. nl .. totalCount
+    caller:PrintMessage( 2, topBlock )
 
     -- Print the rest of the counts
     for constrType, count in pairs( constraintCounts ) do
