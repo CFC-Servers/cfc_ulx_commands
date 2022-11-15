@@ -4,7 +4,7 @@ local CATEGORY_NAME = "Utility"
 local IsValid = IsValid
 
 -- Returns the owner of the entity if it is checkable, otherwise returns false
-local function getOwnerIfCheckable( ent )
+local function getAbsoluteOwner( ent )
     if not IsValid( ent ) then return false end
     if ent.IsConstraint and ent:IsConstraint() then return false end
 
@@ -19,20 +19,18 @@ local function getCheckableEnts( plys )
     local allEnts = ents.GetAll()
     local perPlyEnts = {}
 
-    for i = 1, #plys do
-        local ply = plys[i]
+    for _, ply in ipairs( plys ) do
         perPlyEnts[ply] = {}
     end
 
-    for i = 1, #allEnts do
-        local ent = allEnts[i]
-        local owner = getOwnerIfCheckable( ent )
+    for _, ent in ipairs( allEnts ) do
+        local owner = getAbsoluteOwner( ent )
 
         if owner then
             local ownedEnts = perPlyEnts[owner]
 
             if ownedEnts then
-                ownedEnts[#ownedEnts + 1] = ent
+                table.insert( ownedEnts, ent )
             end
         end
     end
@@ -44,8 +42,7 @@ local function countConstraintsForPly( ownedEnts )
     local constraintCounts = {}
     local totalConstraints = 0
 
-    for i2 = 1, #ownedEnts do
-        local ent = ownedEnts[i2]
+    for _, ent in ipairs( ownedEnts ) do
         local entConstraints = ent.Constraints or {}
 
         for _, constr in pairs( entConstraints ) do
@@ -81,8 +78,7 @@ local function countConstraints( plys )
     local perPlyEnts = getCheckableEnts( plys )
     local perPlyConstraints = {}
 
-    for i = 1, #plys do
-        local ply = plys[i]
+    for _, ply in ipairs( plys ) do
         local ownedEnts = perPlyEnts[ply]
 
         perPlyConstraints[ply] = countConstraintsForPly( ownedEnts )
