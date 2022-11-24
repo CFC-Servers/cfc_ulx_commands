@@ -113,8 +113,9 @@ function cmd.checkConstraints( caller, targetPlys )
 
     for _, ply in pairs( targetPlys ) do
         local constraintCounts = perPlyConstraints[ply]
-
-        printConstraintResults( caller, ply, constraintCounts )
+        if constraintCounts.Total > 0 then
+            printConstraintResults( caller, ply, constraintCounts )
+        end
     end
 end
 
