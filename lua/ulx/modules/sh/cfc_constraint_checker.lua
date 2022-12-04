@@ -94,7 +94,7 @@ local function countConstraints( plys )
     return perPlyConstraints
 end
 
-local function printConstraintResults( caller, ply, constraintCounts )
+local function printConstraintResults( _, ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
