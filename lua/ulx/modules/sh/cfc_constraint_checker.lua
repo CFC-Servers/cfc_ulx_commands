@@ -1,7 +1,7 @@
 CFCUlxCommands.constrainChecker = CFCUlxCommands.constrainChecker or {}
 local cmd = CFCUlxCommands.constrainChecker
 local CATEGORY_NAME = "Utility"
-local IsValid, Clamp, Remap = IsValid, math.Clamp, math.Remap
+local IsValid, Clamp, Remap, Round = IsValid, math.Clamp, math.Remap, math.Round
 local HSV_RED_ANGLE, HSV_GREEN_ANGLE = 0, 120
 local WHITE = Color( 255, 255, 255 )
 local CONSTRAINT_THRESHOLD = 500
@@ -99,21 +99,7 @@ local function printConstraintResults( caller, ply, constraintCounts )
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
     local nameDivider = string.rep( "-", decorLength ) .. nl
-    --[[
-    local totalCount = "TOTAL: " .. constraintCounts.Total
-    local topBlock = nl .. divider .. nl .. ply:Name() .. "'s constraints:" .. nl .. nameDivider .. nl .. totalCount
-    caller:PrintMessage( 2, topBlock )
-
-    -- Print the rest of the counts
-    for constrType, count in pairs( constraintCounts ) do
-        if constrType ~= "Total" then
-            caller:PrintMessage( 2, constrType .. ": " .. count )
-        end
-    end
-
-    caller:PrintMessage( 2, divider )
-    ]]
-    local totalCount = constraintCounts.Total
+    local totalCount = Round( constraintCounts.Total )
     local totalLabel = "TOTAL: " .. totalCount .. nl
     local plyTeamColor = team.GetColor( ply:Team() )
 
@@ -131,7 +117,7 @@ local function printConstraintResults( caller, ply, constraintCounts )
 
     for constrType, count in pairs( constraintCounts ) do
         if constrType ~= "Total" then
-            local data = constrType .. ": " .. count .. nl
+            local data = constrType .. ": " .. Round( count ) .. nl
             table.insert( blockData, #blockData, data )
         end
     end
