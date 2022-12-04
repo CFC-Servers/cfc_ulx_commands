@@ -122,11 +122,6 @@ local function printConstraintResults( caller, ply, constraintCounts )
         end
     end
 
-    --[[
-    net.Start( NETWORK_NAME )
-    net.WriteTable( blockData )
-    net.Send( caller )
-    ]]
     return blockData
 end
 
@@ -136,15 +131,7 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     local dataBlocks = {}
 
     ulx.fancyLogAdmin( caller, true, "#A checked the constraints of #T", targetPlys ) -- Alert staff console of the command being used
-    caller:ChatPrint( "Open your console to see the results." )
-    --[[
-    for _, ply in pairs( targetPlys ) do
-        local constraintCounts = perPlyConstraints[ply]
-        if constraintCounts.Total > 0 then
-            printConstraintResults( caller, ply, constraintCounts )
-        end
-    end
-    ]]
+
     for _, ply in pairs( targetPlys ) do
         local constraintCounts = perPlyConstraints[ply]
         if showPlysWithNoConstraints or constraintCounts.Total > 0 then
@@ -156,10 +143,14 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     net.Start( NETWORK_NAME )
     net.WriteTable( dataBlocks )
     net.Send( caller )
+
+    timer.Simple( 0, function()
+        caller:ChatPrint( "Open your console to see the results." )
+    end )
 end
 
 local constraintCheckerCommand = ulx.command( CATEGORY_NAME, "ulx constraints", cmd.checkConstraints, "!constraints" )
 constraintCheckerCommand:addParam{ type = ULib.cmds.PlayersArg }
-constraintCheckerCommand:addParam{ type = ULib.cmds.BoolArg, default = "false", ULib.cmds.optional }
+constraintCheckerCommand:addParam{ type = ULib.cmds.BoolArg, default = 0, ULib.cmds.optional }
 constraintCheckerCommand:defaultAccess( ULib.ACCESS_ADMIN )
 constraintCheckerCommand:help( "Prints out the number of constraints the player(s) have." )
