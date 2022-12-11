@@ -32,6 +32,8 @@ function TP.Punish( steamID64, punishment, expiration, issuer, reason )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
+    ply.TimedPunishments = ply.TimedPunishments or {}
+    ply.TimedPunishments[punishment] = expiration
     Punishments[punishment].enable( ply )
 end
 
@@ -41,6 +43,7 @@ function TP.Unpunish( steamID64, punishment )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
+    ply.TimedPunishments[punishment] = nil
     Punishments[punishment].disable( ply )
 end
 
@@ -54,7 +57,7 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
         Punishments[punishment].enable( ply )
     end
 
-    ply.TimedPunishments = punishments
+    ply.TimedPunishments = punishments or {}
 end )
 
 hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
