@@ -1,4 +1,4 @@
-CFCUlxCommands.timedtrainfuck = CFCUlxCommands.timedtrainfuck or {}
+CFCUlxCommands.timedowoify = CFCUlxCommands.timedowoify or {}
 local CATEGORY_NAME = "Fun"
 local PUNISHMENT = "timedowoify"
 local HELP = "Curse a user to be owoified at random intervals and for random amounts of time."
@@ -17,28 +17,29 @@ if SERVER then
     end 
 
     local function enable( caller, ply )
-        local name = timerName( ply )[1]
+        local delayTimer, durationTimer = timerName( ply )
 
         timer.Create( name, newDelay(), 0, function()
             if not IsValid( ply ) then
                 return timer.Remove( name )
             end
             CFCUlxCommands.owoify.owoifyCommand( caller, ply, false )
-            timer.Adjust( timerName( ply )[2] ), newDuration() )
+            timer.Adjust( durationTimer ), newDuration() )
         end )
-        timer.Create( timerName( ply )[2], newDuration(), 0, function()
-            local t_name = timerName( ply )[2]
+        timer.Create( durationTimer, newDuration(), 0, function()
+            local delayTimer, t_name = timerName( ply )
             if not IsValid( ply ) then
                 return timer.Remove( t_name )
             end
             CFCUlxCommands.owoify.owoifyCommand( caller, ply, true )
-            timer.Adjust( timerName( ply )[1], newDelay() )
+            timer.Adjust( delayTimer, newDelay() )
         end )
     end
 
     local function disable( ply )
-        timer.Remove( timerName( ply )[1] )
-        timer.Remove( timerName( ply )[2] )
+        local delayTimer, durationTimer = timerName( ply )
+        timer.Remove( delayTimer )
+        timer.Remove( durationTimer )
     end
 
     TimedPunishments.Register( PUNISHMENT, enable, disable )
