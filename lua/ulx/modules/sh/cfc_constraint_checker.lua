@@ -1,13 +1,12 @@
 CFCUlxCommands.constrainChecker = CFCUlxCommands.constrainChecker or {}
 local cmd = CFCUlxCommands.constrainChecker
 local CATEGORY_NAME = "Utility"
-local IsValid, Clamp, Remap, Round = IsValid, math.Clamp, math.Remap, math.Round
+local IsValid, math_Clamp, math_Remap, math_Round = IsValid, math.Clamp, math.Remap, math.Round
 local HSV_RED_ANGLE, HSV_GREEN_ANGLE = 0, 120
 local WHITE = Color( 255, 255, 255 )
 local CONSTRAINT_THRESHOLD = 500
-local NETWORK_NAME = "CFC_ulx-constraint_checker"
 if SERVER then
-    util.AddNetworkString( NETWORK_NAME )
+    util.AddNetworkString( "CFC_ULX_ConstraintResults" )
 end
 
 -- Returns the owner of the entity if it is checkable, otherwise returns false
@@ -56,6 +55,7 @@ local function countConstraintsForPly( ownedEnts )
             local constrType = constr.Type or "UNKNOWN_CONSTRAINT"
 
             -- Add by 0.5 to compensate for double-counting, as each constraint exists on two entities
+            -- NOTE: Some constraints do only exist on only ONE entity but are rare! This will be rounded up later.
             constraintCounts[constrType] = ( constraintCounts[constrType] or 0 ) + 0.5
             totalConstraints = totalConstraints + 0.5
         end
@@ -99,12 +99,12 @@ local function printConstraintResults( _, ply, constraintCounts )
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
     local nameDivider = string.rep( "-", decorLength ) .. nl
-    local totalCount = Round( constraintCounts.Total )
+    local totalCount = math_Round( constraintCounts.Total )
     local totalLabel = "TOTAL: " .. totalCount .. nl
     local plyTeamColor = team.GetColor( ply:Team() )
 
-    local valueInThreshold = Clamp( totalCount, 0, CONSTRAINT_THRESHOLD )
-    local severity = Remap( valueInThreshold, CONSTRAINT_THRESHOLD, 0, HSV_RED_ANGLE, HSV_GREEN_ANGLE )
+    local valueInThreshold = math_Clamp( totalCount, 0, CONSTRAINT_THRESHOLD )
+    local severity = math_Remap( valueInThreshold, CONSTRAINT_THRESHOLD, 0, HSV_RED_ANGLE, HSV_GREEN_ANGLE )
     local colorSeverity = HSVToColor( severity, 1, 0.8 )
     if totalCount == 0 then colorSeverity = WHITE end
 
@@ -117,7 +117,7 @@ local function printConstraintResults( _, ply, constraintCounts )
 
     for constrType, count in pairs( constraintCounts ) do
         if constrType ~= "Total" then
-            local data = constrType .. ": " .. Round( count ) .. nl
+            local data = constrType .. ": " .. math_Round( count ) .. nl
             table.insert( blockData, #blockData, data )
         end
     end
@@ -140,7 +140,7 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
         end
     end
 
-    net.Start( NETWORK_NAME )
+    net.Start( "CFC_ULX_ConstraintResults" )
     net.WriteTable( dataBlocks )
     net.Send( caller )
 

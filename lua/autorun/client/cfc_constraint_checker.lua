@@ -1,4 +1,3 @@
-local NETWORK_NAME = "CFC_ulx-constraint_checker"
-net.Receive( NETWORK_NAME, function()
+net.Receive( "CFC_ULX_ConstraintResults", function()
     MsgC( unpack( net.ReadTable() ) )
 end )
