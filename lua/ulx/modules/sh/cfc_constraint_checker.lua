@@ -106,7 +106,10 @@ local function compileConstraintResults( _, ply, constraintCounts )
     local valueInThreshold = math_Clamp( totalCount, 0, CONSTRAINT_THRESHOLD )
     local severity = math_Remap( valueInThreshold, CONSTRAINT_THRESHOLD, 0, HSV_RED_ANGLE, HSV_GREEN_ANGLE )
     local colorSeverity = HSVToColor( severity, 1, 0.8 )
-    if totalCount == 0 then colorSeverity = WHITE end
+    if totalCount == 0 then
+        colorSeverity = WHITE
+        nameDivider = ""
+    end
 
     local blockData = {
         WHITE, nl .. divider,
@@ -136,14 +139,24 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
         local constraintCounts = perPlyConstraints[ply]
         if showPlysWithNoConstraints or constraintCounts.Total > 0 then
             local block = compileConstraintResults( caller, ply, constraintCounts )
-            table.Add( dataBlocks, block )
+            table.insert( dataBlocks, block )
         end
     end
 
-    table.sort( dataBlocks, function( a, b ) return a[7] < b[7] end )
+    -- sort the data if needed to
+    if #dataBlocks > 1 then
+        table.sort( dataBlocks, function( a, b )
+            a = string.sub( a[7], 7, #a[7] - 2 )
+            b = string.sub( b[7], 7, #b[7] - 2 )
+            return tonumber( a ) < tonumber( b )
+        end )
+    end
+
+    local finalData = {}
+    for _, block in pairs( dataBlocks ) do table.Add( finalData, block ) end
 
     net.Start( "CFC_ULX_ConstraintResults" )
-    net.WriteTable( dataBlocks )
+    net.WriteTable( finalData )
     net.Send( caller )
 
     timer.Simple( 0, function()
