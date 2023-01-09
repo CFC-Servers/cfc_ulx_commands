@@ -4,7 +4,7 @@ local CATEGORY_NAME = "Utility"
 local IsValid, math_Clamp, math_Remap, math_Round = IsValid, math.Clamp, math.Remap, math.Round
 local HSV_RED_ANGLE, HSV_GREEN_ANGLE = 0, 120
 local WHITE = Color( 255, 255, 255 )
-local CONSTRAINT_THRESHOLD = 500
+local CONSTRAINT_THRESHOLD = 150
 if SERVER then
     util.AddNetworkString( "CFC_ULX_ConstraintResults" )
 end
@@ -94,7 +94,7 @@ local function countConstraints( plys )
     return perPlyConstraints
 end
 
-local function printConstraintResults( _, ply, constraintCounts )
+local function compileConstraintResults( _, ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
@@ -135,10 +135,12 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     for _, ply in pairs( targetPlys ) do
         local constraintCounts = perPlyConstraints[ply]
         if showPlysWithNoConstraints or constraintCounts.Total > 0 then
-            local block = printConstraintResults( caller, ply, constraintCounts )
+            local block = compileConstraintResults( caller, ply, constraintCounts )
             table.Add( dataBlocks, block )
         end
     end
+
+    table.sort( dataBlocks, function( a, b ) return a[7] < b[7] end )
 
     net.Start( "CFC_ULX_ConstraintResults" )
     net.WriteTable( dataBlocks )
