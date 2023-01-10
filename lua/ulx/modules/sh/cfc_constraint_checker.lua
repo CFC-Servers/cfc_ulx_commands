@@ -1,7 +1,13 @@
 CFCUlxCommands.constrainChecker = CFCUlxCommands.constrainChecker or {}
 local cmd = CFCUlxCommands.constrainChecker
 local CATEGORY_NAME = "Utility"
-local IsValid = IsValid
+local IsValid, math_Clamp, math_Remap, math_Round = IsValid, math.Clamp, math.Remap, math.Round
+local HSV_RED_ANGLE, HSV_GREEN_ANGLE = 0, 120
+local WHITE = Color( 255, 255, 255 )
+local CONSTRAINT_THRESHOLD = 150
+if SERVER then
+    util.AddNetworkString( "CFC_ULX_ConstraintResults" )
+end
 
 -- Returns the owner of the entity if it is checkable, otherwise returns false
 local function getAbsoluteOwner( ent )
@@ -49,6 +55,7 @@ local function countConstraintsForPly( ownedEnts )
             local constrType = constr.Type or "UNKNOWN_CONSTRAINT"
 
             -- Add by 0.5 to compensate for double-counting, as each constraint exists on two entities
+            -- NOTE: Some constraints do only exist on only ONE entity but are rare! This will be rounded up later.
             constraintCounts[constrType] = ( constraintCounts[constrType] or 0 ) + 0.5
             totalConstraints = totalConstraints + 0.5
         end
@@ -87,38 +94,78 @@ local function countConstraints( plys )
     return perPlyConstraints
 end
 
-local function printConstraintResults( caller, ply, constraintCounts )
+local function compileConstraintResults( _, ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
-    local divider, nameDivider = string.rep( "=", decorLength ), string.rep( "-", decorLength )
-    local totalCount = "TOTAL: " .. constraintCounts.Total
-    local topBlock = nl .. divider .. nl .. ply:Name() .. "'s constraints:" .. nl .. nameDivider .. nl .. totalCount
-    caller:PrintMessage( 2, topBlock )
+    local divider = string.rep( "=", decorLength ) .. nl
+    local nameDivider = string.rep( "-", decorLength ) .. nl
+    local totalCount = math_Round( constraintCounts.Total )
+    local totalLabel = "TOTAL: " .. totalCount .. nl
+    local plyTeamColor = team.GetColor( ply:Team() )
 
-    -- Print the rest of the counts
+    local valueInThreshold = math_Clamp( totalCount, 0, CONSTRAINT_THRESHOLD )
+    local severity = math_Remap( valueInThreshold, CONSTRAINT_THRESHOLD, 0, HSV_RED_ANGLE, HSV_GREEN_ANGLE )
+    local colorSeverity = HSVToColor( severity, 1, 0.8 )
+    if totalCount == 0 then
+        colorSeverity = WHITE
+        nameDivider = ""
+    end
+
+    local blockData = {
+        WHITE, nl .. divider,
+        plyTeamColor, ply:Name(), WHITE, " | ", colorSeverity, totalLabel, WHITE,
+        nameDivider,
+        divider
+    }
+
     for constrType, count in pairs( constraintCounts ) do
         if constrType ~= "Total" then
-            caller:PrintMessage( 2, constrType .. ": " .. count )
+            local data = constrType .. ": " .. math_Round( count ) .. nl
+            table.insert( blockData, #blockData, data )
         end
     end
 
-    caller:PrintMessage( 2, divider )
+    return blockData
 end
 
 
-function cmd.checkConstraints( caller, targetPlys )
+function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     local perPlyConstraints = countConstraints( targetPlys )
+    local dataBlocks = {}
 
     ulx.fancyLogAdmin( caller, true, "#A checked the constraints of #T", targetPlys ) -- Alert staff console of the command being used
 
     for _, ply in pairs( targetPlys ) do
         local constraintCounts = perPlyConstraints[ply]
-
-        printConstraintResults( caller, ply, constraintCounts )
+        if showPlysWithNoConstraints or constraintCounts.Total > 0 then
+            local block = compileConstraintResults( caller, ply, constraintCounts )
+            table.insert( dataBlocks, block )
+        end
     end
+
+    -- sort the data if needed to
+    if #dataBlocks > 1 then
+        table.sort( dataBlocks, function( a, b )
+            a = string.sub( a[7], 7, #a[7] - 2 )
+            b = string.sub( b[7], 7, #b[7] - 2 )
+            return tonumber( a ) < tonumber( b )
+        end )
+    end
+
+    local finalData = {}
+    for _, block in pairs( dataBlocks ) do table.Add( finalData, block ) end
+
+    net.Start( "CFC_ULX_ConstraintResults" )
+    net.WriteTable( finalData )
+    net.Send( caller )
+
+    timer.Simple( 0, function()
+        caller:ChatPrint( "Open your console to see the results." )
+    end )
 end
 
 local constraintCheckerCommand = ulx.command( CATEGORY_NAME, "ulx constraints", cmd.checkConstraints, "!constraints" )
 constraintCheckerCommand:addParam{ type = ULib.cmds.PlayersArg }
+constraintCheckerCommand:addParam{ type = ULib.cmds.BoolArg, default = 0, ULib.cmds.optional }
 constraintCheckerCommand:defaultAccess( ULib.ACCESS_ADMIN )
 constraintCheckerCommand:help( "Prints out the number of constraints the player(s) have." )
