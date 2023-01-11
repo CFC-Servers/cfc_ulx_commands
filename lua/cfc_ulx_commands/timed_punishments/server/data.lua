@@ -107,19 +107,6 @@ function Data:removePunishment( punishment, steamID64 )
     ]], steamID64, punishment )
 end
 
-function Data:getPunishments( steamID64 )
-    local result = query( [[
-        SELECT
-            expiration, punishment
-        FROM
-            cfc_timed_punishments
-        WHERE
-            steamid64 = %s
-    ]], steamID64 )
-
-    return formatPunishments( result )
-end
-
 function Data:getActivePunishments( steamID64 )
     local now = os.time()
 
