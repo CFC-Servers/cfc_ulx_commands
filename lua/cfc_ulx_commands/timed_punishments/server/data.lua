@@ -18,6 +18,18 @@ local function query( query, ... )
     return sql.Query( query )
 end
 
+local function formatPunishments( result )
+    local punishments = {}
+    if result == nil then return punishments end
+    if result == false then return ErrorNoHaltWithStack( "Query failed when retrieving punishments!" ) end
+
+    for _, p in ipairs( result ) do
+        punishments[p.punishment] = tonumber( p.expiration )
+    end
+
+    return punishments
+end
+
 local Data = {}
 
 function Data:setupTables()
@@ -105,15 +117,26 @@ function Data:getPunishments( steamID64 )
             steamid64 = %s
     ]], steamID64 )
 
-    local punishments = {}
-    if result == nil then return punishments end
-    if result == false then return ErrorNoHaltWithStack( steamID64 ) end
+    return formatPunishments( result )
+end
 
-    for _, p in ipairs( result ) do
-        punishments[p.punishment] = tonumber( p.expiration )
-    end
+function Data:getActivePunishments( steamID64 )
+    local now = os.time()
 
-    return punishments
+    local result = query( [[
+        SELECT
+            expiration, punishment
+        FROM
+            cfc_timed_punishments
+        WHERE
+            steamid64 = %s
+        AND
+            expiration > 0
+        AND
+            expiration > %u
+    ]], steamID64, now )
+
+    return formatPunishments( result )
 end
 
 return function( logger )

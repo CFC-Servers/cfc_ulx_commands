@@ -21,3 +21,4 @@ local action = "gagged ##"
 local inverseAction = "removed ##'s time gag"
 TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NAME, HELP )
 
+

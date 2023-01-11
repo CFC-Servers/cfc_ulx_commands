@@ -38,8 +38,12 @@ return function( logger )
     --
     --   help:
     --     The ULX Command help text to display with the created commands
+    --
+    --   silent:
+    --     Whether the logs for the action should print to only admins
 
-    return function( name, action, inverseAction, category, help )
+    return function( name, action, inverseAction, category, help, silent )
+        if silent == nil then silent = false end
 
         CFCUlxCommands[name] = CFCUlxCommands[name] or {}
         local cmd = CFCUlxCommands[name]
@@ -55,7 +59,7 @@ return function( logger )
                         TimedPunishments.Unpunish( ply:SteamID64(), name )
                     end
 
-                    return ulx.fancyLogAdmin( callingPly, inverseActionStr, targetPlys )
+                    return ulx.fancyLogAdmin( callingPly, silent, inverseActionStr, targetPlys )
                 end
 
                 reason = reason or ""
@@ -67,10 +71,10 @@ return function( logger )
                 end
 
                 if minutes == 0 then
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", targetPlys, reason )
+                    ulx.fancyLogAdmin( callingPly, silent, actionStr .. " permanently! (#s)", targetPlys, reason )
                 else
                     local timeStr = ULib.secondsToStringTime( minutes * 60 )
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", targetPlys, timeStr, reason )
+                    ulx.fancyLogAdmin( callingPly, silent, actionStr .. " for #s! (#s)", targetPlys, timeStr, reason )
                 end
             end
 
@@ -105,7 +109,7 @@ return function( logger )
                 if shouldInverse then
                     TimedPunishments.Unpunish( steamID64, name )
 
-                    return ulx.fancyLogAdmin( callingPly, inverseActionStr, target )
+                    return ulx.fancyLogAdmin( callingPly, silent, inverseActionStr, target )
                 end
 
                 local expiration = minutes == 0 and -1 or os.time() + ( minutes * 60 )
@@ -114,10 +118,10 @@ return function( logger )
                 TimedPunishments.Punish( steamID64, name, expiration, issuer, reason )
 
                 if minutes == 0 then
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " permanently! (#s)", target, reason )
+                    ulx.fancyLogAdmin( callingPly, silent, actionStr .. " permanently! (#s)", target, reason )
                 else
                     local timeStr = ULib.secondsToStringTime( minutes * 60 )
-                    ulx.fancyLogAdmin( callingPly, actionStr .. " for #s! (#s)", target, timeStr, reason )
+                    ulx.fancyLogAdmin( callingPly, silent, actionStr .. " for #s! (#s)", target, timeStr, reason )
                 end
             end
 
