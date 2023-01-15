@@ -131,7 +131,7 @@ end
 local function getMsgCArgs( constraintData )
     local args = {}
     for _, data in pairs( constraintData ) do
-        table.Add(args, getPlyCountsMsgData( data.ply, data.counts ))
+        table.Add( args, getPlyCountsMsgData( data.ply, data.counts ) )
     end
 
     return args
@@ -150,7 +150,7 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
             table.insert( constraintCountsList, {
                 ply = ply,
                 counts = plyCounts
-            })
+            } )
         end
     end
     table.sort( constraintCountsList, function( a, b )
@@ -160,7 +160,7 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     -- Create args for MsgC using constraint count list and send to client
     -- TODO move visualization code clientside
     net.Start( "CFC_ULX_ConstraintResults" )
-        net.WriteTable( getMsgCArgs(constraintCountsList))
+        net.WriteTable( getMsgCArgs( constraintCountsList ))
     net.Send( caller )
 
     timer.Simple( 0, function()
