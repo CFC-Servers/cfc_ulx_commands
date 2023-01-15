@@ -143,15 +143,6 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
         end
     end
 
-    -- sort the data if needed to
-    if #dataBlocks > 1 then
-        table.sort( dataBlocks, function( a, b )
-            a = string.sub( a[7], 7, #a[7] - 2 )
-            b = string.sub( b[7], 7, #b[7] - 2 )
-            return tonumber( a ) < tonumber( b )
-        end )
-    end
-
     local finalData = {}
     for _, block in pairs( dataBlocks ) do table.Add( finalData, block ) end
 
