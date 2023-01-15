@@ -119,7 +119,7 @@ local function getPlyCountsMsgData( ply, constraintCounts )
     }
 
     for constrType, count in pairs( constraintCounts ) do
-        if constrType ~= "Total" and type(count) == "number" then
+        if constrType ~= "Total" and type( count ) == "number" then
             local data = constrType .. ": " .. math_Round( count ) .. nl
             table.insert( blockData, #blockData, data )
         end
