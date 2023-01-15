@@ -94,7 +94,7 @@ local function countConstraints( plys )
     return perPlyConstraints
 end
 
-local function compileConstraintResults( _, ply, constraintCounts )
+local function compileConstraintResults( ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
@@ -119,7 +119,7 @@ local function compileConstraintResults( _, ply, constraintCounts )
     }
 
     for constrType, count in pairs( constraintCounts ) do
-        if constrType ~= "Total" then
+        if constrType ~= "Total" and type(count) == "number" then
             local data = constrType .. ": " .. math_Round( count ) .. nl
             table.insert( blockData, #blockData, data )
         end
@@ -128,32 +128,46 @@ local function compileConstraintResults( _, ply, constraintCounts )
     return blockData
 end
 
+local function getMsgCArgs( constraintData )
+    local args = {}
+    for _, data in pairs( constraintData ) do
+        table.Add(args, compileConstraintResults( data.ply, data.counts ))
+    end
+
+    return args
+end
 
 function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     local perPlyConstraints = countConstraints( targetPlys )
-    local dataBlocks = {}
 
     ulx.fancyLogAdmin( caller, true, "#A checked the constraints of #T", targetPlys ) -- Alert staff console of the command being used
 
+    -- Convert constraint data to list and remove players with no constraints if necessary
+    local constraintCountsList = {}
     for _, ply in pairs( targetPlys ) do
-        local constraintCounts = perPlyConstraints[ply]
-        if showPlysWithNoConstraints or constraintCounts.Total > 0 then
-            local block = compileConstraintResults( caller, ply, constraintCounts )
-            table.insert( dataBlocks, block )
+        local plyCounts = perPlyConstraints[ply]
+        if showPlysWithNoConstraints or plyCounts.Total > 0 then
+            table.insert( constraintCountsList, {
+                ply = ply,
+                counts = plyCounts
+            })
         end
     end
+    table.sort( constraintCountsList, function( a, b )
+        return a.counts.Total > b.counts.Total
+    end )
 
-    local finalData = {}
-    for _, block in pairs( dataBlocks ) do table.Add( finalData, block ) end
-
+    -- Create args for MsgC using constraint count list and send to client
+    -- TODO move visualization code clientside
     net.Start( "CFC_ULX_ConstraintResults" )
-    net.WriteTable( finalData )
+        net.WriteTable( getMsgCArgs(constraintCountsList))
     net.Send( caller )
 
     timer.Simple( 0, function()
         caller:ChatPrint( "Open your console to see the results." )
     end )
 end
+
 
 local constraintCheckerCommand = ulx.command( CATEGORY_NAME, "ulx constraints", cmd.checkConstraints, "!constraints" )
 constraintCheckerCommand:addParam{ type = ULib.cmds.PlayersArg }
