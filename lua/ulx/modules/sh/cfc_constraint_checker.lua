@@ -94,7 +94,7 @@ local function countConstraints( plys )
     return perPlyConstraints
 end
 
-local function compileConstraintResults( ply, constraintCounts )
+local function getPlyCountsMsgData( ply, constraintCounts )
     local decorLength = 25
     local nl = "\n"
     local divider = string.rep( "=", decorLength ) .. nl
@@ -131,7 +131,7 @@ end
 local function getMsgCArgs( constraintData )
     local args = {}
     for _, data in pairs( constraintData ) do
-        table.Add(args, compileConstraintResults( data.ply, data.counts ))
+        table.Add(args, getPlyCountsMsgData( data.ply, data.counts ))
     end
 
     return args
