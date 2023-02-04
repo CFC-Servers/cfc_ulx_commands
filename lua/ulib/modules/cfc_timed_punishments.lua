@@ -43,6 +43,7 @@ function TP.Unpunish( steamID64, punishment )
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
 
+    ply.TimedPunishments = ply.TimedPunishments or {}
     ply.TimedPunishments[punishment] = nil
     Punishments[punishment].disable( ply )
 end
