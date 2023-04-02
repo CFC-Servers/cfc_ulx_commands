@@ -29,7 +29,7 @@ if SERVER then
         if not expiration then return end
 
         if expiration > 0 and expiration > os.time() then
-            vacban( steamID64 )
+            return "##VAC_ConnectionRefusedDetail"
         end
     end )
 end

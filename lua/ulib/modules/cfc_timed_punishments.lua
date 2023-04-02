@@ -63,7 +63,10 @@ end )
 
 hook.Add( "CheckPassword", "CFC_TimedPunishments_Check", function( steamID64 )
     local punishments = Data:getActivePunishments( steamID64 )
-    hook.Run( "CFC_TimedPunishments_PunishmentNotify", steamID64, punishments )
+    local message = hook.Run( "CFC_TimedPunishments_PunishmentNotify", steamID64, punishments )
+    if not message then return end
+
+    return false, message
 end )
 
 hook.Add( "Initialize", "CFC_TimedPunishments_Init", function()
