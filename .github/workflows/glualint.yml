@@ -3,7 +3,7 @@ name: GLuaFixer
 on:
   pull_request:
     paths:
-      - 'lua/**'
+      - '**.lua'
 
 jobs:
   Lint:
