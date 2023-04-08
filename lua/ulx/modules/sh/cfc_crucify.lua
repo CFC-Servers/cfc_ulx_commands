@@ -111,7 +111,6 @@ local function crucifyDisconnectedCheck( ply )
         ply.ragdoll:Remove()
     end
     if IsValid( ply.cross ) then
-        ply.cross:DisallowDeleting( false )
         ply.cross:Remove()
     end
 end
