@@ -22,6 +22,6 @@ end
 local sragdoll = ulx.command( "Fun", "ulx sragdoll", ragdoll, "!sragdoll" )
 sragdoll:addParam{ type = ULib.cmds.PlayersArg }
 sragdoll:addParam{ type = ULib.cmds.BoolArg, invisible = true }
-sragdoll:defaultAccess( ULib.ACCESS_ADMIN )
+sragdoll:defaultAccess( ULib.ACCESS_SUPERADMIN )
 sragdoll:help( "sragdolls target(s)." )
 sragdoll:setOpposite( "ulx unsragdoll", { _, _, true }, "!unsragdoll" )
