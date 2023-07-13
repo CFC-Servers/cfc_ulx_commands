@@ -4,8 +4,8 @@ local function ragdoll( calling_ply, should_unragdoll )
             ULib.tsayError( calling_ply, ulx.getExclusive( calling_ply, calling_ply ), true )
         elseif not calling_ply:Alive() then
             ULib.tsayError( calling_ply, calling_ply:Nick() .. " is dead and cannot be ragdolled!", true )
-        elseif ply.IsInPvp and ply:IsInPvp() then
-            ply:ChatPrint( "You cannot ragdoll or propify yourself in PvP mode!" )
+        elseif calling_ply.IsInPvp and calling_ply:IsInPvp() then
+            calling_ply:ChatPrint( "You cannot ragdoll or propify yourself in PvP mode!" )
         else
             ulx.ragdollPlayer( calling_ply )
         end
