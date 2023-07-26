@@ -24,7 +24,7 @@ if SERVER then
     TimedPunishments.Register( PUNISHMENT, enable, disable )
 
     -- Runs on CheckPassword
-    hook.Add( "CFC_TimedPunishments_PunishmentNotify", "CFC_TimedPunishments_VACBan", function( steamID64, punishments )
+    hook.Add( "CFC_TimedPunishments_PunishmentNotify", "CFC_TimedPunishments_VACBan", function( _, punishments )
         local expiration = punishments[PUNISHMENT]
         if not expiration then return end
 
