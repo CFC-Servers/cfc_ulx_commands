@@ -60,10 +60,6 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
         return "Model too big!"
     end
 
-    prop.ragdolledPly = ply
-    ply:SetNWBool( "propifyGrabbed", false )
-    ply:SetNWInt( "propifyStruggle", 0 )
-
     prop:SetPos( ply:WorldSpaceCenter() )
     prop:SetAngles( ply:GetAngles() )
     prop:Spawn()
@@ -73,6 +69,10 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
         prop:Remove()
         return "Invalid model!"
     end
+
+    prop.ragdolledPly = ply
+    ply:SetNWBool( "propifyGrabbed", false )
+    ply:SetNWInt( "propifyStruggle", 0 )
 
     prop:Activate()
     phys:SetVelocity( ply:GetVelocity() )
