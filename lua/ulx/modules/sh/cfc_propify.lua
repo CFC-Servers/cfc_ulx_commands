@@ -67,8 +67,15 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
     prop:SetPos( ply:WorldSpaceCenter() )
     prop:SetAngles( ply:GetAngles() )
     prop:Spawn()
+
+    local phys = prop:GetPhysicsObject()
+    if not phys:IsValid() then
+        prop:Remove()
+        return "Invalid model!"
+    end
+
     prop:Activate()
-    prop:GetPhysicsObject():SetVelocity( ply:GetVelocity() )
+    phys:SetVelocity( ply:GetVelocity() )
 
     ply:Spectate( OBS_MODE_CHASE )
     ply:SpectateEntity( prop )
