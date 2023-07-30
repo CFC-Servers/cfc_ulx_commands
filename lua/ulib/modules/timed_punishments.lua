@@ -1,5 +1,4 @@
-require "logger"
-AddCSLuaFile( "cfc_ulx_commands/timed_punishments/ulx.lua" )
+require( "logger" )
 
 local IsValid = IsValid
 local logger = Logger( "ULX_TimedPunishments" )
@@ -12,6 +11,9 @@ TimedPunishments = {
 }
 
 if CLIENT then return end
+
+util.AddNetworkString( "CFC_TimedPunishments_Punishments" )
+AddCSLuaFile( "cfc_ulx_commands/timed_punishments/ulx.lua" )
 
 local TP = TimedPunishments
 local Data = TP.Data
@@ -35,6 +37,10 @@ function TP.Punish( steamID64, punishment, expiration, issuer, reason )
     ply.TimedPunishments = ply.TimedPunishments or {}
     ply.TimedPunishments[punishment] = expiration
     Punishments[punishment].enable( ply )
+
+    timer.Simple( 0.1, function()
+        TP.SendPunishments( ply )
+    end )
 end
 
 function TP.Unpunish( steamID64, punishment )
@@ -46,19 +52,47 @@ function TP.Unpunish( steamID64, punishment )
     ply.TimedPunishments = ply.TimedPunishments or {}
     ply.TimedPunishments[punishment] = nil
     Punishments[punishment].disable( ply )
+
+    timer.Simple( 0.1, function()
+        TP.SendPunishments( ply )
+    end )
 end
 
 local none = {}
 
+function TP.SendPunishments( ply )
+    local punishments = ply.TimedPunishments
+
+    net.Start( "CFC_TimedPunishments_Punishments" )
+
+    local count = table.Count( punishments )
+    net.WriteUInt( count, 8 )
+
+    for name, expiration in pairs( punishments ) do
+        net.WriteString( name )
+        net.WriteUInt( expiration, 32 )
+    end
+
+    net.Send( ply )
+end
+
 hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local steamID64 = ply:SteamID64()
     local punishments = Data:getActivePunishments( steamID64 )
+    if not punishments then return end
 
-    for punishment in pairs( punishments or none ) do
-        Punishments[punishment].enable( ply )
+    for punishment in pairs( punishments ) do
+        local basePunishment = Punishments[punishment]
+        if basePunishment then
+            basePunishment.enable( ply )
+        else
+            ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
+        end
     end
 
-    ply.TimedPunishments = punishments or {}
+    ply.TimedPunishments = punishments
+
+    TP.SendPunishments( ply )
 end )
 
 hook.Add( "CheckPassword", "CFC_TimedPunishments_Check", function( steamID64 )
