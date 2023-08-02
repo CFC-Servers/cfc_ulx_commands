@@ -2,6 +2,8 @@ AddCSLuaFile( "cl_init.lua" ) -- Make sure clientside
 AddCSLuaFile( "shared.lua" )  -- and shared scripts are sent.
 include( "shared.lua" )
 
+resource.AddFile( "materials/hud/killicons/trainfucked.vmt" )
+
 local IsValid = IsValid
 
 function ENT:Initialize()

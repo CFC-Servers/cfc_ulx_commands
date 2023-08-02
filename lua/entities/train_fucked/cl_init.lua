@@ -1,7 +1,7 @@
 include( "shared.lua" )
 
 language.Add( "train_fucked", "Train fucked!" )
-killicon.Add( "train_fucked", "cfc_trainfuck_kill_icon", Color( 255, 255, 255, 255 ) )
+killicon.Add( "train_fucked", "hud/killicons/trainfucked", Color( 255, 80, 0, 255 ) )
 
 ENT.spawnSounds = {
     "ambient/alarms/razortrain_horn1.wav",
