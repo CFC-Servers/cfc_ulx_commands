@@ -24,7 +24,7 @@ if SERVER then
 
     -- Block spawning and noclip while in darkrp mode.
     -- Has to be done manually to prevent ulib's :DisallowSpawning() and etc from interfering, such as when a player unragdolls.
-    hook.Add( "PlayerNoClip", "ULibNoclipCheck", noclip, HOOK_HIGH )
+    hook.Add( "PlayerNoClip", "CFC_ULX_DarkRP_blockActioning", blockAction, HOOK_HIGH )
     hook.Add( "CanTool", "CFC_ULX_DarkRP_blockActioning", blockAction, HOOK_HIGH )
     hook.Add( "PlayerSpawnObject", "CFC_ULX_DarkRP_blockActioning", blockAction )
     hook.Add( "PlayerSpawnEffect", "CFC_ULX_DarkRP_blockActioning", blockAction )
