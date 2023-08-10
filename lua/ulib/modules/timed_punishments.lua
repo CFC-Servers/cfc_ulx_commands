@@ -70,7 +70,7 @@ function TP.SendPunishments( ply )
 
     for name, expiration in pairs( punishments ) do
         net.WriteString( name )
-        net.WriteUInt( expiration, 32 )
+        net.WriteDouble( expiration )
     end
 
     net.Send( ply )
