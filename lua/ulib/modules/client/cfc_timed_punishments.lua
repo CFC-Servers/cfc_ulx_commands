@@ -33,7 +33,7 @@ net.Receive( "CFC_TimedPunishments_Punishments", function()
 
     for _ = 1, count do
         local name = net.ReadString()
-        local expiration = net.ReadUInt( 32 )
+        local expiration = net.ReadDouble()
         punishments[name] = expiration
     end
 
