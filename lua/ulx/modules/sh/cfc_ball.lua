@@ -97,6 +97,11 @@ end )
 
 function cmd.ball( callingPlayer, targetPlayers )
     for _, ply in ipairs( targetPlayers ) do
+        local exclusive = ulx.getExclusive( ply, callingPly )
+        if exclusive then
+            ULib.tsayError( callingPlayer, exclusive, true )
+        end
+
         makeSpawner( ply )
     end
 
