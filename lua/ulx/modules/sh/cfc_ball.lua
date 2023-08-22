@@ -19,7 +19,7 @@ end
 local function makeSpawner( ply )
     local ballMaker = ents.Create( "point_combine_ball_launcher" )
 
-    ballMaker:SetPos( ply:GetPos() )
+    ballMaker:SetPos( ply:EyePos() )
     ballMaker:SetKeyValue( "minspeed", "5700" )
     ballMaker:SetKeyValue( "maxspeed", "6500" )
     ballMaker:SetKeyValue( "ballradius", "15" )
