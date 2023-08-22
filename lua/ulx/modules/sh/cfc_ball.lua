@@ -4,11 +4,24 @@ local CATEGORY_NAME = "Fun"
 
 local spawnerToPlayer = {}
 
+function redirectBall(projectile, eyeAngles)
+    local physObj = projectile:GetPhysicsObject()
+    if IsValid(physObj) then
+        local velocity = physObj:GetVelocity()
+        local speed = velocity:Length() * 1.35
+        local direction = eyeAngles:Forward()
+        local newVelocity = direction * speed
+        physObj:SetVelocityInstantaneous(newVelocity)
+    end
+end
+
+
 local function makeSpawner( ply )
     local ballMaker = ents.Create( "point_combine_ball_launcher" )
+
     ballMaker:SetPos( ply:GetPos() )
-    ballMaker:SetKeyValue( "minspeed", "1000" )
-    ballMaker:SetKeyValue( "maxspeed", "4500" )
+    ballMaker:SetKeyValue( "minspeed", "5700" )
+    ballMaker:SetKeyValue( "maxspeed", "6500" )
     ballMaker:SetKeyValue( "ballradius", "15" )
     ballMaker:SetKeyValue( "ballcount", "0" )
     ballMaker:SetKeyValue( "maxballbounces", "9999999999" )
@@ -24,6 +37,8 @@ end
 local function unball( ply )
     assert( ply:IsValid(), "Player is invalid: " .. tostring( ply ) )
 
+    local eyeAngles = ply:EyeAngles()
+
     ply:SetParent()
     ply:UnSpectate()
     ply:GodEnable( false )
@@ -37,12 +52,18 @@ local function unball( ply )
     if not ball then return end
     if not ball:IsValid() then return end
 
+    ply:SetPos( ball:GetPos() )
+    ply:SetEyeAngles( eyeAngles )
+    ply:SetVelocity( ball:GetVelocity() )
+
     ball:Remove()
 end
 
 local function ballify( ply, ball )
     assert( ply:IsValid(), "Player is invalid: " .. tostring( ply ) )
     assert( ball:IsValid(), "Ball is invalid: " .. tostring( ball ) )
+
+    redirectBall( ball, ply:EyeAngles() )
 
     ply:SetParent( ball )
     ply:Spectate( OBS_MODE_CHASE )
@@ -64,7 +85,7 @@ end
 hook.Add( "OnEntityCreated", "CFCUlxCommands_Balls", function( ent )
     if ent:GetClass() ~= "prop_combine_ball" then return end
 
-    timer.Simple( 0.15, function()
+    timer.Simple( 0, function()
         if not ent:IsValid() then return end
 
         local spawner = ent:GetInternalVariable( "m_hSpawner" )
@@ -78,6 +99,7 @@ hook.Add( "OnEntityCreated", "CFCUlxCommands_Balls", function( ent )
         spawner:Fire( "kill", "", 0 )
         spawnerToPlayer[spawner] = nil
         ply.BallMaker = nil
+
 
         ballify( ply, ent )
     end )
@@ -105,12 +127,20 @@ function cmd.ball( callingPlayer, targetPlayers )
         makeSpawner( ply )
     end
 
+    if #targetPlayers == 1 and targetPlayers[1] == callingPlayer then
+        return
+    end
+
     ulx.fancyLogAdmin( callingPlayer, "#A balls'd #T", targetPlayers )
 end
 
 function cmd.unball( callingPlayer, targetPlayers )
     for _, ply in ipairs( targetPlayers ) do
         unball( ply )
+    end
+
+    if #targetPlayers == 1 and targetPlayers[1] == callingPlayer then
+        return
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A unballs'd #T", targetPlayers )
