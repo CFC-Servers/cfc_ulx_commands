@@ -32,7 +32,7 @@ if SERVER then
     TimedPunishments.Register( PUNISHMENT, enable, disable )
 end
 
-local action = "cursed ## (choo choo)"
-local inverseAction = "lifted ##'s curse"
+local action = "train cursed ##"
+local inverseAction = "lifted ##'s train curse"
 TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NAME, HELP )
 
