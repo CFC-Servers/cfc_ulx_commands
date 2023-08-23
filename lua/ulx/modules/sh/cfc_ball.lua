@@ -4,17 +4,16 @@ local CATEGORY_NAME = "Fun"
 
 local spawnerToPlayer = {}
 
-function redirectBall(projectile, eyeAngles)
+local function redirectBall( projectile, eyeAngles )
     local physObj = projectile:GetPhysicsObject()
-    if IsValid(physObj) then
+    if IsValid( physObj ) then
         local velocity = physObj:GetVelocity()
         local speed = velocity:Length() * 1.35
         local direction = eyeAngles:Forward()
         local newVelocity = direction * speed
-        physObj:SetVelocityInstantaneous(newVelocity)
+        physObj:SetVelocityInstantaneous( newVelocity )
     end
 end
-
 
 local function makeSpawner( ply )
     local ballMaker = ents.Create( "point_combine_ball_launcher" )
@@ -38,25 +37,26 @@ local function unball( ply )
     assert( ply:IsValid(), "Player is invalid: " .. tostring( ply ) )
 
     local eyeAngles = ply:EyeAngles()
+    local pos = ply:GetPos()
 
     ply:SetParent()
     ply:UnSpectate()
     ply:GodEnable( false )
     ply:DisallowSpawning( false )
-
     ply:Spawn()
+
+    ply:SetPos( pos )
+    ply:SetEyeAngles( eyeAngles )
 
     ulx.clearExclusive( ply )
 
     local ball = ply.Ball
-    if not ball then return end
-    if not ball:IsValid() then return end
+    if ball and ball:IsValid() then
+        ply:SetVelocity( ball:GetVelocity() )
+        ball:Remove()
+    end
 
-    ply:SetPos( ball:GetPos() )
-    ply:SetEyeAngles( eyeAngles )
-    ply:SetVelocity( ball:GetVelocity() )
-
-    ball:Remove()
+    ply.Ball = nil
 end
 
 local function ballify( ply, ball )
@@ -74,11 +74,12 @@ local function ballify( ply, ball )
 
     ball:CallOnRemove( "CFCUlxCommands_Balls", function()
         unball( ply )
+
+        if ball.ManualRemove then return end
         ulx.fancyLogAdmin( ply, "#A has been unballed!" )
     end )
 
     ply.Ball = ball
-
     ulx.setExclusive( ply, "balled" )
 end
 
@@ -100,6 +101,8 @@ hook.Add( "OnEntityCreated", "CFCUlxCommands_Balls", function( ent )
         spawnerToPlayer[spawner] = nil
         ply.BallMaker = nil
 
+        ply.IsBalled = true
+        ent.IsPlayerBall = true
 
         ballify( ply, ent )
     end )
@@ -112,9 +115,15 @@ hook.Add( "PlayerDisconnected", "CFCUlxCommands_Balls", function( ply )
     spawnerToPlayer[spawner] = nil
 end )
 
-
 hook.Add( "CanPlayerSuicide", "CFCUlxCommands_Balls", function( ply )
     if ply.Ball and ply.Ball:IsValid() then return false end
+end )
+
+hook.Add( "EntityTakeDamage", "CFCUlxCommands_Balls", function( _, dmginfo )
+    local inflictor = dmginfo:GetInflictor()
+    if not inflictor:IsValid() then return end
+
+    if inflictor.IsPlayerBall then return true end
 end )
 
 function cmd.ball( callingPlayer, targetPlayers )
@@ -136,7 +145,9 @@ end
 
 function cmd.unball( callingPlayer, targetPlayers )
     for _, ply in ipairs( targetPlayers ) do
-        unball( ply )
+        if ply.Ball and ply.Ball:IsValid() then
+            unball( ply )
+        end
     end
 
     if #targetPlayers == 1 and targetPlayers[1] == callingPlayer then
