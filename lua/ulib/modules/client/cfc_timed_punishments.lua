@@ -26,7 +26,8 @@ local function alert()
 end
 
 net.Receive( "CFC_TimedPunishments_Punishments", function()
-    punishments = {}
+    table.Empty( punishments )
+    LocalPlayer().TimedPunishments = punishments
 
     local count = net.ReadUInt( 8 )
     if count == 0 then return end
