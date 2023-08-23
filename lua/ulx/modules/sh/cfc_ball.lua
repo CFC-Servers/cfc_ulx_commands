@@ -46,6 +46,7 @@ local function unball( ply )
     ply:Spawn()
 
     ply:SetPos( pos )
+    eyeAngles.r = 0
     ply:SetEyeAngles( eyeAngles )
 
     ulx.clearExclusive( ply )
