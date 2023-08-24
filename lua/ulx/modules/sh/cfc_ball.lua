@@ -36,8 +36,9 @@ end
 local function unball( ply )
     assert( ply:IsValid(), "Player is invalid: " .. tostring( ply ) )
 
-    local eyeAngles = ply:EyeAngles()
     local pos = ply:GetPos()
+    local eyeAngles = ply:EyeAngles()
+    eyeAngles.r = 0
 
     ply:SetParent()
     ply:UnSpectate()
