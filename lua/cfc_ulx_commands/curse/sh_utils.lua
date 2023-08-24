@@ -16,7 +16,7 @@ CFCUlxCurse.EFFECT_DURATION_MIN = 10 -- Default min duration for effects. Can be
 CFCUlxCurse.EFFECT_DURATION_MAX = 30 -- Default max duration for effects. Can be overridden per effect.
 CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT = 3 -- Default duration multiplier for one-time effects. Can be overridden per effect.
 CFCUlxCurse.EFFECT_GAP_MIN = 10 -- Min gap between effects.
-CFCUlxCurse.EFFECT_GAP_MAX = 3 * 60 -- Max gap between effects.
+CFCUlxCurse.EFFECT_GAP_MAX = 2 * 60 -- Max gap between effects.
 
 local effectNameToID = {}
 local onetimeEffectIDs = {}
