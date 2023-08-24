@@ -1,6 +1,6 @@
 local EFFECT_NAME = "OffsetAim"
 local ANGLE_OFFSET_MIN = 2
-local ANGLE_OFFSET_MAX = 8
+local ANGLE_OFFSET_MAX = 15
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
