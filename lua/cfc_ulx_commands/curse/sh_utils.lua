@@ -9,10 +9,6 @@
             - These one-time effects often last longer than normal effects.
 --]]
 
---[[ TODO:
-    - Make some basic curse effects to get started with.
---]]
-
 CFCUlxCurse = CFCUlxCurse or {}
 
 CFCUlxCurse.Effects = {}
