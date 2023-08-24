@@ -48,8 +48,8 @@ CFCUlxCurse.RegisterEffect( {
         -- Do nothing.
     end,
 
-    minDuration = nil,
-    maxDuration = nil,
+    minDuration = 30,
+    maxDuration = 120,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
 } )
