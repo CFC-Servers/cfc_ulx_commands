@@ -76,3 +76,14 @@ hook.Add( "Think", "CFC_ULXCommands_Curse_EffectTick", function()
         end
     end
 end )
+
+hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectOnLeave", function( ply )
+    if not IsValid( ply ) then return end
+
+    local prevEffect = CFCUlxCurse.GetCurrentEffect( ply )
+    if not prevEffect then return end
+
+    ply.CFCUlxCurseEffect = nil
+    ply.CFCUlxCurseEffectExpireTime = nil
+    prevEffect.onEnd( ply )
+end )
