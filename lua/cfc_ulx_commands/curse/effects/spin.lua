@@ -31,10 +31,6 @@ CFCUlxCurse.RegisterEffect( {
         hook.Remove( "CreateMove", HOOK_PREFIX .. "SPEEN" )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = 5,
     maxDuration = 20,
     onetimeDurationMult = nil,

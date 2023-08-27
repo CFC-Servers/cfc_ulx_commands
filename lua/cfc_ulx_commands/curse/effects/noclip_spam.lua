@@ -20,10 +20,6 @@ CFCUlxCurse.RegisterEffect( {
         timer.Remove( HOOK_PREFIX .. "ToggleNoclip" )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

@@ -45,10 +45,6 @@ CFCUlxCurse.RegisterEffect( {
         cursedPly:SetEyeAngles( eyeAngles )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = 20,
     maxDuration = 50,
     onetimeDurationMult = nil,

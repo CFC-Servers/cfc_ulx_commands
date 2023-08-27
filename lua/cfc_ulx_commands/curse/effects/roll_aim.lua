@@ -42,10 +42,6 @@ CFCUlxCurse.RegisterEffect( {
         hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

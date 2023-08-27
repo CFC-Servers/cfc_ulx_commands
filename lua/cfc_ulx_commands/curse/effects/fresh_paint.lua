@@ -29,10 +29,6 @@ CFCUlxCurse.RegisterEffect( {
         RunConsoleCommand( "stop" )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

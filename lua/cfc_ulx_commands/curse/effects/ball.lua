@@ -25,10 +25,6 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCommands.ball.unball( cursedPly, { cursedPly } )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

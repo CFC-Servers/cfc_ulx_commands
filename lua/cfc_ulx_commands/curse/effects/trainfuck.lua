@@ -13,10 +13,6 @@ CFCUlxCurse.RegisterEffect( {
         -- Do nothing.
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = 1,
     maxDuration = 1,
     onetimeDurationMult = nil,

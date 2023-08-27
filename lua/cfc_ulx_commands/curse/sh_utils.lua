@@ -35,9 +35,6 @@ local onetimeEffectIDs = {}
         onEnd: (function)
             - Function to call when the effect ends.
             - Has the form   function( ply )  end
-        onTick: (function)
-            - Function to call every tick while the effect is active.
-            - Has the form   function( ply )  end
         minDuration: (optional) (number)
             - The minimum duration of the effect in seconds.
             - If not specified, defaults to CFCUlxCurse.EFFECT_DURATION_MIN.

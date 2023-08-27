@@ -67,12 +67,6 @@ hook.Add( "Think", "CFC_ULXCommands_Curse_EffectTick", function()
             local effect = CFCUlxCurse.GetRandomEffect()
 
             CFCUlxCurse.ApplyCurseEffect( ply, effect )
-        else
-            local effect = CFCUlxCurse.GetCurrentEffect( ply )
-
-            if effect then
-                effect.onTick( ply )
-            end
         end
     end
 end )

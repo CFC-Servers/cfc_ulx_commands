@@ -24,10 +24,6 @@ CFCUlxCurse.RegisterEffect( {
         affectedPlys[cursedPly] = nil
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

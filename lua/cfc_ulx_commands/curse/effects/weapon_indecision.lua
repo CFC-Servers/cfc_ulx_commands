@@ -30,10 +30,6 @@ CFCUlxCurse.RegisterEffect( {
         timer.Remove( HOOK_PREFIX .. "SelectWeapon_" .. cursedPly:SteamID64() )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,

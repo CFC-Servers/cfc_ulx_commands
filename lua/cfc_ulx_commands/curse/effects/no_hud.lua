@@ -19,10 +19,6 @@ CFCUlxCurse.RegisterEffect( {
         hook.Remove( "HUDShouldDraw", HOOK_PREFIX .. "NoHudPls" )
     end,
 
-    onTick = function()
-        -- Do nothing.
-    end,
-
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,
