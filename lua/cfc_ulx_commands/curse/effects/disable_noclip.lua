@@ -6,14 +6,20 @@ CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-        hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip_" .. cursedPly:SteamID64(), function( ply, desiredState )
-            if ply ~= cursedPly then return end
-            if desiredState then return false end
-        end )
-
         cursedPly:SetMoveType( MOVETYPE_WALK )
 
-        if CLIENT then return end
+        local function blockNoclip( ply, desiredState )
+            if ply ~= cursedPly then return end
+            if desiredState then return false end
+        end
+
+        if CLIENT then
+            hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
+
+            return
+        end
+
+        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
 
         -- Respawn the player if they are outside of the world.
         if not util.IsInWorld( cursedPly:GetPos() ) then
@@ -21,8 +27,10 @@ CFCUlxCurse.RegisterEffect( {
         end
     end,
 
-    onEnd = function( cursedPly )
-        hook.Remove( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip_" .. cursedPly:SteamID64() )
+    onEnd = function()
+        if CLIENT then
+            hook.Remove( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip" )
+        end
     end,
 
     minDuration = nil,

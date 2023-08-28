@@ -9,7 +9,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        hook.Add( "Think", HOOK_PREFIX .. "Punch_" .. cursedPly:SteamID64(), function()
+        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "Punch", function()
             local ang = Angle(
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),
@@ -20,10 +20,8 @@ CFCUlxCurse.RegisterEffect( {
         end )
     end,
 
-    onEnd = function( cursedPly )
-        if CLIENT then return end
-
-        hook.Remove( "Think", HOOK_PREFIX .. "Punch_" .. cursedPly:SteamID64() )
+    onEnd = function()
+        -- Do nothing.
     end,
 
     minDuration = nil,

@@ -7,14 +7,16 @@ CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-        timer.Create( HOOK_PREFIX .. "SelectWeapon_" .. cursedPly:SteamID64(), INTERVAL, 0, function()
-            if not IsValid( cursedPly ) then return end
-
-            if CLIENT then
+        if CLIENT then
+            timer.Create( HOOK_PREFIX .. "SelectWeapon", INTERVAL, 0, function()
                 surface.PlaySound( "common/wpn_hudoff.wav" )
+            end )
 
-                return
-            end
+            return
+        end
+
+        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "SelectWeapon", INTERVAL, 0, function()
+            if not IsValid( cursedPly ) then return end
 
             local weps = cursedPly:GetWeapons()
             local wepCount = #weps
@@ -26,8 +28,10 @@ CFCUlxCurse.RegisterEffect( {
         end )
     end,
 
-    onEnd = function( cursedPly )
-        timer.Remove( HOOK_PREFIX .. "SelectWeapon_" .. cursedPly:SteamID64() )
+    onEnd = function()
+        if CLIENT then
+            timer.Remove( HOOK_PREFIX .. "SelectWeapon" )
+        end
     end,
 
     minDuration = nil,

@@ -8,13 +8,13 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        hook.Add( "CFC_ULXCommands_Balls_CanUnball", HOOK_PREFIX .. "BlockUnball_" .. cursedPly:SteamID64(), function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, "CFC_ULXCommands_Balls_CanUnball", HOOK_PREFIX .. "BlockUnball", function( ply )
             if ply ~= cursedPly then return end
 
             return false
         end )
 
-        hook.Add( "CFC_ULXCommands_Balls_OnBallEnded", HOOK_PREFIX .. "StopEffectEarly_" .. cursedPly:SteamID64(), function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, "CFC_ULXCommands_Balls_OnBallEnded", HOOK_PREFIX .. "StopEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
             CFCUlxCurse.StopCurseEffect( ply )
@@ -26,8 +26,7 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function( cursedPly )
         if CLIENT then return end
 
-        hook.Remove( "CFC_ULXCommands_Balls_CanUnball", HOOK_PREFIX .. "BlockUnball_" .. cursedPly:SteamID64() )
-        hook.Remove( "CFC_ULXCommands_Balls_OnBallEnded", HOOK_PREFIX .. "StopEffectEarly_" .. cursedPly:SteamID64() )
+        CFCUlxCurse.RemoveEffectHooks( cursedPly ) -- Remove hooks first, otherwise the unball will be blocked.
 
         if not cursedPly.Ball then return end
 
