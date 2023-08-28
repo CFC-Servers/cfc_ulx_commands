@@ -54,7 +54,7 @@ end
 
 ----- SETUP -----
 
-hook.Add( "Think", "CFC_ULXCommands_Curse_EffectTick", function()
+timer.Create( "CFC_ULXCommands_Curse_StartAndStopEffects", 5, 0, function()
     local now = RealTime()
 
     for _, ply in ipairs( player.GetAll() ) do
