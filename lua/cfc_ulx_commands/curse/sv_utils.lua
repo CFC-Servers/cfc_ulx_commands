@@ -54,6 +54,18 @@ end
 
 ----- SETUP -----
 
+hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectOnLeave", function( ply )
+    if not IsValid( ply ) then return end
+
+    local prevEffect = CFCUlxCurse.GetCurrentEffect( ply )
+    if not prevEffect then return end
+
+    ply.CFCUlxCurseEffect = nil
+    ply.CFCUlxCurseEffectExpireTime = nil
+    prevEffect.onEnd( ply )
+end )
+
+
 timer.Create( "CFC_ULXCommands_Curse_StartAndStopEffects", 5, 0, function()
     local now = RealTime()
 
@@ -69,15 +81,4 @@ timer.Create( "CFC_ULXCommands_Curse_StartAndStopEffects", 5, 0, function()
             CFCUlxCurse.ApplyCurseEffect( ply, effect )
         end
     end
-end )
-
-hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectOnLeave", function( ply )
-    if not IsValid( ply ) then return end
-
-    local prevEffect = CFCUlxCurse.GetCurrentEffect( ply )
-    if not prevEffect then return end
-
-    ply.CFCUlxCurseEffect = nil
-    ply.CFCUlxCurseEffectExpireTime = nil
-    prevEffect.onEnd( ply )
 end )
