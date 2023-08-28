@@ -47,7 +47,7 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectData )
     local duration = math.Rand( minDuration, maxDuration ) * durationMult
 
     ply.CFCUlxCurseEffect = effectData
-    ply.CFCUlxCurseEffectExpireTime = RealTime() + duration
+    ply.CFCUlxCurseEffectExpireTime = CurTime() + duration
     effectData.onStart( ply )
     addInflictedPlayer( ply )
 
@@ -76,7 +76,7 @@ function CFCUlxCurse.StopCurseEffect( ply )
     if CFCUlxCurse.IsCursed( ply ) then
         local gap = math.Rand( CFCUlxCurse.EFFECT_GAP_MIN, CFCUlxCurse.EFFECT_GAP_MAX )
 
-        ply.CFCUlxCurseNextEffectTime = RealTime() + gap
+        ply.CFCUlxCurseNextEffectTime = CurTime() + gap
     else
         removeInflictedPlayer( ply )
     end
@@ -99,7 +99,7 @@ end )
 
 
 timer.Create( "CFC_ULXCommands_Curse_StartAndStopEffects", 5, 0, function()
-    local now = RealTime()
+    local now = CurTime()
 
     for _, ply in ipairs( inflictedPlayers ) do
         local effectExpireTime = ply.CFCUlxCurseEffectExpireTime
