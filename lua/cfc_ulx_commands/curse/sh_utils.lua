@@ -87,13 +87,6 @@ function CFCUlxCurse.GetRandomOnetimeEffect()
     return CFCUlxCurse.Effects[id]
 end
 
--- Returns true if the player is currently cursed.
-function CFCUlxCurse.IsCursed( ply )
-    if not ply.TimedPunishments then return false end
-
-    return ply.TimedPunishments.timedcurse ~= nil
-end
-
 function CFCUlxCurse.GetCurrentEffect( ply )
     return ply.CFCUlxCurseEffect
 end

@@ -25,6 +25,13 @@ local function removeInflictedPlayer( ply )
 end
 
 
+-- Returns true if the player is currently cursed.
+function CFCUlxCurse.IsCursed( ply )
+    if not ply.TimedPunishments then return false end
+
+    return ply.TimedPunishments.timedcurse ~= nil
+end
+
 --[[
     - Apply a curse effect to a player.
     - If the player is not cursed, this will apply as a one-time effect.

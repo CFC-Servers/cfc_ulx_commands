@@ -26,7 +26,7 @@ local function alert()
 end
 
 net.Receive( "CFC_TimedPunishments_Punishments", function()
-    table.Empty( punishments )
+    punishments = {}
 
     local count = net.ReadUInt( 8 )
     if count == 0 then return end
@@ -46,8 +46,4 @@ hook.Add( "OnPlayerChat", "CFC_TimedPunishments_Punishments", function( ply, tex
 
     alert()
     return true
-end )
-
-hook.Add( "InitPostEntity", "CFC_TimedPunishments_GlobalizePunishments", function()
-    LocalPlayer().TimedPunishments = punishments
 end )
