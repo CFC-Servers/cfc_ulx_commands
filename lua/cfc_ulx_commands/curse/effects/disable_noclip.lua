@@ -1,14 +1,15 @@
 local EFFECT_NAME = "DisableNoclip"
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
-local affectedPlys = {}
-
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-        affectedPlys[cursedPly] = true
+        hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip_" .. cursedPly:SteamID64(), function( ply, desiredState )
+            if ply ~= cursedPly then return end
+            if desiredState then return false end
+        end )
 
         cursedPly:SetMoveType( MOVETYPE_WALK )
 
@@ -21,7 +22,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function( cursedPly )
-        affectedPlys[cursedPly] = nil
+        hook.Remove( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip_" .. cursedPly:SteamID64() )
     end,
 
     minDuration = nil,
@@ -29,9 +30,3 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
 } )
-
-
-hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", function( ply, desiredState )
-    if not affectedPlys[ply] then return end
-    if desiredState then return false end
-end )
