@@ -89,7 +89,7 @@ end
 
 -- Returns true if the player is currently cursed.
 function CFCUlxCurse.IsCursed( ply )
-    ply.TimedPunishments = ply.TimedPunishments or {}
+    if not ply.TimedPunishments then return false end
 
     return ply.TimedPunishments.timedcurse ~= nil
 end
