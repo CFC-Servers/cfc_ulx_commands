@@ -71,6 +71,16 @@ function CFCUlxCurse.GetEffectByName( name )
     return CFCUlxCurse.Effects[effectNameToID[string.lower( name )]]
 end
 
+function CFCUlxCurse.GetEffectNames()
+    local names = {}
+
+    for _, effect in ipairs( CFCUlxCurse.Effects ) do
+        table.insert( names, effect.nameUpper )
+    end
+
+    return names
+end
+
 --[[
     - Get a random curse effect.
     - This is the draw pool used by the ulx timedcurse command.

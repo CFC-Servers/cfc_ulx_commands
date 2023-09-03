@@ -5,6 +5,28 @@ CATEGORY_NAME = "Fun"
 
 CFCUlxCurse = CFCUlxCurse or {}
 
+do -- Load curse effects
+    AddCSLuaFile( "cfc_ulx_commands/curse/sh_utils.lua" )
+    AddCSLuaFile( "cfc_ulx_commands/curse/cl_utils.lua" )
+
+    include( "cfc_ulx_commands/curse/sh_utils.lua" )
+
+    if SERVER then
+        include( "cfc_ulx_commands/curse/sv_utils.lua" )
+    else
+        include( "cfc_ulx_commands/curse/cl_utils.lua" )
+    end
+
+
+    local effects_modules = file.Find( "cfc_ulx_commands/curse/effects/*.lua", "LUA" )
+
+    for _, fileName in ipairs( effects_modules ) do
+        AddCSLuaFile( "cfc_ulx_commands/curse/effects/" .. fileName )
+        include( "cfc_ulx_commands/curse/effects/" .. fileName )
+    end
+end
+
+
 function cmd.curse( ply, effectOverride, shouldUncurse )
     if shouldUncurse then
         CFCUlxCurse.StopCurseEffect( ply )
@@ -76,7 +98,7 @@ end
 
 local curseCommand = ulx.command( CATEGORY_NAME, "ulx curse", cmd.cursePlayers, "!curse" )
 curseCommand:addParam{ type = ULib.cmds.PlayersArg }
-curseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional }
+curseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
 curseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 curseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 curseCommand:help( "Applies a one-time curse effect to target(s)" )
