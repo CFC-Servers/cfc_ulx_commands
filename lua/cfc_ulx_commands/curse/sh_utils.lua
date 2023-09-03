@@ -27,8 +27,8 @@ local onetimeEffectIDs = {}
 
     effectData should be a table with the following fields:
         name: (string)
-            - The name of the effect. Must be unique.
-            - This is primarily for debugging.
+            - The name of the effect. Must be unique, and is case-insensitive.
+            - The name must not be "random" as it is reserved for manual selection via ulx.
         onStart: (function)
             - Function to call when the effect starts.
             - Has the form   function( ply )  end
@@ -50,13 +50,17 @@ local onetimeEffectIDs = {}
             - If not specified, defaults to false.
 --]]
 function CFCUlxCurse.RegisterEffect( effectData )
-    local name = effectData.name
-    if not name then return ErrorNoHaltWithStack( "Effect must have a name" ) end
-    if effectNameToID[name] then return ErrorNoHaltWithStack( "Already registered an effect with the name " .. name ) end
+    local nameUpper = effectData.name
+    if not nameUpper then return ErrorNoHaltWithStack( "Effect must have a name" ) end
+
+    local name = string.lower( nameUpper )
+    if name == "random" then return ErrorNoHaltWithStack( "Effect name cannot be \"random\"" ) end
+    if effectNameToID[name] then return ErrorNoHaltWithStack( "Already registered an effect with the name \"" .. nameUpper .. "\"" ) end
 
     local id = table.insert( CFCUlxCurse.Effects, effectData )
 
     effectNameToID[name] = id
+    effectData.nameUpper = nameUpper
 
     if effectData.excludeFromOnetime ~= true then
         table.insert( onetimeEffectIDs, id )
@@ -64,7 +68,7 @@ function CFCUlxCurse.RegisterEffect( effectData )
 end
 
 function CFCUlxCurse.GetEffectByName( name )
-    return CFCUlxCurse.Effects[effectNameToID[name]]
+    return CFCUlxCurse.Effects[effectNameToID[string.lower( name )]]
 end
 
 --[[
