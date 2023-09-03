@@ -50,7 +50,11 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectData )
 
     ply.CFCUlxCurseEffect = effectData
     ply.CFCUlxCurseEffectExpireTime = CurTime() + duration
-    effectData.onStart( ply )
+
+    ProtectedCall( function()
+        effectData.onStart( ply )
+    end )
+
     addInflictedPlayer( ply )
 
     net.Start( "CFC_ULXCommands_Curse_StartEffect" )
@@ -68,7 +72,11 @@ function CFCUlxCurse.StopCurseEffect( ply )
     if prevEffect then
         ply.CFCUlxCurseEffect = nil
         ply.CFCUlxCurseEffectExpireTime = nil
-        prevEffect.onEnd( ply )
+
+        ProtectedCall( function()
+            prevEffect.onEnd( ply )
+        end )
+
         CFCUlxCurse.RemoveEffectHooks( ply )
         CFCUlxCurse.RemoveEffectTimers( ply )
 
@@ -196,7 +204,10 @@ hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectOnLeave", funct
 
     if prevEffect then
         ply.CFCUlxCurseEffect = nil
-        prevEffect.onEnd( ply )
+
+        ProtectedCall( function()
+            prevEffect.onEnd( ply )
+        end )
     end
 
     removeInflictedPlayer( ply )
