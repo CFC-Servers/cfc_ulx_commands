@@ -10,6 +10,7 @@
 --]]
 
 CFCUlxCurse = CFCUlxCurse or {}
+CFCUlxCurse.EffectGlobals = CFCUlxCurse.EffectGlobals or {} -- Effects can store global vars here, preferably in a subtable indexed by the effect's lowercase name.
 
 CFCUlxCurse.Effects = {}
 CFCUlxCurse.EFFECT_DURATION_MIN = 10 -- Default min duration for effects. Can be overridden per effect.
