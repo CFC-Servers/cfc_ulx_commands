@@ -1,8 +1,8 @@
 local EFFECT_NAME = "SanFransisco"
-local AMPLITUDE_MIN = 5
-local AMPLITUDE_MAX = 20
-local AMPLITUDE_MIN_GROWTH = 1 -- Per second
-local AMPLITUDE_MAX_GROWTH = 2 -- Per second
+local AMPLITUDE_MIN = 3
+local AMPLITUDE_MAX = 8
+local AMPLITUDE_MIN_GROWTH = 2 -- Per second
+local AMPLITUDE_MAX_GROWTH = 4 -- Per second
 local FREQUENCY = 40
 local DURATION_MIN = 0.1
 local DURATION_MAX = 1
@@ -21,7 +21,7 @@ CFCUlxCurse.RegisterEffect( {
         local amplitudeMax = AMPLITUDE_MAX
 
         timer.Create( HOOK_PREFIX .. "ShakeyShakey", INTERVAL_MIN, 0, function()
-            local amplitude = math.Rand( AMPLITUDE_MIN, AMPLITUDE_MAX )
+            local amplitude = math.Rand( amplitudeMin, amplitudeMax )
             local duration = math.Rand( DURATION_MIN, DURATION_MAX )
             local interval = math.Rand( INTERVAL_MIN, INTERVAL_MAX )
 
