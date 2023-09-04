@@ -1,6 +1,7 @@
 local EFFECT_NAME = "HealthScramble"
+local TICK_INTERVAL = 10 -- Only update once every x amount of ticks.
 local HEALTH_MIN = 1
-local HEALTH_MAX_MULT = 1.5
+local HEALTH_MAX_MULT = 2
 local ARMOR_MIN = 1
 local ARMOR_MAX_MULT = 1
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
@@ -14,7 +15,20 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
+        local tickCount = 1
+
         CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "TimeToGamble", function()
+            -- Only update once every x amount of ticks.
+            if TICK_INTERVAL ~= 1 then
+                if tickCount == TICK_INTERVAL then
+                    tickCount = 1
+                else
+                    tickCount = tickCount + 1
+
+                    return
+                end
+            end
+
             if not cursedPly:Alive() then return end
 
             local maxHealth = math.ceil( cursedPly:GetMaxHealth() * HEALTH_MAX_MULT )
