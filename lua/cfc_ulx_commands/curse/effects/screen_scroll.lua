@@ -4,9 +4,13 @@ local SPEED_MAX = 0.06
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
-local gameMat = CreateMaterial( "cfc_ulx_commands_curse_game_rt", "UnlitGeneric", {
-    ["$basetexture"] = "_rt_PowerOfTwoFB"
-} )
+local gameMat
+
+if CLIENT then
+    gameMat = CreateMaterial( "cfc_ulx_commands_curse_game_rt", "UnlitGeneric", {
+        ["$basetexture"] = "_rt_PowerOfTwoFB"
+    } )
+end
 
 
 CFCUlxCurse.RegisterEffect( {
