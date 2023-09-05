@@ -1,4 +1,4 @@
-local EFFECT_NAME = "InvertColors"
+local EFFECT_NAME = "InvertedColors"
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
