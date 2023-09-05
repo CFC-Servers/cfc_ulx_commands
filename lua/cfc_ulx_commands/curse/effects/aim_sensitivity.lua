@@ -1,6 +1,8 @@
 local EFFECT_NAME = "AimSensitivity"
-local SENSITIVITY_MULT_MIN = 0.25
-local SENSITIVITY_MULT_MAX = 2
+local SENSITIVITY_LOW_MULT_MIN = 0.25
+local SENSITIVITY_LOW_MULT_MAX = 0.5
+local SENSITIVITY_HIGH_MULT_MIN = 1.5
+local SENSITIVITY_HIGH_MULT_MAX = 3
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
@@ -10,7 +12,10 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function()
         if SERVER then return end
 
-        local sensitivityMult = math.Rand( SENSITIVITY_MULT_MIN, SENSITIVITY_MULT_MAX )
+        local useLowMult = math.random( 1, 2 ) == 1
+        local multMin = useLowMult and SENSITIVITY_LOW_MULT_MIN or SENSITIVITY_HIGH_MULT_MIN
+        local multMax = useLowMult and SENSITIVITY_LOW_MULT_MAX or SENSITIVITY_HIGH_MULT_MAX
+        local sensitivityMult = math.Rand( multMin, multMax )
 
         hook.Add( "AdjustMouseSensitivity", HOOK_PREFIX .. "LBozo", function()
             return sensitivityMult
