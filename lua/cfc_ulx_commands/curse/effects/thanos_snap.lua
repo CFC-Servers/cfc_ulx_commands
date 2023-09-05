@@ -16,6 +16,7 @@ if CLIENT then
 
     trySnap = function( ent )
         if not IsValid( ent ) then return end
+        if ent.PACPart then return end
         if ent:IsPlayer() then return end
         if ent:IsWeapon() then return end
         if ent:GetColor() == COLOR then return end
