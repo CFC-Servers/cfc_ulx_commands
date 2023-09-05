@@ -52,13 +52,14 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectData )
     ply.CFCUlxCurseEffectExpireTime = CurTime() + duration
 
     ProtectedCall( function()
-        effectData.onStart( ply )
+        effectData.onStart( ply, duration )
     end )
 
     addInflictedPlayer( ply )
 
     net.Start( "CFC_ULXCommands_Curse_StartEffect" )
     net.WriteString( effectData.name )
+    net.WriteFloat( duration )
     net.Send( ply )
 end
 

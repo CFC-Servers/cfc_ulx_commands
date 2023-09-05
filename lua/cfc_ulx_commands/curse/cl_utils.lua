@@ -6,9 +6,10 @@ net.Receive( "CFC_ULXCommands_Curse_StartEffect", function()
     if not effect then return end
 
     local ply = LocalPlayer()
+    local duration = net.ReadFloat()
 
     ply.CFCUlxCurseEffect = effect
-    effect.onStart( ply )
+    effect.onStart( ply, duration )
 end )
 
 net.Receive( "CFC_ULXCommands_Curse_EndEffect", function()
