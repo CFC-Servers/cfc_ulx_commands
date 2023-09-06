@@ -58,6 +58,8 @@ local function unball( ply )
     end
 
     ply.Ball = nil
+
+    hook.Run( "CFC_ULXCommands_Balls_OnBallEnded", ply )
 end
 
 local function ballify( ply, ball )
@@ -147,7 +149,11 @@ end
 function cmd.unball( callingPlayer, targetPlayers )
     for _, ply in ipairs( targetPlayers ) do
         if ply.Ball and ply.Ball:IsValid() then
-            unball( ply )
+            if hook.Run( "CFC_ULXCommands_Balls_CanUnball", ply ) == false then
+                ULib.tsayError( callingPlayer, "You cannot unball " .. ply:Nick() .. " at this time.", true )
+            else
+                unball( ply )
+            end
         end
     end
 
