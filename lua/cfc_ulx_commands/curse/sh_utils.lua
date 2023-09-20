@@ -11,13 +11,7 @@
 
 CFCUlxCurse = CFCUlxCurse or {}
 CFCUlxCurse.EffectGlobals = CFCUlxCurse.EffectGlobals or {} -- Effects can store global vars here, preferably in a subtable indexed by the effect's lowercase name.
-
 CFCUlxCurse.Effects = {}
-CFCUlxCurse.EFFECT_DURATION_MIN = 10 -- Default min duration for effects. Can be overridden per effect.
-CFCUlxCurse.EFFECT_DURATION_MAX = 30 -- Default max duration for effects. Can be overridden per effect.
-CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT = 3 -- Default duration multiplier for one-time effects. Can be overridden per effect.
-CFCUlxCurse.EFFECT_GAP_MIN = 10 -- Min gap between effects.
-CFCUlxCurse.EFFECT_GAP_MAX = 5 * 60 -- Max gap between effects.
 
 local effectNameToID = {}
 local onetimeEffectIDs = {}
