@@ -1,0 +1,11 @@
+{
+    "effectDurationMin": 10,
+    "effectDurationMax": 30,
+    "effectDurationOnetimeMult": 3,
+    "effectGapMin": 10,
+    "effectGapMax": 300,
+
+    "disabledEffects": {
+        "effect_file_name_without_extension": true
+    }
+}
