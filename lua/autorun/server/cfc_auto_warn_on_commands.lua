@@ -128,9 +128,9 @@ function AW.CommandWatcher( caller, commandName, args )
         duration = duration and duration * 60
     end
 
+    local warnReason = AW.buildReason( reason, commandName, duration )
     for _, target in ipairs( targets ) do
-        reason = AW.buildReason( reason, commandName, duration )
-        AW.warn( caller, target, reason )
+        AW.warn( caller, target, warnReason )
     end
 end
 
