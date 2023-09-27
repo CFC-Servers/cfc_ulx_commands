@@ -45,8 +45,8 @@ CFCUlxCurse.RegisterEffect( {
         cursedPly:SetFOV( 0 )
     end,
 
-    minDuration = nil,
-    maxDuration = nil,
+    minDuration = 20,
+    maxDuration = 40,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
 } )
