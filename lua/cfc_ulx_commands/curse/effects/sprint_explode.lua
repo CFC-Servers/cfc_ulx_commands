@@ -10,7 +10,7 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, "KeyPress", HOOK_PREFIX .. "Boom", function( ply, key )
             if ply ~= cursedPly then return end
-            if key ~= IN_RUN then return end
+            if key ~= IN_SPEED then return end
             if not ply:Alive() then return end
             if ply:HasGodMode() then return end
 
