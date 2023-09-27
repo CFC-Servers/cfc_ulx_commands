@@ -26,7 +26,7 @@ CFCUlxCurse.RegisterEffect( {
             local curPos = cursedPly:GetPos()
             local boxMin = cursedPly:OBBMins()
             local boxMax = cursedPly:OBBMaxs()
-            local traceStart = curPos + cursedPly:OBBCenter()
+            local traceStart = curPos
 
             local tr = util.TraceHull( {
                 start = traceStart,
