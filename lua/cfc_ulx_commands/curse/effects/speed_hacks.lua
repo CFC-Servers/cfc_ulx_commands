@@ -1,12 +1,12 @@
 local EFFECT_NAME = "SpeedHacks"
 local SPEED_UPDATE_INTERVAL = 0.05 -- Set to 0 to run on Think hook.
 local SPEED_OSCILLATION_RATE = 2
-local SPEED_MULT_MIN = 0.25
+local SPEED_MULT_MIN = 0.3
 local SPEED_MULT_MAX = 1.5
 local SPEED_MULT_SUPER = 20
-local SPEED_SUPER_CHANCE = 0.01
+local SPEED_SUPER_CHANCE = 0.005
 local SPEED_SUPER_DURATION = 0.4
-local SPEED_SUPER_COOLDOWN = 3
+local SPEED_SUPER_COOLDOWN = 5
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
