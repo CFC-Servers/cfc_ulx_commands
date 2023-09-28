@@ -1,8 +1,8 @@
 local EFFECT_NAME = "Jittery"
 local JITTER_INTERVAL = 0.05
 local JITTER_CHANCE = 1
-local JITTER_RADIUS_MIN = 0
-local JITTER_RADIUS_MAX = 15
+local JITTER_RADIUS_MIN = 3
+local JITTER_RADIUS_MAX = 20
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
