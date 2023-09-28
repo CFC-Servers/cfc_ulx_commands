@@ -86,8 +86,8 @@ CFCUlxCurse.RegisterEffect( {
         timer.Remove( HOOK_PREFIX .. "CheckLineOfSight" )
     end,
 
-    minDuration = nil,
-    maxDuration = nil,
+    minDuration = 30,
+    maxDuration = 90,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
 } )
