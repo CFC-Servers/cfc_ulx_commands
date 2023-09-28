@@ -4,7 +4,8 @@ local TRASH_SPAWN_HEIGHT_MAX = 650
 local TRASH_SPAWN_RADIUS_MIN = 0
 local TRASH_SPAWN_RADIUS_MAX = 150
 local TRASH_SPAWN_INTERVAL = 0.05
-local TRASH_SPAWN_CHANCE = 0.25
+local TRASH_SPAWN_CHANCE_MIN = 0.01
+local TRASH_SPAWN_CHANCE_MAX = 0.25
 local TRASH_MAX = 50
 local TRASH_VELOCITY_SPEED_MIN = 2000
 local TRASH_VELOCITY_SPEED_MAX = 2500
@@ -33,6 +34,7 @@ local TRASH_MODEL_COUNT = #TRASH_MODELS
 
 local trashEnts = {}
 local fadingTrashEnts = {}
+local trashSpawnChance = 0
 local spawnTrash
 local startFadingTrash
 local trySpawnTrash
@@ -44,6 +46,8 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function()
         if SERVER then return end
+
+        trashSpawnChance = math.Rand( TRASH_SPAWN_CHANCE_MIN, TRASH_SPAWN_CHANCE_MAX )
 
         timer.Create( HOOK_PREFIX .. "SpawnTrash", TRASH_SPAWN_INTERVAL, 0, trySpawnTrash )
         timer.Create( HOOK_PREFIX .. "UpdateTrash", TRASH_UPDATE_INTERVAL, 0, updateTrash )
@@ -129,7 +133,7 @@ startFadingTrash = function( ent )
 end
 
 trySpawnTrash = function()
-    if math.Rand( 0, 1 ) > TRASH_SPAWN_CHANCE then return end
+    if trashSpawnChance ~= 1 and math.Rand( 0, 1 ) > trashSpawnChance then return end
 
     spawnTrash()
 end
