@@ -27,7 +27,7 @@ if CLIENT then
             start = traceStart,
             endpos = traceStart + dir * CAM_DIST_MAX,
             filter = ply,
-            mask = MASK_VISIBLE_AND_NPCS,
+            mask = MASK_SHOT, -- Would use MASK_VISIBLE_AND_NPCS, but some opaque models have broken flags (such as models/hunter/blocks/cube4x4x1.mdl)
         } )
 
         camPos = tr.HitPos
@@ -66,7 +66,7 @@ CFCUlxCurse.RegisterEffect( {
             local tr = util.TraceLine( {
                 start = camPos,
                 endpos = cursedPly:GetShootPos(),
-                mask = MASK_VISIBLE_AND_NPCS,
+                mask = MASK_SHOT,
             } )
 
             if tr.Hit and tr.Entity ~= cursedPly then
