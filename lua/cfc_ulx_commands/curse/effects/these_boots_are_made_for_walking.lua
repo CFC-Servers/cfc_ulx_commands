@@ -16,7 +16,7 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function()
         if SERVER then return end
 
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
+        hook.Remove( "CreateMove", HOOK_PREFIX .. "AndThat'sJustWhatThey'llDo" )
     end,
 
     minDuration = nil,
