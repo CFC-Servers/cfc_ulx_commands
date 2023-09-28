@@ -7,6 +7,11 @@ local TRASH_SPAWN_INTERVAL = 0.05
 local TRASH_SPAWN_CHANCE_MIN = 0.01
 local TRASH_SPAWN_CHANCE_MAX = 0.25
 local TRASH_MAX = 50
+local TRASH_FLOOD_START_CHANCE = 0.0005
+local TRASH_FLOOD_SPAWN_CHANCE = 0.75
+local TRASH_FLOOD_DURATION_MIN = 0.5
+local TRASH_FLOOD_DURATION_MAX = 3
+local TRASH_FLOOD_COOLDOWN = 10
 local TRASH_VELOCITY_SPEED_MIN = 2000
 local TRASH_VELOCITY_SPEED_MAX = 2500
 local TRASH_VELOCITY_SPREAD = 10 -- In degrees 0-89.9
@@ -35,8 +40,10 @@ local TRASH_MODEL_COUNT = #TRASH_MODELS
 local trashEnts = {}
 local fadingTrashEnts = {}
 local trashSpawnChance = 0
+local trashCanFlood = true
 local spawnTrash
 local startFadingTrash
+local tryStartTrashFlood
 local trySpawnTrash
 local updateTrash
 
@@ -48,9 +55,13 @@ CFCUlxCurse.RegisterEffect( {
         if SERVER then return end
 
         trashSpawnChance = math.Rand( TRASH_SPAWN_CHANCE_MIN, TRASH_SPAWN_CHANCE_MAX )
+        trashCanFlood = true
 
-        timer.Create( HOOK_PREFIX .. "SpawnTrash", TRASH_SPAWN_INTERVAL, 0, trySpawnTrash )
         timer.Create( HOOK_PREFIX .. "UpdateTrash", TRASH_UPDATE_INTERVAL, 0, updateTrash )
+        timer.Create( HOOK_PREFIX .. "SpawnTrash", TRASH_SPAWN_INTERVAL, 0, function()
+            tryStartTrashFlood()
+            trySpawnTrash()
+        end )
     end,
 
     onEnd = function()
@@ -58,6 +69,8 @@ CFCUlxCurse.RegisterEffect( {
 
         timer.Remove( HOOK_PREFIX .. "SpawnTrash" )
         timer.Remove( HOOK_PREFIX .. "UpdateTrash" )
+        timer.Remove( HOOK_PREFIX .. "StopTrashFlood" )
+        timer.Remove( HOOK_PREFIX .. "TrashFloodCooldownFinished" )
 
         for i = #trashEnts, 1, -1 do
             local ent = trashEnts[i]
@@ -130,6 +143,24 @@ startFadingTrash = function( ent )
 
     table.RemoveByValue( trashEnts, ent )
     table.insert( fadingTrashEnts, ent )
+end
+
+tryStartTrashFlood = function()
+    if not trashCanFlood then return end
+    if TRASH_FLOOD_START_CHANCE == 0 or math.Rand( 0, 1 ) > TRASH_FLOOD_START_CHANCE then return end
+
+    local prevTrashSpawnChance = trashSpawnChance
+
+    trashCanFlood = false
+    trashSpawnChance = TRASH_FLOOD_SPAWN_CHANCE
+
+    timer.Create( HOOK_PREFIX .. "StopTrashFlood", math.Rand( TRASH_FLOOD_DURATION_MIN, TRASH_FLOOD_DURATION_MAX ), 1, function()
+        trashSpawnChance = prevTrashSpawnChance
+    end )
+
+    timer.Create( HOOK_PREFIX .. "TrashFloodCooldownFinished", TRASH_FLOOD_COOLDOWN, 1, function()
+        trashCanFlood = true
+    end )
 end
 
 trySpawnTrash = function()
