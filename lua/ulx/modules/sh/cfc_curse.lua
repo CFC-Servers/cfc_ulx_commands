@@ -19,8 +19,9 @@ function cmd.curse( ply, effectOverride, shouldUncurse )
     end
 end
 
-function cmd.silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
+function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse, isSilent )
     local effectOverride
+    isSilent = isSilent or false
 
     if type( effectName ) == "string" and effectName ~= "random" then
         effectOverride = CFCUlxCurse.GetEffectByName( effectName )
@@ -36,13 +37,6 @@ function cmd.silentCursePlayers( callingPlayer, targetPlayers, effectName, shoul
         cmd.curse( ply, effectOverride, shouldUncurse )
     end
 
-    return true
-end
-
-function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
-    local success = cmd.silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
-    if not success then return end
-
     local onetimeCursedPlayers = {}
     local longCursedPlayers = {}
 
@@ -56,11 +50,11 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
 
     if shouldUncurse then -- Uncurse
         if not table.IsEmpty( onetimeCursedPlayers ) then
-            ulx.fancyLogAdmin( callingPlayer, "#A lifted #T's brief curse", onetimeCursedPlayers )
+            ulx.fancyLogAdmin( callingPlayer, isSilent, "#A lifted #T's brief curse", onetimeCursedPlayers )
         end
 
         if not table.IsEmpty( longCursedPlayers ) then
-            ulx.fancyLogAdmin( callingPlayer, "#A delayed #T's next curse effect", longCursedPlayers )
+            ulx.fancyLogAdmin( callingPlayer, isSilent, "#A delayed #T's next curse effect", longCursedPlayers )
         end
     else
         if effectOverride then -- Manually selected effect
@@ -71,18 +65,23 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
             local effectPrettyName = effectOverride.nameUpper
 
             if not table.IsEmpty( combinedPlayers ) then
-                ulx.fancyLogAdmin( callingPlayer, "#A briefly cursed #T with " .. effectPrettyName, combinedPlayers )
+                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A briefly cursed #T with " .. effectPrettyName, combinedPlayers )
             end
         else -- Random effect
             if not table.IsEmpty( onetimeCursedPlayers ) then
-                ulx.fancyLogAdmin( callingPlayer, "#A briefly cursed #T", onetimeCursedPlayers )
+                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A briefly cursed #T", onetimeCursedPlayers )
             end
 
             if not table.IsEmpty( longCursedPlayers ) then
-                ulx.fancyLogAdmin( callingPlayer, "#A hastened #T's next curse effect", longCursedPlayers )
+                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A hastened #T's next curse effect", longCursedPlayers )
             end
         end
     end
+end
+
+
+local function silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
+    cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse, true )
 end
 
 
@@ -94,7 +93,7 @@ curseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 curseCommand:help( "Applies a one-time curse effect to target(s)" )
 curseCommand:setOpposite( "ulx uncurse", { _, _, _, true }, "!uncurse" )
 
-local silentCurseCommand = ulx.command( CATEGORY_NAME, "ulx scurse", cmd.silentCursePlayers, "!scurse" )
+local silentCurseCommand = ulx.command( CATEGORY_NAME, "ulx scurse", silentCursePlayers, "!scurse" )
 silentCurseCommand:addParam{ type = ULib.cmds.PlayersArg }
 silentCurseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
 silentCurseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
