@@ -19,7 +19,7 @@ function cmd.curse( ply, effectOverride, shouldUncurse )
     end
 end
 
-function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
+function cmd.silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
     local effectOverride
 
     if type( effectName ) == "string" and effectName ~= "random" then
@@ -35,6 +35,13 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
     for _, ply in ipairs( targetPlayers ) do
         cmd.curse( ply, effectOverride, shouldUncurse )
     end
+
+    return true
+end
+
+function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
+    local success = cmd.silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
+    if not success then return end
 
     local onetimeCursedPlayers = {}
     local longCursedPlayers = {}
@@ -78,6 +85,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
     end
 end
 
+
 local curseCommand = ulx.command( CATEGORY_NAME, "ulx curse", cmd.cursePlayers, "!curse" )
 curseCommand:addParam{ type = ULib.cmds.PlayersArg }
 curseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
@@ -85,3 +93,11 @@ curseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 curseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 curseCommand:help( "Applies a one-time curse effect to target(s)" )
 curseCommand:setOpposite( "ulx uncurse", { _, _, _, true }, "!uncurse" )
+
+local silentCurseCommand = ulx.command( CATEGORY_NAME, "ulx scurse", cmd.silentCursePlayers, "!scurse" )
+silentCurseCommand:addParam{ type = ULib.cmds.PlayersArg }
+silentCurseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
+silentCurseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
+silentCurseCommand:defaultAccess( ULib.ACCESS_ADMIN )
+silentCurseCommand:help( "Silently applies a one-time curse effect to target(s)" )
+silentCurseCommand:setOpposite( "ulx unscurse", { _, _, _, true }, "!unscurse" )
