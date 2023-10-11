@@ -21,7 +21,7 @@ CFCUlxCurse.RegisterEffect( {
             local fovMin = useHighFOV and FOV_HIGH_MIN or FOV_LOW_MIN
             local fovMax = useHighFOV and FOV_HIGH_MAX or FOV_LOW_MAX
 
-            cursedPly:SetFOV( math.Rand( fovMin, fovMax ) )
+            cursedPly:SetFOV( math.Rand( fovMin, fovMax ), 0, game.GetWorld() )
         end
 
         randomizeFOV()
@@ -42,7 +42,7 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function( cursedPly )
         if CLIENT then return end
 
-        cursedPly:SetFOV( 0 )
+        cursedPly:SetFOV( 0, 0, game.GetWorld() )
     end,
 
     minDuration = 20,
