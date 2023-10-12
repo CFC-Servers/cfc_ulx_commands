@@ -79,6 +79,7 @@ if CLIENT then
         if ent:IsPlayer() then return false end
         if ent:IsNPC() then return false end
         if ent:IsWeapon() then return false end
+        if ent:IsVehicle() then return false end
 
         return true
     end
