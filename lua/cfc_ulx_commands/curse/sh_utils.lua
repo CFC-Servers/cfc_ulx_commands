@@ -43,6 +43,9 @@ local onetimeEffectIDs = {}
             - If true, this effect will be excluded from the one-time effect draw pool (i.e. ulx curse command)
                 - They can still be called manually with CFCUlxCurse.ApplyCurseEffect().
             - If not specified, defaults to false.
+        blockCustomDuration: (optional) (boolean)
+            - If true, the duration of this effect cannot be manually overridden by the ulx curse command.
+            - If not specified, defaults to false.
 --]]
 function CFCUlxCurse.RegisterEffect( effectData )
     local nameUpper = effectData.name
