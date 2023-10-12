@@ -8,9 +8,43 @@ local LOS_DETECTION_INTERVAL = 0.1
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
+local IGNORE_CLASSES = {
+    -- HL2
+    crossbow_bolt = true,
+    prop_combine_ball = true,
+    npc_satchel = true,
+    npc_grenade_frag = true,
+    npc_grenade_bugbait = true,
+
+    -- M9K
+    m9k_proxy = true,
+    m9k_thrown_knife = true,
+    m9k_thrown_m61 = true,
+    m9k_thrown_sticky_grenade = true,
+    m9k_thrown_harpoon = true,
+    m9k_nervegasnade = true,
+    m9k_thrown_nitrox = true,
+    m9k_launched_flare = true,
+    m9k_m202_rocket = true,
+    m9k_launched_m79 = true,
+    m9k_ammo_matador_90mm = true,
+
+    -- CW2
+    ent_ins2rpgrocket = true,
+    cw_grenade_thrown = true,
+    cw_flash_thrown = true,
+    cw_smoke_thrown = true,
+    cw_40mm_explosive = true,
+
+    -- LFS
+    lunasflightschool_missile = true,
+}
+
 local camPos = Vector()
 local nextCamChangeTime = 0
+local localPly = nil
 local relocateCamera
+local traceFilter
 
 if CLIENT then
     relocateCamera = function()
@@ -19,14 +53,13 @@ if CLIENT then
 
         nextCamChangeTime = now + CAM_CHANGE_COOLDOWN
 
-        local ply = LocalPlayer()
         local dir = Angle( math.Rand( CAM_PITCH_MIN, CAM_PITCH_MAX ), math.Rand( -180, 180 ), 0 ):Forward()
-        local traceStart = ply:GetShootPos()
+        local traceStart = localPly:GetShootPos()
 
         local tr = util.TraceLine( {
             start = traceStart,
             endpos = traceStart + dir * CAM_DIST_MAX,
-            filter = ply,
+            filter = traceFilter,
             mask = MASK_SHOT, -- Would use MASK_VISIBLE_AND_NPCS, but some opaque models have broken flags (such as models/hunter/blocks/cube4x4x1.mdl)
         } )
 
@@ -35,6 +68,19 @@ if CLIENT then
         if tr.Hit then
             camPos = camPos + tr.HitNormal * CAM_HIT_PUSHBACK
         end
+    end
+
+    traceFilter = function( ent )
+        if ent == localPly then return false end
+        if not ent:IsValid() then return true end
+
+        local class = ent:GetClass()
+        if IGNORE_CLASSES[class] then return false end
+        if ent:IsPlayer() then return false end
+        if ent:IsNPC() then return false end
+        if ent:IsWeapon() then return false end
+
+        return true
     end
 end
 
@@ -49,6 +95,7 @@ CFCUlxCurse.RegisterEffect( {
             return
         end
 
+        localPly = LocalPlayer()
         relocateCamera()
 
         hook.Add( "CalcView", HOOK_PREFIX .. "FunnyCam", function( ply, _, _, fov )
@@ -66,6 +113,7 @@ CFCUlxCurse.RegisterEffect( {
             local tr = util.TraceLine( {
                 start = camPos,
                 endpos = cursedPly:GetShootPos(),
+                filter = traceFilter,
                 mask = MASK_SHOT,
             } )
 
