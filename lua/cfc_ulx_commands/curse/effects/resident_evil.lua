@@ -1,5 +1,6 @@
 local EFFECT_NAME = "ResidentEvil"
 local CAM_DIST_MAX = 1000
+local CAM_FORCE_CHANGE_DIST = 3000
 local CAM_PITCH_MIN = -30 -- Note that pitch is backwards, so this is pointing upwards.
 local CAM_PITCH_MAX = 0 -- Note that pitch is backwards, so this is pointing downwards.
 local CAM_HIT_PUSHBACK = 10 -- Moves the camera away from walls.
@@ -8,6 +9,7 @@ local LOS_DETECTION_INTERVAL = 0.1
 local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
+local CAM_FORCE_CHANGE_DIST_SQR = CAM_FORCE_CHANGE_DIST ^ 2
 local IGNORE_CLASSES = {
     -- HL2
     crossbow_bolt = true,
@@ -124,9 +126,18 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         timer.Create( HOOK_PREFIX .. "CheckLineOfSight", LOS_DETECTION_INTERVAL, 0, function()
+            local startPos = camPos
+            local endPos = localPly:GetShootPos()
+
+            if startPos:DistToSqr( endPos ) > CAM_FORCE_CHANGE_DIST_SQR then
+                relocateCamera()
+
+                return
+            end
+
             local tr = util.TraceLine( {
-                start = camPos,
-                endpos = cursedPly:GetShootPos(),
+                start = startPos,
+                endpos = endPos,
                 filter = traceFilter,
                 mask = MASK_SHOT,
             } )
