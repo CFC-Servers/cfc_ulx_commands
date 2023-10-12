@@ -92,6 +92,19 @@ CFCUlxCurse.RegisterEffect( {
         if SERVER then
             cursedPly:CrosshairDisable()
 
+            local function enforceDisableCrosshair( ply )
+                if ply ~= cursedPly then return end
+
+                ply:CrosshairDisable()
+
+                CFCUlxCurse.CreateEffectTimer( ply, HOOK_PREFIX .. "DisableCrosshair", 0, 1, function()
+                    ply:CrosshairDisable()
+                end )
+            end
+
+            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSpawn", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
+            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerLeaveVehicle", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
+
             return
         end
 
