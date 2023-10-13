@@ -9,17 +9,17 @@ do -- Load curse effects
 end
 
 
-function cmd.curse( ply, effectOverride, shouldUncurse )
+function cmd.curse( ply, effectOverride, durationSeconds, shouldUncurse )
     if shouldUncurse then
         CFCUlxCurse.StopCurseEffect( ply )
     else
         local effect = effectOverride or CFCUlxCurse.GetRandomOnetimeEffect()
 
-        CFCUlxCurse.ApplyCurseEffect( ply, effect )
+        CFCUlxCurse.ApplyCurseEffect( ply, effect, durationSeconds )
     end
 end
 
-function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse, isSilent )
+function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMinutes, shouldUncurse, isSilent )
     local effectOverride
     isSilent = isSilent or false
 
@@ -33,8 +33,10 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
         end
     end
 
+    local durationSeconds = durationMinutes and durationMinutes * 60 or 0
+
     for _, ply in ipairs( targetPlayers ) do
-        cmd.curse( ply, effectOverride, shouldUncurse )
+        cmd.curse( ply, effectOverride, durationSeconds, shouldUncurse )
     end
 
     local onetimeCursedPlayers = {}
@@ -57,6 +59,19 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
             ulx.fancyLogAdmin( callingPlayer, isSilent, "#A delayed #T's next curse effect", longCursedPlayers )
         end
     else
+        local hasCustomDuration = durationSeconds > 0 and ( not effectOverride or not effectOverride.blockCustomDuration )
+        local durationAppend = ""
+        local briefly = " briefly"
+
+        if hasCustomDuration then
+            local durationStr = durationSeconds >= 60 and
+                ULib.secondsToStringTime( durationSeconds ) or
+                math.Round( durationSeconds ) .. " seconds"
+
+            durationAppend = " for " .. durationStr
+            briefly = ""
+        end
+
         if effectOverride then -- Manually selected effect
             local combinedPlayers = {}
             table.Add( combinedPlayers, onetimeCursedPlayers )
@@ -65,11 +80,11 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
             local effectPrettyName = effectOverride.nameUpper
 
             if not table.IsEmpty( combinedPlayers ) then
-                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A briefly cursed #T with " .. effectPrettyName, combinedPlayers )
+                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " cursed #T with " .. effectPrettyName .. durationAppend, combinedPlayers )
             end
         else -- Random effect
             if not table.IsEmpty( onetimeCursedPlayers ) then
-                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A briefly cursed #T", onetimeCursedPlayers )
+                ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " cursed #T" .. durationAppend, onetimeCursedPlayers )
             end
 
             if not table.IsEmpty( longCursedPlayers ) then
@@ -80,23 +95,25 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncur
 end
 
 
-local function silentCursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse )
-    cmd.cursePlayers( callingPlayer, targetPlayers, effectName, shouldUncurse, true )
+local function silentCursePlayers( callingPlayer, targetPlayers, effectName, durationMinutes, shouldUncurse )
+    cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMinutes, shouldUncurse, true )
 end
 
 
 local curseCommand = ulx.command( CATEGORY_NAME, "ulx curse", cmd.cursePlayers, "!curse" )
 curseCommand:addParam{ type = ULib.cmds.PlayersArg }
 curseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
+curseCommand:addParam{ type = ULib.cmds.NumArg, min = 0, max = 24 * 60, default = 0, ULib.cmds.optional, ULib.cmds.allowTimeString, hint = "duration" }
 curseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 curseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 curseCommand:help( "Applies a one-time curse effect to target(s)" )
-curseCommand:setOpposite( "ulx uncurse", { _, _, _, true }, "!uncurse" )
+curseCommand:setOpposite( "ulx uncurse", { _, _, _, _, true }, "!uncurse" )
 
 local silentCurseCommand = ulx.command( CATEGORY_NAME, "ulx scurse", silentCursePlayers, "!scurse" )
 silentCurseCommand:addParam{ type = ULib.cmds.PlayersArg }
 silentCurseCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional, completes = CFCUlxCurse.GetEffectNames() }
+silentCurseCommand:addParam{ type = ULib.cmds.NumArg, min = 0, max = 24 * 60, default = 0, ULib.cmds.optional, ULib.cmds.allowTimeString, hint = "duration" }
 silentCurseCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
 silentCurseCommand:defaultAccess( ULib.ACCESS_ADMIN )
 silentCurseCommand:help( "Silently applies a one-time curse effect to target(s)" )
-silentCurseCommand:setOpposite( "ulx unscurse", { _, _, _, true }, "!unscurse" )
+silentCurseCommand:setOpposite( "ulx unscurse", { _, _, _, _, true }, "!unscurse" )

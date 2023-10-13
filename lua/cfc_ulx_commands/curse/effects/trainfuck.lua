@@ -17,4 +17,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 1,
     onetimeDurationMult = 1,
     excludeFromOnetime = true,
+    blockCustomDuration = true,
 } )

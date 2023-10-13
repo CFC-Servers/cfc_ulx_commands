@@ -37,16 +37,22 @@ end
 --[[
     - Apply a curse effect to a player.
     - If the player is not cursed, this will apply as a one-time effect.
+    - duration, if provided, is in seconds.
 --]]
-function CFCUlxCurse.ApplyCurseEffect( ply, effectData )
+function CFCUlxCurse.ApplyCurseEffect( ply, effectData, duration )
     CFCUlxCurse.StopCurseEffect( ply )
     ply.CFCUlxCurseNextEffectTime = nil
 
-    local isOnetime = not CFCUlxCurse.IsCursed( ply )
-    local minDuration = effectData.minDuration or CFCUlxCurse.EFFECT_DURATION_MIN
-    local maxDuration = effectData.maxDuration or CFCUlxCurse.EFFECT_DURATION_MAX
-    local durationMult = isOnetime and ( effectData.onetimeDurationMult or CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT ) or 1
-    local duration = math.Rand( minDuration, maxDuration ) * durationMult
+    local randomizeDuration = not duration or duration <= 0 or effectData.blockCustomDuration
+
+    if randomizeDuration then
+        local isOnetime = not CFCUlxCurse.IsCursed( ply )
+        local minDuration = effectData.minDuration or CFCUlxCurse.EFFECT_DURATION_MIN
+        local maxDuration = effectData.maxDuration or CFCUlxCurse.EFFECT_DURATION_MAX
+        local durationMult = isOnetime and ( effectData.onetimeDurationMult or CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT ) or 1
+
+        duration = math.Rand( minDuration, maxDuration ) * durationMult
+    end
 
     ply.CFCUlxCurseEffect = effectData
     ply.CFCUlxCurseEffectExpireTime = CurTime() + duration
