@@ -54,7 +54,7 @@ CFCUlxCurse.RegisterEffect( {
             if not cursedPly:Alive() then return end
 
             local vel = cursedPly:GetVelocity()
-            vel[3] = 0
+            rawset( vel, 3, 0 )
 
             if vel == VECTOR_ZERO then return end
 
