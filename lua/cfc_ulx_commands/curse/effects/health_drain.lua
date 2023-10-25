@@ -14,20 +14,20 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
-            CFCUlxCurse.StopCurseEffect( cursedPly )
+            CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSilentDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
-            CFCUlxCurse.StopCurseEffect( cursedPly )
+            CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Drain", DRAIN_INTERVAL, 0, function()
             if not IsValid( cursedPly ) then return end
 
             if not cursedPly:Alive() then
-                CFCUlxCurse.StopCurseEffect( cursedPly )
+                CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
 
                 return
             end
@@ -36,7 +36,7 @@ CFCUlxCurse.RegisterEffect( {
 
             if newHealth == 0 then
                 cursedPly:KillSilent()
-                CFCUlxCurse.StopCurseEffect( cursedPly )
+                CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
 
                 return
             end

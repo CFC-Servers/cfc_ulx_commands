@@ -13,7 +13,11 @@ if SERVER then
     end
 
     local function disable( ply )
-        CFCUlxCurse.StopCurseEffect( ply )
+        local timedEffectName = ply.CFCUlxCurseCurrentTimedCurseName
+
+        if timedEffectName then
+            CFCUlxCurse.StopCurseEffect( ply, timedEffectName )
+        end
     end
 
     TimedPunishments.Register( PUNISHMENT, enable, disable )

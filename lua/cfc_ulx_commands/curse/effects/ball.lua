@@ -17,7 +17,7 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CFC_ULXCommands_Balls_OnBallEnded", "StopEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
-            CFCUlxCurse.StopCurseEffect( ply )
+            CFCUlxCurse.StopCurseEffect( ply, EFFECT_NAME )
         end )
 
         CFCUlxCommands.ball.ball( cursedPly, { cursedPly } )
