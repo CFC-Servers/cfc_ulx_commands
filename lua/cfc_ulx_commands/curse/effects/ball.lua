@@ -26,7 +26,7 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.RemoveEffectHooks( cursedPly ) -- Remove hooks first, otherwise the unball will be blocked.
+        CFCUlxCurse.RemoveEffectHooks( cursedPly, EFFECT_NAME ) -- Remove hooks first, otherwise the unball will be blocked.
 
         if not cursedPly.Ball then return end
 
