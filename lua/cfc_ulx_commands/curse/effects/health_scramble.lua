@@ -17,7 +17,7 @@ CFCUlxCurse.RegisterEffect( {
 
         local tickCount = 1
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "TimeToGamble", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "TimeToGamble", function()
             -- Only update once every x amount of ticks.
             if TICK_INTERVAL ~= 1 then
                 if tickCount == TICK_INTERVAL then

@@ -19,7 +19,7 @@ CFCUlxCurse.RegisterEffect( {
             return
         end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
 
         -- Respawn the player if they are outside of the world.
         if not util.IsInWorld( cursedPly:GetPos() ) then

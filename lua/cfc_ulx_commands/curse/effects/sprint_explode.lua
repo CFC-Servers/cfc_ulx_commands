@@ -8,7 +8,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "KeyPress", HOOK_PREFIX .. "Boom", function( ply, key )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "KeyPress", "Boom", function( ply, key )
             if ply ~= cursedPly then return end
             if key ~= IN_SPEED then return end
             if not ply:Alive() then return end

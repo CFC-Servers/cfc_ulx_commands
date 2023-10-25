@@ -105,8 +105,8 @@ CFCUlxCurse.RegisterEffect( {
                 end )
             end
 
-            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSpawn", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
-            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerLeaveVehicle", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "DisableCrosshair", enforceDisableCrosshair )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerLeaveVehicle", "DisableCrosshair", enforceDisableCrosshair )
 
             return
         end

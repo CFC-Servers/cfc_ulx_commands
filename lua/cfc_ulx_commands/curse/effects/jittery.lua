@@ -15,7 +15,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "Teleport", JITTER_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Teleport", JITTER_INTERVAL, 0, function()
             if JITTER_CHANCE ~= 1 and math.Rand( 0, 1 ) > JITTER_CHANCE then return end
 
             local theta = math.Rand( 0, PI_DOUBLE )

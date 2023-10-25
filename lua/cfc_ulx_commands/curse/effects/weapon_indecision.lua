@@ -15,7 +15,7 @@ CFCUlxCurse.RegisterEffect( {
             return
         end
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "SelectWeapon", INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SelectWeapon", INTERVAL, 0, function()
             if not IsValid( cursedPly ) then return end
 
             local weps = cursedPly:GetWeapons()

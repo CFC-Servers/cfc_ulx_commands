@@ -9,7 +9,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "Punch", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Punch", function()
             local ang = Angle(
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),

@@ -94,9 +94,9 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         if SPEED_UPDATE_INTERVAL <= 0 then
-            CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "GottaGoFastnt", updateSpeed )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "GottaGoFastnt", updateSpeed )
         else
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "GottaGoFastnt", SPEED_UPDATE_INTERVAL, 0, updateSpeed )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "GottaGoFastnt", SPEED_UPDATE_INTERVAL, 0, updateSpeed )
         end
     end,
 

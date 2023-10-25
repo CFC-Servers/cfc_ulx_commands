@@ -34,22 +34,22 @@ CFCUlxCurse.RegisterEffect( {
 
         cursedPly:SetFriction( FRICTION_MULT )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSpawn", HOOK_PREFIX .. "SetFriction", function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "SetFriction", function( ply )
             if ply ~= cursedPly then return end
 
             ply:SetFriction( FRICTION_MULT )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "GottaGoFast", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "GottaGoFast", function()
             local dt = FrameTime()
             local curVel = cursedPly:GetVelocity()
 
             cursedPly:SetVelocity( curVel * VELOCITY_MULT * dt )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "WallsArePainful", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "WallsArePainful", function()
             if not canWallDamage then return end
             if not cursedPly:Alive() then return end
 
@@ -82,12 +82,12 @@ CFCUlxCurse.RegisterEffect( {
             cursedPly:TakeDamage( impactDamage, game.GetWorld(), DMG_CRUSH )
             cursedPly:EmitSound( "physics/body/body_medium_impact_hard" .. math.random( 1, 6 ) .. ".wav" )
 
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "WallDamageCooldownFinished", WALL_DAMAGE_COOLDOWN, 1, function()
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "WallDamageCooldownFinished", WALL_DAMAGE_COOLDOWN, 1, function()
                 canWallDamage = true
             end )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "EntityTakeDamage", HOOK_PREFIX .. "OwMyBones", function( victim, dmgInfo )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "EntityTakeDamage", "OwMyBones", function( victim, dmgInfo )
             if victim ~= cursedPly then return end
             if not dmgInfo:IsFallDamage() then return end
 

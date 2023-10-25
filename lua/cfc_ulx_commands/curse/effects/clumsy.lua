@@ -36,12 +36,12 @@ CFCUlxCurse.RegisterEffect( {
 
             local ragdollDuration = math.Rand( RAGDOLL_DURATION_MIN, RAGDOLL_DURATION_MAX )
 
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "Unragdoll", ragdollDuration, 1, function()
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Unragdoll", ragdollDuration, 1, function()
                 tryUnragdoll( cursedPly )
 
                 local ragdollGap = math.Rand( RAGDOLL_GAP_MIN, RAGDOLL_GAP_MAX )
 
-                CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "NextRagdoll", ragdollGap, 1, briefRagdoll )
+                CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "NextRagdoll", ragdollGap, 1, briefRagdoll )
             end )
         end
 

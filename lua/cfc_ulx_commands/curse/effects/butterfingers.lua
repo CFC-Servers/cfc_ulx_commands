@@ -10,7 +10,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "KeyPress", HOOK_PREFIX .. "DropWeapon", function( ply, key )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "KeyPress", "DropWeapon", function( ply, key )
             if ply ~= cursedPly then return end
             if key ~= IN_ATTACK and key ~= IN_ATTACK2 then return end
             if math.Rand( 0, 1 ) > DROP_CHANCE_ON_CLICK then return end
@@ -21,7 +21,7 @@ CFCUlxCurse.RegisterEffect( {
             ply:DropWeapon( wep )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "EntityFireBullets", HOOK_PREFIX .. "DropWeapon", function( ent )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "EntityFireBullets", "DropWeapon", function( ent )
             if ent ~= cursedPly then return end
             if math.Rand( 0, 1 ) > DROP_CHANCE_ON_BULLET then return end
 

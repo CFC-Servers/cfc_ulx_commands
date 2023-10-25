@@ -13,15 +13,14 @@ CFCUlxCurse.RegisterEffect( {
         if CLIENT then return end
 
         local vel = Vector( 0, 0, 10 )
-        local timerNameEff = HOOK_PREFIX .. "ChangeVelocity" .. "_" .. cursedPly:SteamID64()
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "GetYoinked", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "GetYoinked", function()
             if not IsValid( cursedPly ) then return end
 
             cursedPly:SetVelocity( vel )
         end )
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "ChangeVelocity", INTERVAL_MIN, 0, function()
+        local timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ChangeVelocity", INTERVAL_MIN, 0, function()
             vel = Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), math.Rand( -1, 1 ) ) * math.Rand( SPEED_MIN, SPEED_MAX )
             timer.Adjust( timerNameEff, math.Rand( INTERVAL_MIN, INTERVAL_MAX ) )
         end )

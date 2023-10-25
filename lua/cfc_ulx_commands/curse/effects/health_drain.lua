@@ -11,19 +11,19 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerDeath", HOOK_PREFIX .. "EndEffectEarly", function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
             CFCUlxCurse.StopCurseEffect( cursedPly )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSilentDeath", HOOK_PREFIX .. "EndEffectEarly", function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSilentDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
             CFCUlxCurse.StopCurseEffect( cursedPly )
         end )
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "Drain", DRAIN_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Drain", DRAIN_INTERVAL, 0, function()
             if not IsValid( cursedPly ) then return end
 
             if not cursedPly:Alive() then

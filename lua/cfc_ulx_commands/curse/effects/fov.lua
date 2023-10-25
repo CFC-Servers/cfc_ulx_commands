@@ -35,7 +35,7 @@ CFCUlxCurse.RegisterEffect( {
             local delaySpread = mcGap * MULTI_CHANGE_TIMING_SPREAD * math.Rand( -1, 1 )
             local delay = mcGap * i + delaySpread
 
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "MultiChange_" .. i, delay, 1, randomizeFOV )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "MultiChange_" .. i, delay, 1, randomizeFOV )
         end
     end,
 
