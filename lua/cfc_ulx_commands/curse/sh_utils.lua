@@ -267,7 +267,8 @@ function CFCUlxCurse.CanPlayerReceiveEffect( ply, effectDataOrName )
     local incomingName = CFCUlxCurse.GetEffectName( effectDataOrName )
     local curEffects = CFCUlxCurse.GetCurrentEffects( ply )
 
-    if table.IsEmpty( curEffects ) then return true end
+    if curEffects[incomingName] then return true end -- Effect is already active
+    if table.IsEmpty( curEffects ) then return true end -- Player has no active effects
 
     local incomingIncompats = CFCUlxCurse.EffectIncompatibilities[incomingName]
     if incomingIncompats.all then return false end
