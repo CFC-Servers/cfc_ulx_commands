@@ -3,7 +3,6 @@ local SPEED_MIN = 10
 local SPEED_MAX = 75
 local INTERVAL_MIN = 0.05
 local INTERVAL_MAX = 2
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -20,7 +19,8 @@ CFCUlxCurse.RegisterEffect( {
             cursedPly:SetVelocity( vel )
         end )
 
-        local timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ChangeVelocity", INTERVAL_MIN, 0, function()
+        local timerNameEff
+        timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ChangeVelocity", INTERVAL_MIN, 0, function()
             vel = Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), math.Rand( -1, 1 ) ) * math.Rand( SPEED_MIN, SPEED_MAX )
             timer.Adjust( timerNameEff, math.Rand( INTERVAL_MIN, INTERVAL_MAX ) )
         end )

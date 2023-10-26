@@ -1,7 +1,6 @@
 local EFFECT_NAME = "EntMagnet"
 local PULL_STRENGTH = 5 * 10^7
 local PULL_ACCELERATION_MAX = 5000
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local mathMin = math.min
@@ -13,7 +12,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "Think", HOOK_PREFIX .. "Reposition", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Reposition", function()
             local plyPos = cursedPly:GetPos() + cursedPly:OBBCenter()
             local dt = FrameTime()
 
@@ -37,14 +36,15 @@ CFCUlxCurse.RegisterEffect( {
         end )
     end,
 
-    onEnd = function()
+    onEnd = function( cursedPly )
         if SERVER then return end
 
         for _, ent in ipairs( ents.GetAll() ) do
             ent.CFCUlxCurseMagnetVel = nil
         end
 
-        hook.Remove( "Think", HOOK_PREFIX .. "Reposition" )
+        -- Ensure nothing is altered while receiving the game update
+        CFCUlxCurse.RemoveEffectHook( cursedPly, EFFECT_NAME, "Think", "Reposition" )
 
         -- Force a full game update
         RunConsoleCommand( "record", "fix" )

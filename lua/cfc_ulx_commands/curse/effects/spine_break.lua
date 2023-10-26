@@ -1,15 +1,14 @@
 local EFFECT_NAME = "SpineBreak"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
         local realAng
-        hook.Add( "CreateMove", HOOK_PREFIX .. "LBozo", function( cmd )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
             if not realAng then
                 realAng = cmd:GetViewAngles()
             end
@@ -23,9 +22,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
+        -- Do nothing.
     end,
 
     minDuration = 30,

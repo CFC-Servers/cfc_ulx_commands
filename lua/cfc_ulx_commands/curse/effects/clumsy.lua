@@ -3,7 +3,6 @@ local RAGDOLL_GAP_MIN = 0.5
 local RAGDOLL_GAP_MAX = 4
 local RAGDOLL_DURATION_MIN = 0.25
 local RAGDOLL_DURATION_MAX = 1
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local tryRagdoll

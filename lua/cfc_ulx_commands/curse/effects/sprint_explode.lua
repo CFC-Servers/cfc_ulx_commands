@@ -1,5 +1,4 @@
 local EFFECT_NAME = "SprintExplode"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {

@@ -1,17 +1,16 @@
 local EFFECT_NAME = "RotatedControls"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
         local mode = math.random( 1, 2 ) -- CLockwise or counter-clockwise
         local moveAmount = ( mode == 1 and 1 or -1 ) * 10000
 
-        hook.Add( "CreateMove", HOOK_PREFIX .. "LBozo", function( cmd )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
             cmd:SetForwardMove( 0 )
             cmd:SetSideMove( 0 )
 
@@ -30,9 +29,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
+        -- Do nothing.
     end,
 
     minDuration = nil,

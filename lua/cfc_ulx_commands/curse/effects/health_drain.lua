@@ -1,6 +1,6 @@
 local EFFECT_NAME = "HealthDrain"
 local DRAIN_RATE = 5 -- Health lost per second.
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
+
 
 local DRAIN_INTERVAL = 1 / DRAIN_RATE
 

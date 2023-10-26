@@ -1,11 +1,8 @@
-
-
 local EFFECT_NAME = "Blindness"
 local FOG_START = 800
 local FOG_END = 700
 local FOG_START_MULT = -100
 local FOG_DENSITY = 1.999
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local function doFog( scale )
@@ -24,23 +21,19 @@ end
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "SetupWorldFog", HOOK_PREFIX .. "DoFog", doFog )
-        hook.Add( "SetupSkyboxFog", HOOK_PREFIX .. "DoFog", doFog )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupWorldFog", "DoFog", doFog )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupSkyboxFog", "DoFog", doFog )
 
-        hook.Add( "PreDrawSkyBox", HOOK_PREFIX .. "RemoveSkybox", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawSkyBox", "RemoveSkybox", function()
             return true
         end )
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "SetupWorldFog", HOOK_PREFIX .. "DoFog" )
-        hook.Remove( "SetupSkyboxFog", HOOK_PREFIX .. "DoFog" )
-        hook.Remove( "PreDrawSkyBox", HOOK_PREFIX .. "RemoveSkybox" )
+        -- Do nothing.
     end,
 
     minDuration = nil,

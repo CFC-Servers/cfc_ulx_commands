@@ -1,6 +1,5 @@
 local EFFECT_NAME = "ViewPummel"
 local PUNCH_STRENGTH = 4
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {

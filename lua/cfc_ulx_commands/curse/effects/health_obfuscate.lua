@@ -1,5 +1,4 @@
 local EFFECT_NAME = "HealthObfuscate"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 --[[
     - Randomizes displayed health every frame by drawing a fake HUD element.
@@ -10,8 +9,9 @@ local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local COLOR_BACKGROUND = Color( 0, 0, 0, 76 )
-local HEALTH_LABEL_FONT = HOOK_PREFIX .. "HealthLabel"
-local HEALTH_NUMBER_FONT = HOOK_PREFIX .. "HealthNumbers"
+local NAME_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
+local HEALTH_LABEL_FONT = NAME_PREFIX .. "HealthLabel"
+local HEALTH_NUMBER_FONT = NAME_PREFIX .. "HealthNumbers"
 
 if CLIENT then
     --[[
@@ -38,14 +38,14 @@ end
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "HUDShouldDraw", HOOK_PREFIX .. "HideBaseHealthDisplay", function( name )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDShouldDraw", "HideBaseHealthDisplay", function( name )
             if name == "CHudHealth" then return false end
         end )
 
-        hook.Add( "HUDPaint", HOOK_PREFIX .. "FakeHealthDisplay", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDPaint", "FakeHealthDisplay", function()
             if not LocalPlayer():Alive() then return end
 
             local fakeHealth = math.random( 1, LocalPlayer():GetMaxHealth() )
@@ -69,10 +69,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "HUDShouldDraw", HOOK_PREFIX .. "HideBaseHealthDisplay" )
-        hook.Remove( "HUDPaint", HOOK_PREFIX .. "FakeHealthDisplay" )
+        -- Do nothing.
     end,
 
     minDuration = nil,

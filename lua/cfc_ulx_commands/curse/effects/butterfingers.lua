@@ -1,7 +1,6 @@
 local EFFECT_NAME = "Butterfingers"
 local DROP_CHANCE_ON_CLICK = 0.1
 local DROP_CHANCE_ON_BULLET = 0.05
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {

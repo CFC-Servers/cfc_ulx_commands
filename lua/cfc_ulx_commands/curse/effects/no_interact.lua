@@ -1,14 +1,13 @@
 local EFFECT_NAME = "NoInteract"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "CreateMove", HOOK_PREFIX .. "LBozo", function( cmd )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
             cmd:RemoveKey( IN_ATTACK )
             cmd:RemoveKey( IN_ATTACK2 )
             cmd:RemoveKey( IN_RELOAD )
@@ -17,9 +16,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
+        -- Do nothing.
     end,
 
     minDuration = 5,

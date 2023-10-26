@@ -5,13 +5,12 @@ local MULTI_CHANGE_CHANCE = 0.5 -- Chance to start doing multi-changes.
 local MULTI_CHANGE_AMOUNT_MIN = 1 -- Minimum amount of additional times to change the offset, if the initial chance triggers.
 local MULTI_CHANGE_AMOUNT_MAX = 3 -- Same as above, but maximum.
 local MULTI_CHANGE_TIMING_SPREAD = 0.15 -- Timings for each multi-change will be offset by +/- this percentage of the multi-change gap. This value should be between 0 and 0.5.
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function( _, curseDuration )
+    onStart = function( cursedPly, curseDuration )
         if SERVER then return end
 
         local offsetAng
@@ -30,7 +29,7 @@ CFCUlxCurse.RegisterEffect( {
 
         randomizeOffset()
 
-        hook.Add( "CreateMove", HOOK_PREFIX .. "LBozo", function( cmd )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
             local isClient = cmd:CommandNumber() == 0
 
             if not realAng then
@@ -57,18 +56,12 @@ CFCUlxCurse.RegisterEffect( {
             local delaySpread = mcGap * MULTI_CHANGE_TIMING_SPREAD * math.Rand( -1, 1 )
             local delay = mcGap * i + delaySpread
 
-            timer.Create( HOOK_PREFIX .. "MultiChange_" .. i, delay, 1, randomizeOffset )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "MultiChange_" .. i, delay, 1, randomizeOffset )
         end
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "LBozo" )
-
-        for i = 1, MULTI_CHANGE_AMOUNT_MAX do
-            timer.Remove( HOOK_PREFIX .. "MultiChange_" .. i )
-        end
+        -- Do nothing.
     end,
 
     minDuration = 30,

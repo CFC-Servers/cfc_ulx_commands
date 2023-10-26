@@ -1,5 +1,4 @@
 local EFFECT_NAME = "DisableNoclip"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -14,7 +13,7 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         if CLIENT then
-            hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
 
             return
         end
@@ -28,9 +27,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if CLIENT then
-            hook.Remove( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip" )
-        end
+        -- Do nothing.
     end,
 
     minDuration = nil,

@@ -4,7 +4,7 @@ local HEALTH_MIN = 1
 local HEALTH_MAX_MULT = 2
 local ARMOR_MIN = 1
 local ARMOR_MAX_MULT = 1
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
+
 -- Similar in concept to HealthObfuscate, but actually changes the values serverside.
 -- Also affects armor, if the player has any.
 

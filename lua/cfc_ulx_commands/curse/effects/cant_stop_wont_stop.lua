@@ -7,7 +7,6 @@ local WALL_DAMAGE_THRESHOLD = 5 -- Don't count a wall damage event unless it doe
 local WALL_DAMAGE_COOLDOWN = 0.5
 local WALL_DETECTION_LENGTH = 20
 local WALL_DETECTION_HULL_MULT = Vector( 1, 1, 0.75 / 2 )
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local VECTOR_ZERO = Vector()
@@ -25,7 +24,7 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         if CLIENT then
-            hook.Add( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip", blockNoclip )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
 
             return
         end
@@ -103,11 +102,7 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function( cursedPly )
-        if CLIENT then
-            hook.Remove( "PlayerNoClip", HOOK_PREFIX .. "BlockNoclip" )
-
-            return
-        end
+        if CLIENT then return end
 
         cursedPly:SetFriction( 1 )
     end,

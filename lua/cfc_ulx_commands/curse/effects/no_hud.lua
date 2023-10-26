@@ -1,22 +1,19 @@
 local EFFECT_NAME = "NoHud"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "HUDShouldDraw", HOOK_PREFIX .. "NoHudPls", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDShouldDraw", "NoHudPls", function()
             return false
         end )
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "HUDShouldDraw", HOOK_PREFIX .. "NoHudPls" )
+        -- Do nothing.
     end,
 
     minDuration = nil,
