@@ -25,8 +25,8 @@ local function removeInflictedPlayer( ply )
 end
 
 
--- Returns true if the player is currently cursed.
-function CFCUlxCurse.IsCursed( ply )
+-- Returns true if the player is currently time cursed.
+function CFCUlxCurse.IsTimeCursed( ply )
     if not ply.TimedPunishments then return false end
 
     return ply.TimedPunishments.timedcurse ~= nil
@@ -51,7 +51,7 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectDataOrName, duration )
 
     CFCUlxCurse.StopCurseEffect( ply, effectName )
 
-    if CFCUlxCurse.IsCursed( ply ) and ply.CFCUlxCurseCurrentTimedCurseName == nil then
+    if CFCUlxCurse.IsTimeCursed( ply ) and ply.CFCUlxCurseCurrentTimedCurseName == nil then
         ply.CFCUlxCurseCurrentTimedCurseName = effectName
         ply.CFCUlxCurseNextEffectTime = nil
     end
@@ -59,7 +59,7 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectDataOrName, duration )
     local randomizeDuration = not duration or duration <= 0 or effectData.blockCustomDuration
 
     if randomizeDuration then
-        local isOnetime = not CFCUlxCurse.IsCursed( ply )
+        local isOnetime = not CFCUlxCurse.IsTimeCursed( ply )
         local minDuration = effectData.minDuration or CFCUlxCurse.EFFECT_DURATION_MIN
         local maxDuration = effectData.maxDuration or CFCUlxCurse.EFFECT_DURATION_MAX
         local durationMult = isOnetime and ( effectData.onetimeDurationMult or CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT ) or 1
@@ -113,7 +113,7 @@ function CFCUlxCurse.StopCurseEffect( ply, effectName )
     net.WriteString( effectName )
     net.Send( ply )
 
-    if CFCUlxCurse.IsCursed( ply ) then
+    if CFCUlxCurse.IsTimeCursed( ply ) then
         if effectName == ply.CFCUlxCurseCurrentTimedCurseName then
             local gap = math.Rand( CFCUlxCurse.EFFECT_GAP_MIN, CFCUlxCurse.EFFECT_GAP_MAX )
 

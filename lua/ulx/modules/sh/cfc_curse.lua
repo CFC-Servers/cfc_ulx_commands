@@ -76,7 +76,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
     local longCursedPlayers = {}
 
     for _, ply in ipairs( targetPlayers ) do
-        if CFCUlxCurse.IsCursed( ply ) then
+        if CFCUlxCurse.IsTimeCursed( ply ) then
             table.insert( longCursedPlayers, ply )
         else
             table.insert( onetimeCursedPlayers, ply )
