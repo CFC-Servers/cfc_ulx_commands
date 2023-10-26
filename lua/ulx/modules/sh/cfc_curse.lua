@@ -53,7 +53,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
 
     local durationSeconds = durationMinutes and durationMinutes * 60 or 0
 
-    for i = 1, #targetPlayers, -1 do
+    for i = #targetPlayers, 1, -1 do
         local ply = targetPlayers[i]
         local applyFailed = cmd.curse( ply, effectOverride, durationSeconds, shouldUncurse )
 
