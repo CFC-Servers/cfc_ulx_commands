@@ -29,6 +29,7 @@ local areEffectsCompatible
     effectData should be a table with the following fields:
         name: (string)
             - The name of the effect. Must be unique, and is case-insensitive.
+                - If an effect with the same name already exists, its values will be overwritten. This should only be done for debugging/testing purposes.
             - The name must not be "random" as it is reserved for manual selection via ulx.
             - The name must not be "all" as it is used for incompatability checks.
         onStart: (function)
@@ -58,17 +59,29 @@ local areEffectsCompatible
                 - If one of the names are "all", then this effect will be incompatible with all other effects.
                 - This will not affect giving the same effect multiple times, as it just restarts the effect.
             - If not specified, defaults to an empty table.
+    hideOverrideMessage: (optional) (boolean)
+        - If true, hides the no-halt error message that is printed when an effect is overwritten.
+        - Should only be used for debugging/testing purposes.
 --]]
-function CFCUlxCurse.RegisterEffect( effectData )
+function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
     local nameUpper = effectData.name
     if not nameUpper then return ErrorNoHaltWithStack( "Effect must have a name" ) end
 
     local name = string.lower( nameUpper )
     if name == "random" then return ErrorNoHaltWithStack( "Effect name cannot be \"random\"" ) end
     if name == "all" then return ErrorNoHaltWithStack( "Effect name cannot be \"all\"" ) end
-    if effectNameToID[name] then return ErrorNoHaltWithStack( "Already registered an effect with the name \"" .. nameUpper .. "\"" ) end
 
-    local id = table.insert( CFCUlxCurse.Effects, effectData )
+    local id = effectNameToID[name]
+
+    if effectNameToID[name] then
+        if not hideOverrideMessage then
+            ErrorNoHaltWithStack( "Already registered an effect with the name \"" .. nameUpper .. "\", it is now being overwritten" )
+        end
+
+        table.RemoveByValue( onetimeEffectIDs, id )
+    else
+        id = table.insert( CFCUlxCurse.Effects, effectData )
+    end
 
     effectNameToID[name] = id
     effectData.name = name
@@ -425,12 +438,8 @@ end
 storeEffectIncompatibilities = function( name, incompatabileEffects )
     incompatabileEffects = incompatabileEffects or {}
 
-    local myIncompats = CFCUlxCurse.EffectIncompatibilities[name]
-
-    if not myIncompats then
-        myIncompats = {}
-        CFCUlxCurse.EffectIncompatibilities[name] = myIncompats
-    end
+    local myIncompats = {}
+    CFCUlxCurse.EffectIncompatibilities[name] = myIncompats
 
     for i, otherName in ipairs( incompatabileEffects ) do
         incompatabileEffects[i] = string.lower( otherName )
