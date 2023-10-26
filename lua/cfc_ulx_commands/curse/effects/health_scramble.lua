@@ -49,4 +49,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 60,
     onetimeDurationMult = 4,
     excludeFromOnetime = nil,
+    incompatabileEffects = {
+        "HealthObfuscate",
+    },
 } )
