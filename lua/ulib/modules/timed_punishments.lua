@@ -103,6 +103,7 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
                 basePunishment.enable( ply )
             else
                 ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
+                punishments[punishment] = nil -- Remove unknown punishment (note that pairs() still works when removing values)
             end
         end
 
