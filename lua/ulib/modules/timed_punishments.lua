@@ -81,18 +81,33 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
     local punishments = Data:getActivePunishments( steamID64 )
     if not punishments then return end
 
-    for punishment in pairs( punishments ) do
-        local basePunishment = Punishments[punishment]
-        if basePunishment then
-            basePunishment.enable( ply )
-        else
-            ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
+    local listenerName = "CFC_TimedPunishments_StartPunishments_" .. steamID64
+
+    -- Wait until the player is fully done spawning (ensures net is reliable, LocalPlayer() exists, etc)
+    hook.Add( "SetupMove", listenerName, function( movePly, _, cmd )
+        if movePly ~= ply then return end
+        if cmd:IsForced() then return end
+
+        hook.Remove( "SetupMove", listenerName )
+
+        -- Double check to make sure punishments haven't changed
+        punishments = Data:getActivePunishments( steamID64 )
+        if not punishments then return end
+
+        -- Run punishment enable functions
+        for punishment in pairs( punishments ) do
+            local basePunishment = Punishments[punishment]
+            if basePunishment then
+                basePunishment.enable( ply )
+            else
+                ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
+            end
         end
-    end
 
-    ply.TimedPunishments = punishments
+        ply.TimedPunishments = punishments
 
-    TP.SendPunishments( ply )
+        TP.SendPunishments( ply )
+    end )
 end )
 
 hook.Add( "CheckPassword", "CFC_TimedPunishments_Check", function( steamID64 )
