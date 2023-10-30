@@ -94,6 +94,8 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
         punishments = Data:getActivePunishments( steamID64 )
         if not punishments then return end
 
+        ply.TimedPunishments = punishments
+
         -- Run punishment enable functions
         for punishment in pairs( punishments ) do
             local basePunishment = Punishments[punishment]
@@ -103,8 +105,6 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
                 ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
             end
         end
-
-        ply.TimedPunishments = punishments
 
         TP.SendPunishments( ply )
     end )
