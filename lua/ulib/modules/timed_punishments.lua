@@ -97,13 +97,13 @@ hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
         ply.TimedPunishments = punishments
 
         -- Run punishment enable functions
-        for punishment in pairs( punishments ) do
-            local basePunishment = Punishments[punishment]
-            if basePunishment then
-                basePunishment.enable( ply )
+        for punishmentName in pairs( punishments ) do
+            local punishment = Punishments[punishmentName]
+            if punishment then
+                punishment.enable( ply )
             else
-                ErrorNoHaltWithStack( "Unknown punishment type: " .. punishment )
-                punishments[punishment] = nil -- Remove unknown punishment (note that pairs() still works when removing values)
+                ErrorNoHaltWithStack( "Unknown punishment type: " .. punishmentName )
+                punishments[punishmentName] = nil -- Remove unknown punishment (note that pairs() still works when removing values)
             end
         end
 
