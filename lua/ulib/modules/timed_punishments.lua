@@ -76,39 +76,26 @@ function TP.SendPunishments( ply )
     net.Send( ply )
 end
 
-hook.Add( "PlayerInitialSpawn", "CFC_TimedPunishments_Check", function( ply )
+-- Requires CFC's gm_playerload
+hook.Add( "PlayerFullLoad", "CFC_TimedPunishments_Check", function( ply )
     local steamID64 = ply:SteamID64()
     local punishments = Data:getActivePunishments( steamID64 )
     if not punishments then return end
 
-    local listenerName = "CFC_TimedPunishments_StartPunishments_" .. steamID64
+    ply.TimedPunishments = punishments
 
-    -- Wait until the player is fully done spawning (ensures net is reliable, LocalPlayer() exists, etc)
-    hook.Add( "SetupMove", listenerName, function( movePly, _, cmd )
-        if movePly ~= ply then return end
-        if cmd:IsForced() then return end
-
-        hook.Remove( "SetupMove", listenerName )
-
-        -- Double check to make sure punishments haven't changed
-        punishments = Data:getActivePunishments( steamID64 )
-        if not punishments then return end
-
-        ply.TimedPunishments = punishments
-
-        -- Run punishment enable functions
-        for punishmentName in pairs( punishments ) do
-            local punishment = Punishments[punishmentName]
-            if punishment then
-                punishment.enable( ply )
-            else
-                ErrorNoHaltWithStack( "Unknown punishment type: " .. punishmentName )
-                punishments[punishmentName] = nil -- Remove unknown punishment (note that pairs() still works when removing values)
-            end
+    -- Run punishment enable functions
+    for punishmentName in pairs( punishments ) do
+        local punishment = Punishments[punishmentName]
+        if punishment then
+            punishment.enable( ply )
+        else
+            ErrorNoHaltWithStack( "Unknown punishment type: " .. punishmentName )
+            punishments[punishmentName] = nil -- Remove unknown punishment (note that pairs() still works when removing values)
         end
+    end
 
-        TP.SendPunishments( ply )
-    end )
+    TP.SendPunishments( ply )
 end )
 
 hook.Add( "CheckPassword", "CFC_TimedPunishments_Check", function( steamID64 )
