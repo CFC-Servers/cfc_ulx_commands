@@ -8,25 +8,25 @@ local DURATION_MIN = 0.1
 local DURATION_MAX = 1
 local INTERVAL_MIN = 0.05
 local INTERVAL_MAX = 0.75
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
         local amplitudeMin = AMPLITUDE_MIN
         local amplitudeMax = AMPLITUDE_MAX
 
-        timer.Create( HOOK_PREFIX .. "ShakeyShakey", INTERVAL_MIN, 0, function()
+        local timerNameEff
+        timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ShakeyShakey", INTERVAL_MIN, 0, function()
             local amplitude = math.Rand( amplitudeMin, amplitudeMax )
             local duration = math.Rand( DURATION_MIN, DURATION_MAX )
             local interval = math.Rand( INTERVAL_MIN, INTERVAL_MAX )
 
             util.ScreenShake( Vector(), amplitude, FREQUENCY, duration, 1 )
-            timer.Adjust( HOOK_PREFIX .. "ShakeyShakey", interval )
+            timer.Adjust( timerNameEff, interval )
 
             amplitudeMin = amplitudeMin + AMPLITUDE_MIN_GROWTH * interval
             amplitudeMax = amplitudeMax + AMPLITUDE_MAX_GROWTH * interval
@@ -34,13 +34,12 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        timer.Remove( HOOK_PREFIX .. "ShakeyShakey" )
+        -- Do nothing.
     end,
 
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

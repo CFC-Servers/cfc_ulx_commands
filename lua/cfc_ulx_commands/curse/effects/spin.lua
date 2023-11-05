@@ -1,13 +1,12 @@
 local EFFECT_NAME = "Spin"
 local SPEED_MIN = 0.5
 local SPEED_MAX = 1.5
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
         -- Randomly select -1 or 1
@@ -15,7 +14,7 @@ CFCUlxCurse.RegisterEffect( {
 
         local spinStep = math.Rand( SPEED_MIN, SPEED_MAX ) * spinMult
 
-        hook.Add( "CreateMove", HOOK_PREFIX .. "SPEEN", function( cmd )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "SPEEN", function( cmd )
             if cmd:CommandNumber() ~= 0 then return end
 
             local ang = cmd:GetViewAngles()
@@ -26,13 +25,12 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "CreateMove", HOOK_PREFIX .. "SPEEN" )
+        -- Do nothing.
     end,
 
     minDuration = 5,
     maxDuration = 20,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

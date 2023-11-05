@@ -7,7 +7,6 @@ local SPEED_MULT_SUPER = 20
 local SPEED_SUPER_CHANCE = 0.005
 local SPEED_SUPER_DURATION = 0.4
 local SPEED_SUPER_COOLDOWN = 5
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local SPEED_MULT_MIN_MAX_GAP = SPEED_MULT_MAX - SPEED_MULT_MIN
@@ -94,9 +93,9 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         if SPEED_UPDATE_INTERVAL <= 0 then
-            CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "GottaGoFastnt", updateSpeed )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "GottaGoFastnt", updateSpeed )
         else
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "GottaGoFastnt", SPEED_UPDATE_INTERVAL, 0, updateSpeed )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "GottaGoFastnt", SPEED_UPDATE_INTERVAL, 0, updateSpeed )
         end
     end,
 
@@ -114,4 +113,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

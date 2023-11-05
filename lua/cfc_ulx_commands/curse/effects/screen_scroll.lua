@@ -1,7 +1,6 @@
 local EFFECT_NAME = "ScreenScroll"
 local SPEED_MIN = 0.03
 local SPEED_MAX = 0.06
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local gameMat
@@ -16,7 +15,7 @@ end
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
         local offset = 0
@@ -24,7 +23,7 @@ CFCUlxCurse.RegisterEffect( {
         local speed = math.Rand( SPEED_MIN, SPEED_MAX )
         speed = speed * ( math.random( 0, 1 ) == 0 and -1 or 1 )
 
-        hook.Add( "HUDPaintBackground", HOOK_PREFIX .. "LBozo", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDPaintBackground", "LBozo", function()
             surface.SetDrawColor( 255, 255, 255, 255 )
             surface.SetMaterial( gameMat )
 
@@ -49,13 +48,14 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if SERVER then return end
-
-        hook.Remove( "HUDPaintBackground", HOOK_PREFIX .. "LBozo" )
+        -- Do nothing.
     end,
 
     minDuration = 10,
     maxDuration = 20,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = true,
+    incompatabileEffects = {
+        "ScreenMirror",
+    },
 } )

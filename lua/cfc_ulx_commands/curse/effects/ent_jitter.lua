@@ -1,15 +1,14 @@
 local EFFECT_NAME = "EntJitter"
 local JITTER_SCALE = 5
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        hook.Add( "Think", HOOK_PREFIX .. "Reposition", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Reposition", function()
             for _, ent in ipairs( ents.GetAll() ) do
                 if IsValid( ent ) then
                     local pos = ent:GetPos() + Vector(
@@ -24,10 +23,11 @@ CFCUlxCurse.RegisterEffect( {
         end )
     end,
 
-    onEnd = function()
+    onEnd = function( cursedPly )
         if SERVER then return end
 
-        hook.Remove( "Think", HOOK_PREFIX .. "Reposition" )
+        -- Ensure nothing is altered while receiving the game update
+        CFCUlxCurse.RemoveEffectHook( cursedPly, EFFECT_NAME, "Think", "Reposition" )
 
         -- Force a full game update
         RunConsoleCommand( "record", "fix" )
@@ -38,4 +38,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {
+        "EntMagnet",
+    },
 } )

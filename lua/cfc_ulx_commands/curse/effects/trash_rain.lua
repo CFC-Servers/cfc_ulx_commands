@@ -32,7 +32,6 @@ local TRASH_MODELS = {
     "models/props_junk/MetalBucket02a.mdl",
     "models/props_c17/chair02a.mdl",
 }
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local TRASH_MODEL_COUNT = #TRASH_MODELS
@@ -41,6 +40,7 @@ local trashEnts = {}
 local fadingTrashEnts = {}
 local trashSpawnChance = 0
 local trashCanFlood = true
+local localPly = nil
 local spawnTrash
 local startFadingTrash
 local tryStartTrashFlood
@@ -51,14 +51,15 @@ local updateTrash
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
+        localPly = cursedPly
         trashSpawnChance = math.Rand( TRASH_SPAWN_CHANCE_MIN, TRASH_SPAWN_CHANCE_MAX )
         trashCanFlood = true
 
-        timer.Create( HOOK_PREFIX .. "UpdateTrash", TRASH_UPDATE_INTERVAL, 0, updateTrash )
-        timer.Create( HOOK_PREFIX .. "SpawnTrash", TRASH_SPAWN_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "UpdateTrash", TRASH_UPDATE_INTERVAL, 0, updateTrash )
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SpawnTrash", TRASH_SPAWN_INTERVAL, 0, function()
             tryStartTrashFlood()
             trySpawnTrash()
         end )
@@ -66,11 +67,6 @@ CFCUlxCurse.RegisterEffect( {
 
     onEnd = function()
         if SERVER then return end
-
-        timer.Remove( HOOK_PREFIX .. "SpawnTrash" )
-        timer.Remove( HOOK_PREFIX .. "UpdateTrash" )
-        timer.Remove( HOOK_PREFIX .. "StopTrashFlood" )
-        timer.Remove( HOOK_PREFIX .. "TrashFloodCooldownFinished" )
 
         for i = #trashEnts, 1, -1 do
             local ent = trashEnts[i]
@@ -95,6 +91,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 80,
     onetimeDurationMult = 2,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )
 
 
@@ -154,11 +151,11 @@ tryStartTrashFlood = function()
     trashCanFlood = false
     trashSpawnChance = TRASH_FLOOD_SPAWN_CHANCE
 
-    timer.Create( HOOK_PREFIX .. "StopTrashFlood", math.Rand( TRASH_FLOOD_DURATION_MIN, TRASH_FLOOD_DURATION_MAX ), 1, function()
+    CFCUlxCurse.CreateEffectTimer( localPly, EFFECT_NAME, "StopTrashFlood", math.Rand( TRASH_FLOOD_DURATION_MIN, TRASH_FLOOD_DURATION_MAX ), 1, function()
         trashSpawnChance = prevTrashSpawnChance
     end )
 
-    timer.Create( HOOK_PREFIX .. "TrashFloodCooldownFinished", TRASH_FLOOD_COOLDOWN, 1, function()
+    CFCUlxCurse.CreateEffectTimer( localPly, EFFECT_NAME, "TrashFloodCooldownFinished", TRASH_FLOOD_COOLDOWN, 1, function()
         trashCanFlood = true
     end )
 end

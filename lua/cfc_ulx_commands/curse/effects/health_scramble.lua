@@ -4,7 +4,7 @@ local HEALTH_MIN = 1
 local HEALTH_MAX_MULT = 2
 local ARMOR_MIN = 1
 local ARMOR_MAX_MULT = 1
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
+
 -- Similar in concept to HealthObfuscate, but actually changes the values serverside.
 -- Also affects armor, if the player has any.
 
@@ -17,7 +17,7 @@ CFCUlxCurse.RegisterEffect( {
 
         local tickCount = 1
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "TimeToGamble", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "TimeToGamble", function()
             -- Only update once every x amount of ticks.
             if TICK_INTERVAL ~= 1 then
                 if tickCount == TICK_INTERVAL then
@@ -49,4 +49,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 60,
     onetimeDurationMult = 4,
     excludeFromOnetime = nil,
+    incompatabileEffects = {
+        "HealthObfuscate",
+    },
 } )

@@ -6,7 +6,6 @@ local CAM_PITCH_MAX = 0 -- Note that pitch is backwards, so this is pointing dow
 local CAM_HIT_PUSHBACK = 10 -- Moves the camera away from walls.
 local CAM_CHANGE_COOLDOWN = 1
 local LOS_DETECTION_INTERVAL = 0.1
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local CAM_FORCE_CHANGE_DIST_SQR = CAM_FORCE_CHANGE_DIST ^ 2
@@ -100,21 +99,21 @@ CFCUlxCurse.RegisterEffect( {
 
                 ply:CrosshairDisable()
 
-                CFCUlxCurse.CreateEffectTimer( ply, HOOK_PREFIX .. "DisableCrosshair", 0, 1, function()
+                CFCUlxCurse.CreateEffectTimer( ply, EFFECT_NAME, "DisableCrosshair", 0, 1, function()
                     ply:CrosshairDisable()
                 end )
             end
 
-            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSpawn", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
-            CFCUlxCurse.AddEffectHook( cursedPly, "PlayerLeaveVehicle", HOOK_PREFIX .. "DisableCrosshair", enforceDisableCrosshair )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "DisableCrosshair", enforceDisableCrosshair )
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerLeaveVehicle", "DisableCrosshair", enforceDisableCrosshair )
 
             return
         end
 
-        localPly = LocalPlayer()
+        localPly = cursedPly
         relocateCamera()
 
-        hook.Add( "CalcView", HOOK_PREFIX .. "FunnyCam", function( ply, _, _, fov )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CalcView", "FunnyCam", function( ply, _, _, fov )
             local view = {
                 origin = camPos,
                 angles = ( ply:GetShootPos() - camPos ):Angle(),
@@ -125,7 +124,7 @@ CFCUlxCurse.RegisterEffect( {
             return view
         end )
 
-        timer.Create( HOOK_PREFIX .. "CheckLineOfSight", LOS_DETECTION_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "CheckLineOfSight", LOS_DETECTION_INTERVAL, 0, function()
             local startPos = camPos
             local endPos = localPly:GetShootPos()
 
@@ -151,16 +150,12 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function( cursedPly )
         if SERVER then
             cursedPly:CrosshairEnable()
-
-            return
         end
-
-        hook.Remove( "CalcView", HOOK_PREFIX .. "FunnyCam" )
-        timer.Remove( HOOK_PREFIX .. "CheckLineOfSight" )
     end,
 
     minDuration = 30,
     maxDuration = 90,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

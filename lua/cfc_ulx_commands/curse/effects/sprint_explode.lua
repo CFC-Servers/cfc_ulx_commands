@@ -1,5 +1,4 @@
 local EFFECT_NAME = "SprintExplode"
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -8,7 +7,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "KeyPress", HOOK_PREFIX .. "Boom", function( ply, key )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "KeyPress", "Boom", function( ply, key )
             if ply ~= cursedPly then return end
             if key ~= IN_SPEED then return end
             if not ply:Alive() then return end
@@ -39,4 +38,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 50,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

@@ -7,7 +7,6 @@ local MULTI_CHANGE_CHANCE = 0.75 -- Chance to start doing multi-changes.
 local MULTI_CHANGE_AMOUNT_MIN = 1 -- Minimum amount of additional times to change the offset, if the initial chance triggers.
 local MULTI_CHANGE_AMOUNT_MAX = 3 -- Same as above, but maximum.
 local MULTI_CHANGE_TIMING_SPREAD = 0.15 -- Timings for each multi-change will be offset by +/- this percentage of the multi-change gap. This value should be between 0 and 0.5.
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -35,7 +34,7 @@ CFCUlxCurse.RegisterEffect( {
             local delaySpread = mcGap * MULTI_CHANGE_TIMING_SPREAD * math.Rand( -1, 1 )
             local delay = mcGap * i + delaySpread
 
-            CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "MultiChange_" .. i, delay, 1, randomizeFOV )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "MultiChange_" .. i, delay, 1, randomizeFOV )
         end
     end,
 
@@ -49,4 +48,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 40,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

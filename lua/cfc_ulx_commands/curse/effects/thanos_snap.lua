@@ -3,7 +3,6 @@ local DISAPPEAR_INTERVAL = 0.15 -- Seconds between each pass across all entities
 local DISAPPEAR_CHANCE = 0.01 -- Chance for each entity to disappear each pass.
 local DO_EFFECT = true -- Play a sound and particle effect when an ent disappears.
 local DO_SOUND = true -- Play a sound when an ent disappears. (Only if DO_EFFECT is true.)
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 local trySnap
@@ -45,20 +44,21 @@ end
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function()
+    onStart = function( cursedPly )
         if SERVER then return end
 
-        timer.Create( HOOK_PREFIX .. "Snap", DISAPPEAR_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Snap", DISAPPEAR_INTERVAL, 0, function()
             for _, ent in ipairs( ents.GetAll() ) do
                 trySnap( ent )
             end
         end )
     end,
 
-    onEnd = function()
+    onEnd = function( cursedPly )
         if SERVER then return end
 
-        timer.Remove( HOOK_PREFIX .. "Snap" )
+        -- Ensure nothing is altered while receiving the game update
+        CFCUlxCurse.RemoveEffectTimer( cursedPly, EFFECT_NAME, "Snap" )
 
         -- Force a full game update
         RunConsoleCommand( "record", "fix" )
@@ -69,4 +69,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )

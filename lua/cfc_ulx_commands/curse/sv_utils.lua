@@ -1,7 +1,5 @@
 local inflictedPlayers = {} -- Players who either have an active one-time effect, or are timecursed (with or without an active effect).
 local inflictedPlayerLookup = {} -- Lookup table for inflictedPlayers.
-local effectHooks = {} -- Player -> { { hookName = string, listenerName = string }, ... }
-local effectTimers = {} -- Player -> { string, ... }
 
 util.AddNetworkString( "CFC_ULXCommands_Curse_StartEffect" )
 util.AddNetworkString( "CFC_ULXCommands_Curse_EndEffect" )
@@ -23,12 +21,12 @@ local function removeInflictedPlayer( ply )
     inflictedPlayerLookup[ply] = nil
 
     ply.CFCUlxCurseNextEffectTime = nil
-    ply.CFCUlxCurseEffectExpireTime = nil
+    ply.CFCUlxCurseCurrentTimedCurseName = nil
 end
 
 
--- Returns true if the player is currently cursed.
-function CFCUlxCurse.IsCursed( ply )
+-- Returns true if the player is currently time cursed.
+function CFCUlxCurse.IsTimeCursed( ply )
     if not ply.TimedPunishments then return false end
 
     return ply.TimedPunishments.timedcurse ~= nil
@@ -39,14 +37,29 @@ end
     - If the player is not cursed, this will apply as a one-time effect.
     - duration, if provided, is in seconds.
 --]]
-function CFCUlxCurse.ApplyCurseEffect( ply, effectData, duration )
-    CFCUlxCurse.StopCurseEffect( ply )
-    ply.CFCUlxCurseNextEffectTime = nil
+function CFCUlxCurse.ApplyCurseEffect( ply, effectDataOrName, duration )
+    local effectName
+    local effectData
+
+    if type( effectDataOrName ) == "string" then
+        effectName = string.lower( effectDataOrName )
+        effectData = CFCUlxCurse.GetEffectByName( effectName )
+    else
+        effectName = effectDataOrName.name
+        effectData = effectDataOrName
+    end
+
+    CFCUlxCurse.StopCurseEffect( ply, effectName )
+
+    if CFCUlxCurse.IsTimeCursed( ply ) and ply.CFCUlxCurseCurrentTimedCurseName == nil then
+        ply.CFCUlxCurseCurrentTimedCurseName = effectName
+        ply.CFCUlxCurseNextEffectTime = nil
+    end
 
     local randomizeDuration = not duration or duration <= 0 or effectData.blockCustomDuration
 
     if randomizeDuration then
-        local isOnetime = not CFCUlxCurse.IsCursed( ply )
+        local isOnetime = not CFCUlxCurse.IsTimeCursed( ply )
         local minDuration = effectData.minDuration or CFCUlxCurse.EFFECT_DURATION_MIN
         local maxDuration = effectData.maxDuration or CFCUlxCurse.EFFECT_DURATION_MAX
         local durationMult = isOnetime and ( effectData.onetimeDurationMult or CFCUlxCurse.EFFECT_DURATION_ONETIME_MULT ) or 1
@@ -54,8 +67,12 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectData, duration )
         duration = math.Rand( minDuration, maxDuration ) * durationMult
     end
 
-    ply.CFCUlxCurseEffect = effectData
-    ply.CFCUlxCurseEffectExpireTime = CurTime() + duration
+    local effect = {
+        effectData = effectData,
+        expireTime = CurTime() + duration,
+    }
+
+    CFCUlxCurse.GetCurrentEffects( ply )[effectName] = effect
 
     ProtectedCall( function()
         effectData.onStart( ply, duration )
@@ -64,7 +81,7 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectData, duration )
     addInflictedPlayer( ply )
 
     net.Start( "CFC_ULXCommands_Curse_StartEffect" )
-    net.WriteString( effectData.name )
+    net.WriteString( effectName )
     net.WriteFloat( duration )
     net.Send( ply )
 end
@@ -73,153 +90,85 @@ end
     - Stops the player's current curse effect.
     - If the player is cursed, they will automatically be given a new effect after some delay.
 --]]
-function CFCUlxCurse.StopCurseEffect( ply )
-    local prevEffect = CFCUlxCurse.GetCurrentEffect( ply )
+function CFCUlxCurse.StopCurseEffect( ply, effectName )
+    effectName = string.lower( effectName )
 
-    if prevEffect then
-        ply.CFCUlxCurseEffect = nil
-        ply.CFCUlxCurseEffectExpireTime = nil
+    local curEffects = CFCUlxCurse.GetCurrentEffects( ply )
+    local effectToStop = curEffects[effectName]
 
-        ProtectedCall( function()
-            prevEffect.onEnd( ply )
-        end )
+    if not effectToStop then return end
 
-        CFCUlxCurse.RemoveEffectHooks( ply )
-        CFCUlxCurse.RemoveEffectTimers( ply )
+    local effectData = effectToStop.effectData
 
-        net.Start( "CFC_ULXCommands_Curse_EndEffect" )
-        net.WriteString( prevEffect.name )
-        net.Send( ply )
-    end
+    curEffects[effectName] = nil
 
-    if CFCUlxCurse.IsCursed( ply ) then
-        local gap = math.Rand( CFCUlxCurse.EFFECT_GAP_MIN, CFCUlxCurse.EFFECT_GAP_MAX )
+    ProtectedCall( function()
+        effectData.onEnd( ply )
+    end )
 
-        ply.CFCUlxCurseNextEffectTime = CurTime() + gap
-    else
+    CFCUlxCurse.RemoveEffectHooks( ply, effectName )
+    CFCUlxCurse.RemoveEffectTimers( ply, effectName )
+
+    net.Start( "CFC_ULXCommands_Curse_EndEffect" )
+    net.WriteString( effectName )
+    net.Send( ply )
+
+    if CFCUlxCurse.IsTimeCursed( ply ) then
+        if effectName == ply.CFCUlxCurseCurrentTimedCurseName then
+            local gap = math.Rand( CFCUlxCurse.EFFECT_GAP_MIN, CFCUlxCurse.EFFECT_GAP_MAX )
+
+            ply.CFCUlxCurseCurrentTimedCurseName = nil
+            ply.CFCUlxCurseNextEffectTime = CurTime() + gap
+        end
+    elseif table.IsEmpty( curEffects ) then
         removeInflictedPlayer( ply )
     end
 end
 
 --[[
-    - Adds an effect hook for a specific player.
-    - For use only within the onStart() of serverside effects.
+    - Stops multiple curse effects on a player.
+
+    ply: (Player)
+        - The player to stop the effects on.
+    effectNames: (optional) (string or table)
+        - The name(s) of the effect(s) to stop.
+        - If not provided, all effects will be stopped.
 --]]
-function CFCUlxCurse.AddEffectHook( cursedPly, hookName, listenerName, func )
-    local plyHooks = effectHooks[cursedPly]
-
-    if not plyHooks then
-        plyHooks = {}
-        effectHooks[cursedPly] = plyHooks
-    end
-
-    listenerName = listenerName .. "_" .. cursedPly:SteamID64()
-
-    table.insert( plyHooks, {
-        hookName = hookName,
-        listenerName = listenerName,
-    } )
-
-    hook.Add( hookName, listenerName, func )
-end
-
--- Removes an effect hook for a specific player.
-function CFCUlxCurse.RemoveEffectHook( cursedPly, hookName, listenerName )
-    local plyHooks = effectHooks[cursedPly]
-    if not plyHooks then return end
-
-    for i = #plyHooks, 1, -1 do
-        local hookData = plyHooks[i]
-
-        if hookData.hookName == hookName and hookData.listenerName == listenerName then
-            hook.Remove( hookName, listenerName )
-            table.remove( plyHooks, i )
+function CFCUlxCurse.StopCurseEffects( ply, effectNames )
+    if not effectNames then
+        for effectName in pairs( CFCUlxCurse.GetCurrentEffects( ply ) ) do
+            CFCUlxCurse.StopCurseEffect( ply, effectName )
         end
-    end
-end
-
---[[
-    - Removes all effect hooks for a specific player.
-    - This will automatically be called after an effect's onEnd() is called.
---]]
-function CFCUlxCurse.RemoveEffectHooks( cursedPly )
-    local plyHooks = effectHooks[cursedPly]
-    if not plyHooks then return end
-
-    for _, hookData in ipairs( plyHooks ) do
-        hook.Remove( hookData.hookName, hookData.listenerName )
-    end
-
-    effectHooks[cursedPly] = nil
-end
-
---[[
-    - Creates an effect timer associated with a specific player.
-    - For use only within the onStart() of serverside effects.
---]]
-function CFCUlxCurse.CreateEffectTimer( cursedPly, timerName, interval, repitions, func )
-    local plyTimers = effectTimers[cursedPly]
-
-    if not plyTimers then
-        plyTimers = {}
-        effectTimers[cursedPly] = plyTimers
-    end
-
-    timerName = timerName .. "_" .. cursedPly:SteamID64()
-
-    table.insert( plyTimers, timerName )
-    timer.Create( timerName, interval, repitions, func )
-end
-
--- Removes an effect timer associated with a specific player.
-function CFCUlxCurse.RemoveEffectTimer( cursedPly, timerName )
-    local plyTimers = effectTimers[cursedPly]
-    if not plyTimers then return end
-
-    for i = #plyTimers, 1, -1 do
-        local plyTimer = plyTimers[i]
-
-        if plyTimer == timerName then
-            timer.Remove( timerName )
-            table.remove( plyTimers, i )
+    elseif type( effectNames ) == "table" then
+        for _, effectName in ipairs( effectNames ) do
+            CFCUlxCurse.StopCurseEffect( ply, effectName )
         end
+    else
+        CFCUlxCurse.StopCurseEffect( ply, effectNames )
     end
-end
-
---[[
-    - Removes all effect timers associated with a specific player.
-    - This will automatically be called after an effect's onEnd() is called.
---]]
-function CFCUlxCurse.RemoveEffectTimers( cursedPly )
-    local plyTimers = effectTimers[cursedPly]
-    if not plyTimers then return end
-
-    for _, plyTimer in ipairs( plyTimers ) do
-        timer.Remove( plyTimer )
-    end
-
-    effectTimers[cursedPly] = nil
 end
 
 
 ----- SETUP -----
 
-hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectOnLeave", function( ply )
+hook.Add( "PlayerDisconnected", "CFC_ULXCommands_Curse_StopEffectsOnLeave", function( ply )
     if not IsValid( ply ) then return end
 
-    local prevEffect = CFCUlxCurse.GetCurrentEffect( ply )
+    local curEffects = CFCUlxCurse.GetCurrentEffects( ply )
 
-    if prevEffect then
-        ply.CFCUlxCurseEffect = nil
+    for effectName, effect in pairs( curEffects ) do
+        local effectData = effect.effectData
 
         ProtectedCall( function()
-            prevEffect.onEnd( ply )
+            effectData.onEnd( ply )
         end )
+
+        CFCUlxCurse.RemoveEffectHooks( ply, effectName )
+        CFCUlxCurse.RemoveEffectTimers( ply, effectName )
     end
 
+    table.Empty( curEffects )
     removeInflictedPlayer( ply )
-    CFCUlxCurse.RemoveEffectHooks( ply )
-    CFCUlxCurse.RemoveEffectTimers( ply )
 end )
 
 
@@ -227,13 +176,19 @@ timer.Create( "CFC_ULXCommands_Curse_StartAndStopEffects", 5, 0, function()
     local now = CurTime()
 
     for _, ply in ipairs( inflictedPlayers ) do
-        local effectExpireTime = ply.CFCUlxCurseEffectExpireTime
+        local curEffects = CFCUlxCurse.GetCurrentEffects( ply )
         local nextEffectTime = ply.CFCUlxCurseNextEffectTime
 
-        if effectExpireTime and effectExpireTime <= now then
-            CFCUlxCurse.StopCurseEffect( ply )
-        elseif nextEffectTime and nextEffectTime <= now then
-            local effect = CFCUlxCurse.GetRandomEffect()
+        for effectName, effect in pairs( curEffects ) do
+            local expireTime = effect.expireTime
+
+            if expireTime <= now then
+                CFCUlxCurse.StopCurseEffect( ply, effectName )
+            end
+        end
+
+        if nextEffectTime and nextEffectTime <= now then
+            local effect = CFCUlxCurse.GetRandomEffect( ply )
 
             CFCUlxCurse.ApplyCurseEffect( ply, effect )
         end

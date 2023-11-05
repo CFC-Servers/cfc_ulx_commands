@@ -1,6 +1,5 @@
 local EFFECT_NAME = "WeaponIndecision"
 local INTERVAL = 0.1
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -8,14 +7,14 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function( cursedPly )
         if CLIENT then
-            timer.Create( HOOK_PREFIX .. "SelectWeapon", INTERVAL, 0, function()
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SelectWeapon", INTERVAL, 0, function()
                 surface.PlaySound( "common/wpn_hudoff.wav" )
             end )
 
             return
         end
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "SelectWeapon", INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SelectWeapon", INTERVAL, 0, function()
             if not IsValid( cursedPly ) then return end
 
             local weps = cursedPly:GetWeapons()
@@ -29,13 +28,14 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        if CLIENT then
-            timer.Remove( HOOK_PREFIX .. "SelectWeapon" )
-        end
+        -- Do nothing.
     end,
 
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
+    incompatabileEffects = {
+        "Butterfingers",
+    },
 } )

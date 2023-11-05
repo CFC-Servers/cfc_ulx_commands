@@ -1,6 +1,6 @@
 local EFFECT_NAME = "HealthDrain"
 local DRAIN_RATE = 5 -- Health lost per second.
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
+
 
 local DRAIN_INTERVAL = 1 / DRAIN_RATE
 
@@ -11,23 +11,23 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerDeath", HOOK_PREFIX .. "EndEffectEarly", function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
-            CFCUlxCurse.StopCurseEffect( cursedPly )
+            CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "PlayerSilentDeath", HOOK_PREFIX .. "EndEffectEarly", function( ply )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSilentDeath", "EndEffectEarly", function( ply )
             if ply ~= cursedPly then return end
 
-            CFCUlxCurse.StopCurseEffect( cursedPly )
+            CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
         end )
 
-        CFCUlxCurse.CreateEffectTimer( cursedPly, HOOK_PREFIX .. "Drain", DRAIN_INTERVAL, 0, function()
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Drain", DRAIN_INTERVAL, 0, function()
             if not IsValid( cursedPly ) then return end
 
             if not cursedPly:Alive() then
-                CFCUlxCurse.StopCurseEffect( cursedPly )
+                CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
 
                 return
             end
@@ -36,7 +36,7 @@ CFCUlxCurse.RegisterEffect( {
 
             if newHealth == 0 then
                 cursedPly:KillSilent()
-                CFCUlxCurse.StopCurseEffect( cursedPly )
+                CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
 
                 return
             end
@@ -53,4 +53,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 4 * 100 / DRAIN_RATE,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
+    incompatabileEffects = {},
 } )

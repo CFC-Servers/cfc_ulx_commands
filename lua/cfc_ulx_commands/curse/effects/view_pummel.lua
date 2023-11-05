@@ -1,6 +1,5 @@
 local EFFECT_NAME = "ViewPummel"
 local PUNCH_STRENGTH = 4
-local HOOK_PREFIX = "CFC_ULXCommands_Curse_" .. EFFECT_NAME .. "_"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -9,7 +8,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if CLIENT then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, "Think", HOOK_PREFIX .. "Punch", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Punch", function()
             local ang = Angle(
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),
                 math.Rand( -PUNCH_STRENGTH, PUNCH_STRENGTH ),
@@ -28,4 +27,5 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = nil,
+    incompatabileEffects = {},
 } )
