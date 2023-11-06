@@ -1,6 +1,7 @@
 local EFFECT_NAME = "NoHud"
 local ALLOWED_HUD_ELEMENTS = {
     CHudMenu = true,
+    CHudWeaponSelection = true,
 }
 
 
