@@ -11,6 +11,18 @@ end
 local awaitingResponse = {}
 
 local function sendResponse( ply, friendTable, caller )
+    if not IsValid( caller ) then -- console
+        print( "\n=======================" )
+        print( ply:Name() .. "'s friends:" )
+        print( "-----------------------" )
+        for target, status in pairs( friendTable ) do
+            print( target:Name() .. " : " .. status )
+        end
+        print( "=======================" )
+
+        return
+    end
+
     caller:PrintMessage( 2, "\n=======================" )
     caller:PrintMessage( 2, ply:Name() .. "'s friends:" )
     caller:PrintMessage( 2, "-----------------------" )
@@ -26,6 +38,11 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
 
     local caller = awaitingResponse[ply]
     if table.IsEmpty( friendTable ) then
+        if IsValid( caller ) then
+            caller:PrintMessage( 2, ply:Name() .. " does currently not have any friends on the server." )
+        else
+            print( ply:Name() .. " does currently not have any friends on the server." )
+        end
         return
     end
 
