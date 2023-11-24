@@ -39,9 +39,9 @@ net.Receive( "CFC_ULX_CheckFriendsReceive", function( _, ply )
     local caller = awaitingResponse[ply]
     if table.IsEmpty( friendTable ) then
         if IsValid( caller ) then
-            caller:PrintMessage( 2, ply:Name() .. "does currently not have any friends on the server." )
+            caller:PrintMessage( 2, ply:Name() .. " does currently not have any friends on the server." )
         else
-            print( ply:Name() .. "does currently not have any friends on the server." )
+            print( ply:Name() .. " does currently not have any friends on the server." )
         end
         return
     end
