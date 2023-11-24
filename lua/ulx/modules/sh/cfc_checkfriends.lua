@@ -11,6 +11,18 @@ end
 local awaitingResponse = {}
 
 local function sendResponse( ply, friendTable, caller )
+    if not IsValid( caller ) then -- console
+        print( "\n=======================" )
+        print( ply:Name() .. "'s friends:" )
+        print( "-----------------------" )
+        for target, status in pairs( friendTable ) do
+            print( target:Name() .. " : " .. status )
+        end
+        print( "=======================" )
+
+        return
+    end
+
     caller:PrintMessage( 2, "\n=======================" )
     caller:PrintMessage( 2, ply:Name() .. "'s friends:" )
     caller:PrintMessage( 2, "-----------------------" )
