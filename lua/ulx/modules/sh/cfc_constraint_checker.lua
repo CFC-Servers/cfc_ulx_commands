@@ -140,8 +140,6 @@ end
 function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     local perPlyConstraints = countConstraints( targetPlys )
 
-    ulx.fancyLogAdmin( caller, true, "#A checked the constraints of #T", targetPlys ) -- Alert staff console of the command being used
-
     -- Convert constraint data to list and remove players with no constraints if necessary
     local constraintCountsList = {}
     for _, ply in pairs( targetPlys ) do
@@ -160,15 +158,21 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
     -- Create args for MsgC using constraint count list and send to client
     -- TODO move visualization code clientside
     local constraintMessageArgs = getMsgCArgs( constraintCountsList )
+    local loggedCaller = nil
 
     if not IsValid( caller ) then 
+        loggedCaller = "Console"
         MsgC( unpack( constraintMessageArgs ) )
         return
     else
+        loggedCaller = caller
         net.Start( "CFC_ULX_ConstraintResults" )
         net.WriteTable( constraintMessageArgs )
         net.Send( caller )
     end 
+
+    ulx.fancyLogAdmin( loggedCaller, true, "#A checked the constraints of #T", targetPlys ) -- Alert staff console of the command being used
+
     timer.Simple( 0, function()
         caller:ChatPrint( "Open your console to see the results." )
     end )
