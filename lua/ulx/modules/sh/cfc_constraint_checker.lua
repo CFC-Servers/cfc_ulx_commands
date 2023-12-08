@@ -159,10 +159,17 @@ function cmd.checkConstraints( caller, targetPlys, showPlysWithNoConstraints )
 
     -- Create args for MsgC using constraint count list and send to client
     -- TODO move visualization code clientside
-    net.Start( "CFC_ULX_ConstraintResults" )
-        net.WriteTable( getMsgCArgs( constraintCountsList ) )
-    net.Send( caller )
+    local constraintMessageArgs = getMsgCArgs( constraintCountsList )
 
+    if not IsValid( caller ) then
+        MsgC( unpack( constraintMessageArgs ) )
+        return
+    else
+        net.Start( "CFC_ULX_ConstraintResults" )
+        net.WriteTable( constraintMessageArgs )
+        net.Send( caller )
+    end
+    
     timer.Simple( 0, function()
         caller:ChatPrint( "Open your console to see the results." )
     end )
