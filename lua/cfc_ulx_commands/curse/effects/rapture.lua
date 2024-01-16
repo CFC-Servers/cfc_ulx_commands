@@ -5,10 +5,35 @@ local INTERVAL_MIN = 0.05
 local INTERVAL_MAX = 2
 
 
+local function startBlockingNoclip( cursedPly )
+    cursedPly:SetMoveType( MOVETYPE_WALK )
+
+    local function blockNoclip( ply, desiredState )
+        if ply ~= cursedPly then return end
+        if desiredState then return false end
+    end
+
+    if CLIENT then
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
+
+        return
+    end
+
+    CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerNoClip", "BlockNoclip", blockNoclip )
+
+    -- Respawn the player if they are outside of the world.
+    if not util.IsInWorld( cursedPly:GetPos() ) then
+        cursedPly:Spawn()
+    end
+end
+
+
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
+        startBlockingNoclip( cursedPly )
+
         if CLIENT then return end
 
         local vel = Vector( 0, 0, 10 )
