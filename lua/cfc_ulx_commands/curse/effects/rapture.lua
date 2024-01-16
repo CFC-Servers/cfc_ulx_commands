@@ -46,7 +46,18 @@ CFCUlxCurse.RegisterEffect( {
 
         local timerNameEff
         timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ChangeVelocity", INTERVAL_MIN, 0, function()
-            vel = Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), math.Rand( -1, 1 ) ) * math.Rand( SPEED_MIN, SPEED_MAX )
+            if not IsValid( cursedPly ) then return end
+
+            local speed = math.Rand( SPEED_MIN, SPEED_MAX )
+            local velZ
+
+            if cursedPly:IsOnGround() then
+                velZ = math.Rand( 0, 1 )
+            else
+                velZ = math.Rand( -1, 1 )
+            end
+
+            vel = Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), velZ ) * speed
             timer.Adjust( timerNameEff, math.Rand( INTERVAL_MIN, INTERVAL_MAX ) )
         end )
     end,
