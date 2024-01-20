@@ -15,8 +15,6 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SelectWeapon", INTERVAL, 0, function()
-            if not IsValid( cursedPly ) then return end
-
             local weps = cursedPly:GetWeapons()
             local wepCount = #weps
             if wepCount == 0 then return end
