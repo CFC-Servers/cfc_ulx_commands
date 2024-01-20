@@ -39,15 +39,11 @@ CFCUlxCurse.RegisterEffect( {
         local vel = Vector( 0, 0, 10 )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "GetYoinked", function()
-            if not IsValid( cursedPly ) then return end
-
             cursedPly:SetVelocity( vel )
         end )
 
         local timerNameEff
         timerNameEff = CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "ChangeVelocity", INTERVAL_MIN, 0, function()
-            if not IsValid( cursedPly ) then return end
-
             local speed = math.Rand( SPEED_MIN, SPEED_MAX )
             local velZ
 
