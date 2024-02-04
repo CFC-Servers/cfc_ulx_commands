@@ -24,8 +24,6 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Drain", DRAIN_INTERVAL, 0, function()
-            if not IsValid( cursedPly ) then return end
-
             if not cursedPly:Alive() then
                 CFCUlxCurse.StopCurseEffect( cursedPly, EFFECT_NAME )
 
