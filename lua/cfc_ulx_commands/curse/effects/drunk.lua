@@ -6,10 +6,6 @@ local SPRING_TILT = 2 -- Multiplier for amount of screen tilt (roll) to apply, b
 local SPRING_ANG_LIMIT = 70 -- 0-90, exclusive
 
 
-local VECTOR_ZERO = Vector( 0, 0, 0 )
-local VECTOR_UP = Vector( 0, 0, 1 )
-local ANGLE_ZERO = Angle( 0, 0, 0 )
-
 local realAng
 local springPos
 local springVel = Vector( 0, 0, 0 )
@@ -49,7 +45,7 @@ end
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function( cursedPly, curseDuration )
+    onStart = function( cursedPly )
         if SERVER then return end
 
         local lastDrunkEyeAng
