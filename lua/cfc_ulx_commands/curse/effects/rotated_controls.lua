@@ -38,5 +38,6 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = true,
     incompatabileEffects = {
         "ReverseControls",
+        "Swagger",
     },
 } )
