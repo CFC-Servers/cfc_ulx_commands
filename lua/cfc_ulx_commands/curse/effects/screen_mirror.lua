@@ -34,5 +34,6 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatabileEffects = {
         "ScreenScroll",
+        "WorldFlip",
     },
 } )
