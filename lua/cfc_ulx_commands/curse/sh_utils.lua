@@ -79,6 +79,7 @@ function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
         end
 
         table.RemoveByValue( onetimeEffectIDs, id )
+        CFCUlxCurse.Effects[id] = effectData
     else
         id = table.insert( CFCUlxCurse.Effects, effectData )
     end
