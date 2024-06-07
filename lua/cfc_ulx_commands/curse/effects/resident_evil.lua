@@ -159,5 +159,6 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatabileEffects = {
         "Isometric",
+        "TopDown",
     },
 } )

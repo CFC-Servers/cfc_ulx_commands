@@ -1,4 +1,4 @@
-local EFFECT_NAME = "Isometric"
+local EFFECT_NAME = "TopDown"
 local ZOOM_MIN = 50
 local ZOOM_MAX = 5000
 local ZOOM_DEFAULT = 2500
@@ -6,7 +6,7 @@ local ZOOM_SPEED = 3000 -- Units per second
 
 --[[
     - Puts your camera into isometric mode.
-    - Arrow keys to rotate and zoom in/out.
+    - Arrow keys to zoom in/out.
 --]]
 
 
@@ -34,21 +34,15 @@ CFCUlxCurse.RegisterEffect( {
         end
 
 
-        local orthoAng = Angle( 45, 45 + 90 * math.random( 0, 3 ), 0 )
-        local orthoAngDir = nil
+        local orthoAng = Angle( 90, 0, 0 )
+        local orthoAngDir = Vector( 0, 0, -1 )
         local orthoDist = ZOOM_DEFAULT
         local orthoDistDir = nil
-
-        local function adjustAng( yawStep )
-            orthoAng[2] = orthoAng[2] + yawStep
-            orthoAngDir = orthoAng:Forward()
-        end
 
         local function determineDistDir()
             orthoDistDir = ( input.IsButtonDown( KEY_UP ) and -1 or 0 ) + ( input.IsButtonDown( KEY_DOWN ) and 1 or 0 )
         end
 
-        adjustAng( 0 )
         determineDistDir()
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CalcView", "CameraGoBrr", function( _, eyePos )
@@ -81,10 +75,6 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonDown", "CameraControls", function( _, key )
             if key == KEY_UP or key == KEY_DOWN then
                 determineDistDir()
-            elseif key == KEY_LEFT then
-                adjustAng( 90 )
-            elseif key == KEY_RIGHT then
-                adjustAng( -90 )
             end
         end )
 
@@ -106,7 +96,7 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {
+        "Isometric",
         "ResidentEvil",
-        "TopDown",
     },
 } )
