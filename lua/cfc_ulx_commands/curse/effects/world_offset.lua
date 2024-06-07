@@ -1,6 +1,7 @@
 local EFFECT_NAME = "WorldOffset"
 local OFFSET_MIN = Vector( -200, -200, 0 )
 local OFFSET_MAX = Vector( 200, 200, 0 )
+-- Offsets rendering of the world entity. Does not affect the rendering of other entities.
 
 
 local pushed = false
