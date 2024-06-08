@@ -87,6 +87,7 @@ function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
     effectNameToID[name] = id
     effectData.name = name
     effectData.nameUpper = nameUpper
+    effectData.incompatabileEffects = effectData.incompatabileEffects or {}
 
     if effectData.excludeFromOnetime ~= true then
         table.insert( onetimeEffectIDs, id )
