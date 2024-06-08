@@ -1,14 +1,17 @@
 local EFFECT_NAME = "Schizophrenia"
 local SPAWN_ATTEMPT_INTERVAL = 0.05
 
-local DISAPPEAR_DELAY_MIN = 0
-local DISAPPEAR_DELAY_MAX = 0.15
+local DISAPPEAR_DELAY_MIN = 0.5
+local DISAPPEAR_DELAY_MAX = 1
+
+local FLEE_SPEED_MIN = 1200
+local FLEE_SPEED_MAX = 1500
 
 local DISAPPEAR_MARGIN = 100
 local APPEAR_MARGIN = 200
 
 local SPAWN_RADIUS_MIN = 100
-local SPAWN_RADIUS_MAX = 3000
+local SPAWN_RADIUS_MAX = 2000
 local SPAWN_CHANCE = 0.05
 local SPAWN_COOLDOWN = 5
 local SPAWN_ATTEMPTS = 10
@@ -137,10 +140,12 @@ local SOUND_LIST = {
 
 
 local PI_DOUBLE = math.pi * 2
+local VECTOR_ZERO = Vector( 0, 0, 0 )
 local VECTOR_UP_SHORT = Vector( 0, 0, 10 )
 local VECTOR_DOWN_LONG = Vector( 0, 0, -10000 )
 
 local ghosts = {}
+local fleeingGhosts = {}
 local nextSpawnTime = 0
 local nextSoundTime = 0
 
@@ -180,6 +185,20 @@ local function getRandomPlayer()
     return plys[math.random( 1, #plys )]
 end
 
+local function getFleeDir( pos, eyePos, eyeDir )
+    local toGhost = pos - eyePos
+    if toGhost == VECTOR_ZERO then return toGhost end
+    --local dist = toGhost:Length()
+    --if dist == 0 then return Vector() end
+
+    --local toGhostDir = toGhost / dist
+
+    local fleeDir = eyeDir:Cross( toGhost ):Cross( eyeDir )
+    fleeDir:Normalize()
+
+    return fleeDir
+end
+
 local function delayedRemove( ent )
     local delay = math.Rand( DISAPPEAR_DELAY_MIN, DISAPPEAR_DELAY_MAX )
 
@@ -194,12 +213,16 @@ local function poofVisibleGhosts()
     local edgeW = ScrW() - DISAPPEAR_MARGIN
     local edgeH = ScrH() - DISAPPEAR_MARGIN
 
+    local eyePos = EyePos()
+    local eyeDir = EyeVector()
+
     for i = #ghosts, 1, -1 do
         local ghost = ghosts[i]
 
         -- Ents made from ClientsideModel() can sometimes become invalid under various circumstances.
         if IsValid( ghost ) then
-            local scrPos = ghost:GetPos():ToScreen()
+            local pos = ghost:GetPos()
+            local scrPos = pos:ToScreen()
 
             if scrPos.visible then
                 local x = scrPos.x
@@ -207,12 +230,34 @@ local function poofVisibleGhosts()
 
                 -- If the ghost is far enough into the screen, remove it.
                 if x > DISAPPEAR_MARGIN and x < edgeW and y > DISAPPEAR_MARGIN and y < edgeH then
+                    local fleeDir = getFleeDir( pos, eyePos, eyeDir )
+
+                    ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel = fleeDir * math.Rand( FLEE_SPEED_MIN, FLEE_SPEED_MAX )
+
                     table.remove( ghosts, i )
+                    table.insert( fleeingGhosts, ghost )
                     delayedRemove( ghost )
                 end
             end
         else
             table.remove( ghosts, i )
+        end
+    end
+end
+
+local function moveFleeingGhosts()
+    local dt = FrameTime()
+
+    for i = #fleeingGhosts, 1, -1 do
+        local ghost = fleeingGhosts[i]
+
+        if IsValid( ghost ) then
+            local fleeVel = ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel
+            local pos = ghost:GetPos()
+
+            ghost:SetPos( pos + fleeVel * dt )
+        else
+            table.remove( fleeingGhosts, i )
         end
     end
 end
@@ -284,6 +329,7 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Schizo", function()
             poofVisibleGhosts()
+            moveFleeingGhosts()
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
