@@ -9,7 +9,13 @@ function ENT:Initialize()
     self:PhysicsInit( SOLID_VPHYSICS )
     self:SetSolid( SOLID_VPHYSICS )
     self:SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS )
-    self:PhysWake()
+
+    local phys = self:GetPhysicsObject()
+    if IsValid( phys ) then
+        phys:EnableDrag( false )
+        phys:SetMass( 50000 )
+        phys:Wake()
+    end
 end
 
 function ENT:PhysicsCollide( colData )
