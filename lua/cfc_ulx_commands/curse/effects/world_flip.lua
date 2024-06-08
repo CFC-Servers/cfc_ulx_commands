@@ -59,4 +59,13 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenMirror",
         "ScreenScroll",
     },
+    groups = {
+        "Input",
+        "ViewAngles",
+        "AD",
+    },
+    incompatibleGroups = {
+        "ViewAngles",
+        "AD",
+    },
 } )

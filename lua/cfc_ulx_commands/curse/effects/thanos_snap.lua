@@ -70,4 +70,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "FullGameUpdate"
+    },
+    incompatibleGroups = {},
 } )

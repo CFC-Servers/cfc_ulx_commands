@@ -30,4 +30,6 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "HealthObfuscate",
     },
+    groups = {},
+    incompatibleGroups = {},
 } )

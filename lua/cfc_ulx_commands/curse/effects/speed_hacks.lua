@@ -114,4 +114,10 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "Speed",
+    },
+    incompatibleGroups = {
+        "Speed",
+    },
 } )

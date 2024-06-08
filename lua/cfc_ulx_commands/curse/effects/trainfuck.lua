@@ -19,4 +19,8 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = true,
     blockCustomDuration = true,
     incompatabileEffects = {},
+    groups = {
+        "Death",
+    },
+    incompatibleGroups = {},
 } )

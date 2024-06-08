@@ -133,6 +133,12 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         EFFECT_NAME_CONTINUOUS,
     },
+    groups = {
+        "Textures",
+    },
+    incompatibleGroups = {
+        "Textures",
+    },
 } )
 
 
@@ -172,5 +178,11 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatabileEffects = {
         EFFECT_NAME
+    },
+    groups = {
+        "Textures",
+    },
+    incompatibleGroups = {
+        "Textures",
     },
 } )

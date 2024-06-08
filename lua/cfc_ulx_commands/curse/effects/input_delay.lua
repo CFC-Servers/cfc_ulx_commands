@@ -77,5 +77,14 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatabileEffects = {
+        "InputDrop",
+    },
+    groups = {
+        "Input",
+        "ViewAngles",
+    },
+    incompatibleGroups = {
+        "ViewAngles",
+    },
 } )

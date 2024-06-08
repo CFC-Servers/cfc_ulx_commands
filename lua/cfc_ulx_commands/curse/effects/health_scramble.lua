@@ -52,4 +52,12 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "HealthObfuscate",
     },
+    groups = {
+        "Health",
+        "Armor",
+    },
+    incompatibleGroups = {
+        "Health",
+        "Armor",
+    },
 } )

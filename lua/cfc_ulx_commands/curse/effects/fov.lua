@@ -49,4 +49,10 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "FOV",
+    },
+    incompatibleGroups = {
+        "FOV",
+    },
 } )

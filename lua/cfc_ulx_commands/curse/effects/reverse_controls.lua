@@ -34,4 +34,13 @@ CFCUlxCurse.RegisterEffect( {
         "RotatedControls",
         "Swagger",
     },
+    groups = {
+        "Input",
+        "WS",
+        "AD",
+    },
+    incompatibleGroups = {
+        "WS",
+        "AD",
+    },
 } )

@@ -12,7 +12,9 @@
 CFCUlxCurse = CFCUlxCurse or {}
 CFCUlxCurse.EffectGlobals = CFCUlxCurse.EffectGlobals or {} -- Effects can store global vars here, preferably in a subtable indexed by the effect's lowercase name.
 CFCUlxCurse.Effects = {}
-CFCUlxCurse.EffectIncompatibilities = {}
+CFCUlxCurse.EffectIncompatibilities = {} -- lowercase curse name -> lookup table of lowercase curse names -> true
+CFCUlxCurse.EffectGroups = {} -- lowercase curse name -> list of lowercase group names
+CFCUlxCurse.EffectGroupIncompatibilities = {} -- lowercase curse name -> lookup table of lowercase group names -> true
 
 local effectNameToID = {}
 local onetimeEffectIDs = {}
@@ -20,6 +22,8 @@ local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, lis
 local effectTimers = {} -- Player -> { effectNameOne = { string, ... }, effectNameTwo = ..., ... }
 local getRandomCompatibleEffect
 local storeEffectIncompatibilities
+local storeEffectGroups
+local storeEffectGroupIncompatibilities
 local areEffectsCompatible
 
 
@@ -59,6 +63,11 @@ local areEffectsCompatible
                 - If one of the names are "all", then this effect will be incompatible with all other effects.
                 - This will not affect giving the same effect multiple times, as it just restarts the effect.
             - If not specified, defaults to an empty table.
+        groups: (optional) (table)
+            - A list of names of groups that this effect belongs to.
+            - This is to categorize things like curses that control movement vs eye angles vs purely visual effects, etc.
+        incompatibleGroups: (optional) (table)
+            - A list of names of groups that this effect is incompatible with.
     hideOverrideMessage: (optional) (boolean)
         - If true, hides the no-halt error message that is printed when an effect is overwritten.
         - Should only be used for debugging/testing purposes.
@@ -88,12 +97,16 @@ function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
     effectData.name = name
     effectData.nameUpper = nameUpper
     effectData.incompatabileEffects = effectData.incompatabileEffects or {}
+    effectData.groups = effectData.groups or {}
+    effectData.incompatibleGroups = effectData.incompatibleGroups or {}
 
     if effectData.excludeFromOnetime ~= true then
         table.insert( onetimeEffectIDs, id )
     end
 
     storeEffectIncompatibilities( name, effectData.incompatabileEffects )
+    storeEffectGroups( name, effectData.groups )
+    storeEffectGroupIncompatibilities( name, effectData.incompatibleGroups )
 end
 
 function CFCUlxCurse.GetEffectByName( name )
@@ -459,6 +472,32 @@ storeEffectIncompatibilities = function( name, incompatabileEffects )
     end
 end
 
+storeEffectGroups = function( name, groups )
+    groups = groups or {}
+
+    local myGroups = {}
+    CFCUlxCurse.EffectGroups[name] = myGroups
+
+    for i, groupName in ipairs( groups ) do
+        groupName = string.lower( groupName )
+        groups[i] = groupName
+        myGroups[i] = groupName
+    end
+end
+
+storeEffectGroupIncompatibilities = function( name, incompatibleGroups )
+    incompatibleGroups = incompatibleGroups or {}
+
+    local myGroupIncompats = {}
+    CFCUlxCurse.EffectGroupIncompatibilities[name] = myGroupIncompats
+
+    for i, groupName in ipairs( incompatibleGroups ) do
+        groupName = string.lower( groupName )
+        incompatibleGroups[i] = groupName
+        myGroupIncompats[groupName] = true
+    end
+end
+
 -- Requires incompatsOne to be passed for optimization
 areEffectsCompatible = function( nameOne, nameTwo, incompatsOne )
     if nameOne == nameTwo then return true end
@@ -470,6 +509,19 @@ areEffectsCompatible = function( nameOne, nameTwo, incompatsOne )
 
     if incompatsOne[nameTwo] then return false end
     if incompatsTwo[nameOne] then return false end
+
+    local groupsOne = CFCUlxCurse.EffectGroups[nameOne]
+    local groupsTwo = CFCUlxCurse.EffectGroups[nameTwo]
+    local groupIncompatsOne = CFCUlxCurse.EffectGroupIncompatibilities[nameOne]
+    local groupIncompatsTwo = CFCUlxCurse.EffectGroupIncompatibilities[nameTwo]
+
+    for _, groupOne in ipairs( groupsOne ) do
+        if groupIncompatsTwo[groupOne] then return false end
+    end
+
+    for _, groupTwo in ipairs( groupsTwo ) do
+        if groupIncompatsOne[groupTwo] then return false end
+    end
 
     return true
 end

@@ -109,4 +109,10 @@ CFCUlxCurse.RegisterEffect( {
         "ResidentEvil",
         "TopDown",
     },
+    groups = {
+        "CalcView",
+    },
+    incompatibleGroups = {
+        "CalcView",
+    },
 } )

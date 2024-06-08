@@ -42,4 +42,8 @@ CFCUlxCurse.RegisterEffect( {
         "Jumpy",
         "NoJump",
     },
+    groups = {
+        "Death",
+    },
+    incompatibleGroups = {},
 } )

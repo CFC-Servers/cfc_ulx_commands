@@ -31,4 +31,13 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "Crouch",
     },
+    groups = {
+        "Input",
+        "Crouch",
+        "Walk",
+    },
+    incompatibleGroups = {
+        "Crouch",
+        "Walk",
+    },
 } )

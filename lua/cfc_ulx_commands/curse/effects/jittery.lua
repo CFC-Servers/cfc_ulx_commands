@@ -53,4 +53,11 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "Rubberband",
     },
+    groups = {
+        "Teleportation",
+        "AddedMovement",
+    },
+    incompatibleGroups = {
+        "Teleportation",
+    },
 } )

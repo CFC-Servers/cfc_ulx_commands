@@ -36,4 +36,6 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenScroll",
         "WorldFlip",
     },
+    groups = {},
+    incompatibleGroups = {},
 } )

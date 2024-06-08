@@ -40,4 +40,13 @@ CFCUlxCurse.RegisterEffect( {
         "ReverseControls",
         "Swagger",
     },
+    groups = {
+        "Input",
+        "WS",
+        "AD",
+    },
+    incompatibleGroups = {
+        "WS",
+        "AD",
+    },
 } )

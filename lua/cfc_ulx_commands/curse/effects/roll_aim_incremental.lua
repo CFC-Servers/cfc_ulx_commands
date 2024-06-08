@@ -51,4 +51,10 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "RollAim",
     },
+    groups = {
+        "ViewAngles",
+    },
+    incompatibleGroups = {
+        "ViewAngles",
+    },
 } )

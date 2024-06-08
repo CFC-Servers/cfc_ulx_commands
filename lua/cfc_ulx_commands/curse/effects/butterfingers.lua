@@ -49,4 +49,6 @@ CFCUlxCurse.RegisterEffect( {
         "WeaponIndecision",
         "NoInteract",
     },
+    groups = {},
+    incompatibleGroups = {},
 } )

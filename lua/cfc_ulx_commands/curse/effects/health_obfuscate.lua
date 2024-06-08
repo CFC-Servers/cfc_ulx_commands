@@ -80,4 +80,10 @@ CFCUlxCurse.RegisterEffect( {
         "HealthScramble",
         "NoHud",
     },
+    groups = {
+        "CHudHealth",
+    },
+    incompatibleGroups = {
+        "CHudHealth",
+    },
 } )

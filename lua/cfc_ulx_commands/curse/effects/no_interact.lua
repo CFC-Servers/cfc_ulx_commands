@@ -26,4 +26,8 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "Butterfingers",
     },
+    groups = {
+        "Input",
+    },
+    incompatibleGroups = {},
 } )

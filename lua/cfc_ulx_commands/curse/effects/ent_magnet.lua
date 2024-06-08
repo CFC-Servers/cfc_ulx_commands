@@ -58,4 +58,11 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "EntJitter",
     },
+    groups = {
+        "AllEntPos",
+        "FullUpdate",
+    },
+    incompatibleGroups = {
+        "AllEntPos",
+    },
 } )

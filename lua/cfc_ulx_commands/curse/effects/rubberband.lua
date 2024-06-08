@@ -73,4 +73,10 @@ CFCUlxCurse.RegisterEffect( {
         "Ball",
         "Jittery",
     },
+    groups = {
+        "Teleportation",
+    },
+    incompatibleGroups = {
+        "Teleportation",
+    },
 } )

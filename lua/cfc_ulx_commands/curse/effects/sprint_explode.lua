@@ -39,4 +39,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "Death",
+    },
+    incompatibleGroups = {},
 } )

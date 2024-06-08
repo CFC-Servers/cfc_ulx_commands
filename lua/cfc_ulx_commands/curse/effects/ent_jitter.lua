@@ -41,4 +41,11 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "EntMagnet",
     },
+    groups = {
+        "AllEntPos",
+        "FullUpdate",
+    },
+    incompatibleGroups = {
+        "AllEntPos",
+    },
 } )

@@ -23,4 +23,11 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "TheseBootsAreMadeForWalking",
     },
+    groups = {
+        "Input",
+        "WS",
+    },
+    incompatibleGroups = {
+        "WS",
+    },
 } )

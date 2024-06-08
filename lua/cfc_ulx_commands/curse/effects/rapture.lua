@@ -67,4 +67,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
     incompatabileEffects = {},
+    groups = {
+        "AddedMovement",
+    },
+    incompatibleGroups = {},
 } )

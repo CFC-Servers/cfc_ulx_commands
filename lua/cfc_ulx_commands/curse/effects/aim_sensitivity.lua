@@ -30,4 +30,10 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "MouseSensitivity",
+    },
+    incompatibleGroups = {
+        "MouseSensitivity",
+    },
 } )

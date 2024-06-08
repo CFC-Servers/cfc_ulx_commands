@@ -34,4 +34,11 @@ CFCUlxCurse.RegisterEffect( {
         "RotatedControls",
         "ReverseControls",
     },
+    groups = {
+        "Input",
+        "AD",
+    },
+    incompatibleGroups = {
+        "AD",
+    },
 } )

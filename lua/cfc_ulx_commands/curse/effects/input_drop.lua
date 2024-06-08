@@ -65,5 +65,11 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatabileEffects = {
+        "InputDelay", -- Curses that make the client think it can left click cause issues.
+    },
+    groups = {
+        "Input",
+    },
+    incompatibleGroups = {},
 } )

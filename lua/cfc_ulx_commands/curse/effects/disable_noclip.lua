@@ -37,4 +37,10 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "NoclipSpam",
     },
+    groups = {
+        "BlockNoclip",
+    },
+    incompatibleGroups = {
+        "Noclip",
+    },
 } )

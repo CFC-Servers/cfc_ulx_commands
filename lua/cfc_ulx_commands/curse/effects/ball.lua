@@ -38,7 +38,14 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
     blockCustomDuration = true,
-    incompatabileEffects = {
-        "all",
+    incompatabileEffects = {},
+    groups = {
+        "Transformative",
+    },
+    incompatibleGroups = {
+        "Transformative",
+        "AddedMovement",
+        "Teleportation",
+        "Death",
     },
 } )

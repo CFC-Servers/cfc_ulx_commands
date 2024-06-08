@@ -23,4 +23,11 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "Crab",
     },
+    groups = {
+        "Input",
+        "WS",
+    },
+    incompatibleGroups = {
+        "WS",
+    },
 } )

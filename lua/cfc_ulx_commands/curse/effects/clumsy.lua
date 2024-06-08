@@ -60,4 +60,10 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatabileEffects = {},
+    groups = {
+        "Transformative",
+    },
+    incompatibleGroups = {
+        "Transformative",
+    },
 } )

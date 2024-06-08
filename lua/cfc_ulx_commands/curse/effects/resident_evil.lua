@@ -161,4 +161,10 @@ CFCUlxCurse.RegisterEffect( {
         "Isometric",
         "TopDown",
     },
+    groups = {
+        "CalcView",
+    },
+    incompatibleGroups = {
+        "CalcView",
+    },
 } )

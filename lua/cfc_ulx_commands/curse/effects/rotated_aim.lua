@@ -45,4 +45,10 @@ CFCUlxCurse.RegisterEffect( {
     incompatabileEffects = {
         "InvertedAim",
     },
+    groups = {
+        "ViewAngles",
+    },
+    incompatibleGroups = {
+        "ViewAngles",
+    },
 } )

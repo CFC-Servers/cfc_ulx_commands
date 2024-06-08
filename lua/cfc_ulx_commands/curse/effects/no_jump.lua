@@ -24,4 +24,6 @@ CFCUlxCurse.RegisterEffect( {
         "JumpExplode",
         "Jumpy",
     },
+    groups = {},
+    incompatibleGroups = {},
 } )

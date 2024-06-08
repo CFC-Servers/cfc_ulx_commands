@@ -99,4 +99,10 @@ CFCUlxCurse.RegisterEffect( {
         "Isometric",
         "ResidentEvil",
     },
+    groups = {
+        "CalcView",
+    },
+    incompatibleGroups = {
+        "CalcView",
+    },
 } )
