@@ -188,10 +188,6 @@ end
 local function getFleeDir( pos, eyePos, eyeDir )
     local toGhost = pos - eyePos
     if toGhost == VECTOR_ZERO then return toGhost end
-    --local dist = toGhost:Length()
-    --if dist == 0 then return Vector() end
-
-    --local toGhostDir = toGhost / dist
 
     local fleeDir = eyeDir:Cross( toGhost ):Cross( eyeDir )
     fleeDir:Normalize()
