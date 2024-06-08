@@ -110,7 +110,10 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatibileEffects = {},
+    incompatibileEffects = {
+        "ColorModify",
+        "ColorModifyContinuous",
+    },
     groups = {
         "VisualOnly",
         "ScreenOverlay",

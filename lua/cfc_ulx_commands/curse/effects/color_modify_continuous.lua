@@ -99,7 +99,9 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = true,
-    incompatibileEffects = {},
+    incompatibileEffects = {
+        "MotionSight",
+    },
     groups = {
         "VisualOnly",
         "PP",
