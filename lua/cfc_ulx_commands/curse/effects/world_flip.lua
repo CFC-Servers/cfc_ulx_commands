@@ -60,11 +60,13 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenScroll",
     },
     groups = {
+        "ScreenOverlay",
         "Input",
         "ViewAngles",
         "AD",
     },
     incompatibleGroups = {
+        "ScreenOverlay",
         "ViewAngles",
         "AD",
     },

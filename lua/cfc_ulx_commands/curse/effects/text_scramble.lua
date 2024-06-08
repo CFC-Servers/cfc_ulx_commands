@@ -80,9 +80,9 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {},
     groups = {
-        "SurfaceDrawText",
+        "Wrap:Surface.DrawText",
     },
     incompatibleGroups = {
-        "SurfaceDrawText",
+        "Wrap:Surface.DrawText",
     },
 } )

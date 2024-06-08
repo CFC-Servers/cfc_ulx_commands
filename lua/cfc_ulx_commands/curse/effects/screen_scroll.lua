@@ -59,6 +59,11 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenMirror",
         "WorldFlip",
     },
-    groups = {},
-    incompatibleGroups = {},
+    groups = {
+        "VisualOnly",
+        "ScreenOverlay",
+    },
+    incompatibleGroups = {
+        "ScreenOverlay",
+    },
 } )
