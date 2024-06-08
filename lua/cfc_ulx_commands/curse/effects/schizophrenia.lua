@@ -1,4 +1,5 @@
 local EFFECT_NAME = "Schizophrenia"
+local SPAWN_ATTEMPT_INTERVAL = 0.05
 
 local DISAPPEAR_DELAY_MIN = 0
 local DISAPPEAR_DELAY_MAX = 0.15
@@ -8,12 +9,12 @@ local APPEAR_MARGIN = 200
 
 local SPAWN_RADIUS_MIN = 100
 local SPAWN_RADIUS_MAX = 3000
-local SPAWN_CHANCE = 0.01
+local SPAWN_CHANCE = 0.05
 local SPAWN_COOLDOWN = 5
 local SPAWN_ATTEMPTS = 10
 local SPAWN_LIMIT = 5
 
-local SOUND_CHANCE = 0.003
+local SOUND_CHANCE = 0.01
 local SOUND_COOLDOWN = 5
 local SOUND_RADIUS_MIN = 200
 local SOUND_RADIUS_MAX = 1500
@@ -283,6 +284,9 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Schizo", function()
             poofVisibleGhosts()
+        end )
+
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
             trySpawnGhost()
             tryPlaySound()
         end )
