@@ -265,11 +265,11 @@ local function tryPlaySound()
     if now < nextSoundTime then return end
     if SOUND_CHANCE ~= 1 and math.Rand( 0, 1 ) > SOUND_CHANCE then return end
 
-    nextSoundTime = now + SOUND_COOLDOWN
-
     local pos = LocalPlayer():GetPos() + randomInCircle( math.Rand( SOUND_RADIUS_MIN, SOUND_RADIUS_MAX ) )
+    local path = SOUND_LIST[math.random( 1, #SOUND_LIST )]
 
-    sound.Play( SOUND_LIST[math.random( 1, #SOUND_LIST )], pos )
+    nextSoundTime = now + SOUND_COOLDOWN + SoundDuration( path )
+    sound.Play( path, pos )
 end
 
 
