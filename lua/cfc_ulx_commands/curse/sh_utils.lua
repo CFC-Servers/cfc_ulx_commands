@@ -34,7 +34,7 @@ local areEffectsCompatible
             - The name must not be "all" as it is used for incompatability checks.
         onStart: (function)
             - Function to call when the effect starts.
-            - Has the form   function( ply )  end
+            - Has the form   function( ply, startTime, duration )  end
         onEnd: (function)
             - Function to call when the effect ends.
             - Has the form   function( ply )  end

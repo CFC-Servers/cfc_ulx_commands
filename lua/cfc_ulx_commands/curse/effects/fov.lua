@@ -12,7 +12,7 @@ local MULTI_CHANGE_TIMING_SPREAD = 0.15 -- Timings for each multi-change will be
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
-    onStart = function( cursedPly, curseDuration )
+    onStart = function( cursedPly, _, curseDuration )
         if CLIENT then return end
 
         local function randomizeFOV()
