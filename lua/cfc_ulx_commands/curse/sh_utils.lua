@@ -58,7 +58,7 @@ local areEffectsCompatible
         blockCustomDuration: (optional) (boolean)
             - If true, the duration of this effect cannot be manually overridden by the ulx curse command.
             - If not specified, defaults to false.
-        incompatabileEffects: (optional) (table)
+        incompatibileEffects: (optional) (table)
             - A list of effect names that are incompatible (not allowed to stack) with this effect.
                 - If one of the names are "all", then this effect will be incompatible with all other effects.
                 - This will not affect giving the same effect multiple times, as it just restarts the effect.
@@ -96,7 +96,7 @@ function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
     effectNameToID[name] = id
     effectData.name = name
     effectData.nameUpper = nameUpper
-    effectData.incompatabileEffects = effectData.incompatabileEffects or {}
+    effectData.incompatibileEffects = effectData.incompatibileEffects or {}
     effectData.groups = effectData.groups or {}
     effectData.incompatibleGroups = effectData.incompatibleGroups or {}
 
@@ -104,7 +104,7 @@ function CFCUlxCurse.RegisterEffect( effectData, hideOverrideMessage )
         table.insert( onetimeEffectIDs, id )
     end
 
-    storeEffectIncompatibilities( name, effectData.incompatabileEffects )
+    storeEffectIncompatibilities( name, effectData.incompatibileEffects )
     storeEffectGroups( name, effectData.groups )
     storeEffectGroupIncompatibilities( name, effectData.incompatibleGroups )
 end
@@ -451,23 +451,23 @@ getRandomCompatibleEffect = function( ply, effectDatas )
     return compatEffects[id]
 end
 
-storeEffectIncompatibilities = function( name, incompatabileEffects )
-    incompatabileEffects = incompatabileEffects or {}
+storeEffectIncompatibilities = function( name, incompatibileEffects )
+    incompatibileEffects = incompatibileEffects or {}
 
     local myIncompats = {}
     CFCUlxCurse.EffectIncompatibilities[name] = myIncompats
 
-    for i, otherName in ipairs( incompatabileEffects ) do
-        incompatabileEffects[i] = string.lower( otherName )
+    for i, otherName in ipairs( incompatibileEffects ) do
+        incompatibileEffects[i] = string.lower( otherName )
     end
 
-    if incompatabileEffects.all then
+    if incompatibileEffects.all then
         myIncompats.all = true
 
         return
     end
 
-    for _, otherName in ipairs( incompatabileEffects ) do
+    for _, otherName in ipairs( incompatibileEffects ) do
         myIncompats[otherName] = true
     end
 end

@@ -23,7 +23,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 20,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "Butterfingers",
     },
     groups = {

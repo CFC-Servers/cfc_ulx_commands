@@ -42,7 +42,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 20,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "InvertedAim",
     },
     groups = {
