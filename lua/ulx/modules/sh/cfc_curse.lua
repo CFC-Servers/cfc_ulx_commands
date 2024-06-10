@@ -1,5 +1,6 @@
 CFCUlxCommands.curse = CFCUlxCommands.curse or {}
 local cmd = CFCUlxCommands.curse
+local multiCurseLimit = 100
 
 CATEGORY_NAME = "Fun"
 
@@ -79,6 +80,12 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
     end
 
     if amount then
+        if amount < 1 or amount > multiCurseLimit or math.floor( amount ) ~= amount then
+            ULib.tsayError( callingPlayer, "Invalid amount: " .. amount )
+
+            return
+        end
+
         isSpecificEffect = false
     end
 
