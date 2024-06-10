@@ -79,6 +79,8 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonDown", "CameraControls", function( _, key )
+            if not IsFirstTimePredicted() then return end
+
             if key == KEY_UP or key == KEY_DOWN then
                 determineDistDir()
             elseif key == KEY_LEFT then
@@ -89,6 +91,8 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonUp", "CameraControls", function( _, key )
+            if not IsFirstTimePredicted() then return end
+
             if key == KEY_UP or key == KEY_DOWN then
                 determineDistDir()
             end
