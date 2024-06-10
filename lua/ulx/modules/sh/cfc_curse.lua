@@ -120,6 +120,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
                         plyAmount = plyAmount - 1
                     else
                         table.remove( availableEffects, effectInd )
+                        availableEffects = CFCUlxCurse.FilterCompatibleEffects( ply, availableEffects ) -- Filter out effects that might be incompatible with the new one.
                     end
                 end
             end
