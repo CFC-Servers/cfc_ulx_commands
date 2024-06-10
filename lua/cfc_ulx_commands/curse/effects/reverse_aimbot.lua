@@ -13,7 +13,10 @@ local function getHeadPos( ply )
     local boneID = ply:GetHitBoxBone( 0, 0 )
     if not boneID then return ply:GetPos() end
 
-    return ply:GetBoneMatrix( boneID ):GetTranslation()
+    local matrix = ply:GetBoneMatrix( boneID )
+    if not matrix then return ply:GetPos() end -- Sometimes nil after full game updates.
+
+    return matrix:GetTranslation()
 end
 
 local function aimAwayFromHeads( localPly, viewAng )
