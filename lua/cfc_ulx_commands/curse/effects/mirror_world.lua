@@ -14,7 +14,8 @@ local gameMat2
 
 if CLIENT then
     gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb"
+        ["$basetexture"] = "_rt_fullframefb",
+        ["$ignorez"] = 1,
     } )
 end
 
