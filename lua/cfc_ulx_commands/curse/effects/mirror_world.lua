@@ -1,4 +1,4 @@
-local EFFECT_NAME = "WorldFlip"
+local EFFECT_NAME = "MirrorWorld"
 -- Horizontally flips 3D rendering and the player's controls.
 -- Adapted from code provided by TankNut.
 

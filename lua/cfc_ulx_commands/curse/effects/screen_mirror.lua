@@ -34,7 +34,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {
         "ScreenScroll",
-        "WorldFlip",
+        "MirrorWorld",
     },
     groups = {
         "VisualOnly",
