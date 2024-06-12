@@ -40,10 +40,12 @@ CFCUlxCurse.RegisterEffect( {
 
             motionSightMat1 = CreateMaterial( "cfc_ulx_commands_curse_motion_sight1", "UnlitGeneric", {
                 ["$basetexture"] = motionSightRT1:GetName(),
+                ["$ignorez"] = 1,
             } )
 
             motionSightMat2 = CreateMaterial( "cfc_ulx_commands_curse_motion_sight2", "UnlitGeneric", {
                 ["$basetexture"] = motionSightRT2:GetName(),
+                ["$ignorez"] = 1,
             } )
         end
 
