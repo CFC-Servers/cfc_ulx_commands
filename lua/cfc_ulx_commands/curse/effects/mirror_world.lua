@@ -26,6 +26,7 @@ CFCUlxCurse.RegisterEffect( {
         if SERVER then return end
 
         globals.vectorToScreen = globals.vectorToScreen or vectorMeta.ToScreen
+        local oldToScreen = globals.vectorToScreen
 
         function vectorMeta:ToScreen()
             local scrPos = oldToScreen( self )
