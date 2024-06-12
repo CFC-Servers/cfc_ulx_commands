@@ -3,6 +3,12 @@ local EFFECT_NAME = "WorldFlip"
 -- Adapted from code provided by TankNut.
 
 
+-- Create global table
+local EFFECT_NAME_LOWER = string.lower( EFFECT_NAME )
+CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] or {}
+local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
+
+local vectorMeta = FindMetaTable( "Vector" )
 local gameMat2
 
 
@@ -18,6 +24,17 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function( cursedPly )
         if SERVER then return end
+
+        globals.vectorToScreen = globals.vectorToScreen or vectorMeta.ToScreen
+
+        function vectorMeta:ToScreen()
+            local scrPos = oldToScreen( self )
+            if not scrPos.visible then return scrPos end
+
+            scrPos.x = ScrW() - scrPos.x
+
+            return scrPos
+        end
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawViewModels", "FlipTheScreen", function()
             cam.Start2D()
@@ -48,7 +65,9 @@ CFCUlxCurse.RegisterEffect( {
     end,
 
     onEnd = function()
-        -- Do nothing.
+        if SERVER then return end
+
+        vectorMeta.ToScreen = globals.vectorToScreen
     end,
 
     minDuration = 60,
