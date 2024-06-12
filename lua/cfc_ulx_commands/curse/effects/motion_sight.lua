@@ -53,17 +53,12 @@ CFCUlxCurse.RegisterEffect( {
 
                 -- Draw the current screen to the second RT so that it receives the same aliasing/bluring as the first RT.
                 -- This fixes single-pixel differences that would show up if we just used RT1 and gameMat2.
-                local oldFlags = gameMat2:GetInt( "$flags" )
-                gameMat2:SetInt( "$flags", 32768 ) -- Ignorez is required when drawing materials to render targets
-
                 render.UpdateScreenEffectTexture()
 
                 render.PushRenderTarget( motionSightRT2 )
                     surface.SetMaterial( gameMat2 )
                     surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
                 render.PopRenderTarget()
-
-                gameMat2:SetInt( "$flags", oldFlags )
 
 
                 -- Draw the first RT, which is a capture of the screen delayed by DELAY seconds.
@@ -85,9 +80,6 @@ CFCUlxCurse.RegisterEffect( {
             nextCaptureTime = now + DELAY
 
             -- Capture the current screen to the first RT.
-            local oldFlags = gameMat2:GetInt( "$flags" )
-            gameMat2:SetInt( "$flags", 32768 ) -- Ignorez is required when drawing materials to render targets
-
             cam.Start2D()
             render.PushRenderTarget( motionSightRT1 )
                 surface.SetDrawColor( 255, 255, 255, 255 )
@@ -96,8 +88,6 @@ CFCUlxCurse.RegisterEffect( {
                 render.OverrideBlend( false )
             render.PopRenderTarget()
             cam.End2D()
-
-            gameMat2:SetInt( "$flags", oldFlags )
         end )
     end,
 
