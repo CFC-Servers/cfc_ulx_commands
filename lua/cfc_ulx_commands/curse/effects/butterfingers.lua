@@ -45,8 +45,10 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 50,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "WeaponIndecision",
         "NoInteract",
     },
+    groups = {},
+    incompatibleGroups = {},
 } )

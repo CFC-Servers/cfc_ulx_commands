@@ -43,7 +43,13 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "RollAimIncremental",
+    },
+    groups = {
+        "ViewAngles",
+    },
+    incompatibleGroups = {
+        "ViewAngles",
     },
 } )

@@ -20,7 +20,14 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "Crab",
+    },
+    groups = {
+        "Input",
+        "WS",
+    },
+    incompatibleGroups = {
+        "WS",
     },
 } )

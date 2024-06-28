@@ -157,5 +157,14 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 90,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatibileEffects = {
+        "Isometric",
+        "TopDown",
+    },
+    groups = {
+        "CalcView",
+    },
+    incompatibleGroups = {
+        "CalcView",
+    },
 } )

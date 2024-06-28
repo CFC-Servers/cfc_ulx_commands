@@ -36,7 +36,17 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "ReverseControls",
+        "Swagger",
+    },
+    groups = {
+        "Input",
+        "WS",
+        "AD",
+    },
+    incompatibleGroups = {
+        "WS",
+        "AD",
     },
 } )
