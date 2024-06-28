@@ -67,11 +67,15 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
     local effectOverride
     isSilent = isSilent or false
 
-    local isSpecificEffect =
+    local isSpecificEffect = -- Gave a non-random effect name AND is either cursing or not doing 'uncurse all'
         type( effectName ) == "string" and
         effectName ~= "random" and
         ( not shouldUncurse or effectName ~= "all" )
-    local amount = isSpecificEffect and not shouldUncurse and tonumber( effectName ) or nil
+
+    local amount = -- Cursing and gave a specific number of effects to apply
+        isSpecificEffect and
+        not shouldUncurse and
+        tonumber( effectName ) or nil
 
     if amount == 1 then
         amount = false
