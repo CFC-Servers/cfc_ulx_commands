@@ -35,6 +35,10 @@ AW.enabledCommands = {
     ["ulx pvpban"] = { skipEmptyReason = true },
     ["ulx pvpbanid"] = {},
 
+    -- BuildBan
+    ["ulx buildban"] = { skipEmptyReason = true },
+    ["ulx buildbanid"] = {},
+
     -- Chipban
     ["ulx chipban"] = { skipEmptyReason = true },
     ["ulx chipbanid"] = {},
