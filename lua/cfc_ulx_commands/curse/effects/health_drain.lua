@@ -51,5 +51,12 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 4 * 100 / DRAIN_RATE,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatabileEffects = {},
+    incompatibileEffects = {},
+    groups = {
+        "Health",
+        "Death",
+    },
+    incompatibleGroups = {
+        "Health",
+    },
 } )

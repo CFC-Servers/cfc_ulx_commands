@@ -111,5 +111,14 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 60,
     onetimeDurationMult = 2,
     excludeFromOnetime = true,
-    incompatabileEffects = {},
+    incompatibileEffects = {},
+    groups = {
+        "AddedMovement",
+        "BlockNoclip",
+        "Death",
+        "Friction",
+    },
+    incompatibleGroups = {
+        "Friction",
+    },
 } )

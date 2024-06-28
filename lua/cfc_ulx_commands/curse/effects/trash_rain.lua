@@ -91,7 +91,11 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 80,
     onetimeDurationMult = 2,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatibileEffects = {},
+    groups = {
+        "VisualOnly",
+    },
+    incompatibleGroups = {},
 } )
 
 

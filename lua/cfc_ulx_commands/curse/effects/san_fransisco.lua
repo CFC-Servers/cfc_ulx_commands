@@ -3,6 +3,8 @@ local AMPLITUDE_MIN = 3
 local AMPLITUDE_MAX = 8
 local AMPLITUDE_MIN_GROWTH = 2 -- Per second
 local AMPLITUDE_MAX_GROWTH = 4 -- Per second
+local AMPLITUDE_MIN_LIMIT = AMPLITUDE_MIN * 15
+local AMPLITUDE_MAX_LIMIT = AMPLITUDE_MAX * 15
 local FREQUENCY = 40
 local DURATION_MIN = 0.1
 local DURATION_MAX = 1
@@ -28,8 +30,8 @@ CFCUlxCurse.RegisterEffect( {
             util.ScreenShake( Vector(), amplitude, FREQUENCY, duration, 1 )
             timer.Adjust( timerNameEff, interval )
 
-            amplitudeMin = amplitudeMin + AMPLITUDE_MIN_GROWTH * interval
-            amplitudeMax = amplitudeMax + AMPLITUDE_MAX_GROWTH * interval
+            amplitudeMin = math.min( amplitudeMin + AMPLITUDE_MIN_GROWTH * interval, AMPLITUDE_MIN_LIMIT )
+            amplitudeMax = math.min( amplitudeMax + AMPLITUDE_MAX_GROWTH * interval, AMPLITUDE_MAX_LIMIT )
         end )
     end,
 
@@ -41,5 +43,9 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = 1.5,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatibileEffects = {},
+    groups = {
+        "VisualOnly",
+    },
+    incompatibleGroups = {},
 } )

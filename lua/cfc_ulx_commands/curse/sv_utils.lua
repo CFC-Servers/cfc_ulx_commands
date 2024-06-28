@@ -67,21 +67,23 @@ function CFCUlxCurse.ApplyCurseEffect( ply, effectDataOrName, duration )
         duration = math.Rand( minDuration, maxDuration ) * durationMult
     end
 
+    local now = CurTime()
     local effect = {
         effectData = effectData,
-        expireTime = CurTime() + duration,
+        expireTime = now + duration,
     }
 
     CFCUlxCurse.GetCurrentEffects( ply )[effectName] = effect
 
     ProtectedCall( function()
-        effectData.onStart( ply, duration )
+        effectData.onStart( ply, now, duration )
     end )
 
     addInflictedPlayer( ply )
 
     net.Start( "CFC_ULXCommands_Curse_StartEffect" )
     net.WriteString( effectName )
+    net.WriteFloat( now )
     net.WriteFloat( duration )
     net.Send( ply )
 end

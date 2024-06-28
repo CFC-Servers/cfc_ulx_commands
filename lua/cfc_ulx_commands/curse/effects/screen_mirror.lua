@@ -32,7 +32,15 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "ScreenScroll",
+        "MirrorWorld",
+    },
+    groups = {
+        "VisualOnly",
+        "ScreenOverlay",
+    },
+    incompatibleGroups = {
+        "ScreenOverlay",
     },
 } )

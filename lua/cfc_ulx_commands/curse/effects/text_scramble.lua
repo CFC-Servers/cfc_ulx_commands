@@ -78,5 +78,11 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {},
+    incompatibileEffects = {},
+    groups = {
+        "Wrap:Surface.DrawText",
+    },
+    incompatibleGroups = {
+        "Wrap:Surface.DrawText",
+    },
 } )

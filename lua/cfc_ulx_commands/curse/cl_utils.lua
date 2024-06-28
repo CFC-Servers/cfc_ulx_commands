@@ -5,6 +5,7 @@ net.Receive( "CFC_ULXCommands_Curse_StartEffect", function()
     local effectData = CFCUlxCurse.GetEffectByName( effectName )
     if not effectData then return end
 
+    local startTime = net.ReadFloat()
     local duration = net.ReadFloat()
 
     local ply = LocalPlayer()
@@ -12,11 +13,11 @@ net.Receive( "CFC_ULXCommands_Curse_StartEffect", function()
 
     curseEffects[effectName] = {
         effectData = effectData,
-        expireTime = CurTime() + duration,
+        expireTime = startTime + duration,
     }
 
     ProtectedCall( function()
-        effectData.onStart( ply, duration )
+        effectData.onStart( ply, startTime, duration )
     end )
 end )
 

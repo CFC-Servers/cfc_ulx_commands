@@ -38,8 +38,12 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 50,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatabileEffects = {
+    incompatibileEffects = {
         "Jumpy",
         "NoJump",
     },
+    groups = {
+        "Death",
+    },
+    incompatibleGroups = {},
 } )

@@ -1,4 +1,6 @@
-local EFFECT_NAME = "ReverseControls"
+local EFFECT_NAME = "Swagger"
+local SWAGGER_INTERVAL = 0.1
+local SWAGGER_CHANGE_CHANCE = 0.3
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -7,18 +9,16 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
-            if cmd:KeyDown( IN_FORWARD ) then
-                cmd:SetForwardMove( -10000 )
-            elseif cmd:KeyDown( IN_BACK ) then
-                cmd:SetForwardMove( 10000 )
-            end
+        local swaggerDir = 0
 
-            if cmd:KeyDown( IN_MOVERIGHT ) then
-                cmd:SetSideMove( -10000 )
-            elseif cmd:KeyDown( IN_MOVELEFT ) then
-                cmd:SetSideMove( 10000 )
-            end
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
+            cmd:SetSideMove( 10000 * swaggerDir )
+        end )
+
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "SwaggerChange", SWAGGER_INTERVAL, 0, function()
+            if SWAGGER_CHANGE_CHANCE ~= 1 and math.Rand( 0, 1 ) > SWAGGER_CHANGE_CHANCE then return end
+
+            swaggerDir = math.random( -1, 1 )
         end )
     end,
 
@@ -32,15 +32,13 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {
         "RotatedControls",
-        "Swagger",
+        "ReverseControls",
     },
     groups = {
         "Input",
-        "WS",
         "AD",
     },
     incompatibleGroups = {
-        "WS",
         "AD",
     },
 } )
