@@ -172,7 +172,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
 
         local durationAppend, briefly = getDurationStrings( durationSeconds, false )
 
-        ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " cursed #T with " .. amountStr .. " random effects" .. durationAppend, targetPlayers )
+        ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " afflicted #T with " .. amountStr .. " random curses" .. durationAppend, targetPlayers )
 
         return
     end
@@ -212,7 +212,7 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
 
             ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " cursed #T with " .. effectPrettyName .. durationAppend, targetPlayers )
         else -- Random effect
-            ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " cursed #T with a random effect" .. durationAppend, targetPlayers )
+            ulx.fancyLogAdmin( callingPlayer, isSilent, "#A" .. briefly .. " afflicted #T with a random curse" .. durationAppend, targetPlayers )
         end
     end
 end
