@@ -30,9 +30,9 @@ local errorMaterialNames = globals._errorMaterialNames
 local function getOriginalTexture( mat )
     local matName = mat:GetName()
     local texture = originalTextures[matName]
-    if texture then return texture end
+    if texture ~= nil then return texture end
 
-    texture = mat:GetTexture( "$basetexture" )
+    texture = mat:GetTexture( "$basetexture" ) or false
     originalTextures[matName] = texture
     table.insert( originalTexturesList, texture )
     table.insert( scrapedMaterialsList, mat )
@@ -44,7 +44,7 @@ end
 -- Will return nil if the material could not be found.
 local function getOriginalTextureFromName( matName )
     local texture = originalTextures[matName]
-    if texture then return texture end
+    if texture ~= nil then return texture end
 
     if errorMaterialNames[matName] then return end -- Avoid calling Material() more than needed.
 
@@ -59,15 +59,24 @@ local function getOriginalTextureFromName( matName )
     return getOriginalTexture( mat )
 end
 
+-- Some textures don't have a $basetexture.
+-- So, when reverting them or applying their (lack of a) texture to other materials, it needs :SetUndefined().
+local function setTextureSafe( mat, texture )
+    if texture then
+        mat:SetTexture( "$basetexture", texture )
+    else
+        mat:SetUndefined( "$basetexture" )
+    end
+end
+
 local function changeTexture( mat, texture )
-    getOriginalTexture( mat )
-    mat:SetTexture( "$basetexture", texture )
+    setTextureSafe( mat, texture )
     modifiedMaterials[mat:GetName()] = mat
 end
 
 local function revertTextures()
     for matName, mat in pairs( modifiedMaterials ) do
-        mat:SetTexture( "$basetexture", getOriginalTexture( mat ) )
+        setTextureSafe( mat, getOriginalTexture( mat ) )
         modifiedMaterials[matName] = nil
     end
 end
