@@ -80,12 +80,8 @@ function cmd.cursePlayers( callingPlayer, targetPlayers, effectName, durationMin
     end
 
     if amount then
-        if amount < 1 or amount > multiCurseLimit or math.floor( amount ) ~= amount then
-            ULib.tsayError( callingPlayer, "Invalid amount: " .. amount )
-
-            return
-        end
-
+        amount = math.floor( amount )
+        amount = math.Clamp( amount, 1, multiCurseLimit )
         isSpecificEffect = false
     end
 
