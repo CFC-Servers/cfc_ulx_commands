@@ -6,6 +6,9 @@ local DOTS_PER_SCAN = 50
 local DOT_SPREAD = 45
 local DOT_SIZE = 3
 local SKY_COLOR = Color( 130, 230, 230, 255 )
+local WATER_COLOR = Color( 50, 100, 225, 255 )
+local SLIME_COLOR = Color( 140, 120, 15, 255 )
+local TRACE_MASK = MASK_SOLID + CONTENTS_WATER + CONTENTS_SLIME
 
 
 local DOT_SPREAD_HALF = DOT_SPREAD / 2
@@ -23,6 +26,7 @@ local showDotHint = false
 local lidarMat = nil
 
 local mathRand = math.Rand
+local bitBand = bit.band
 local utilTraceLine = util.TraceLine
 local playerGetAll = player.GetAll
 local renderGetSurfaceColor = render.GetSurfaceColor
@@ -45,6 +49,7 @@ local function addDot( startPos, dir, filter )
         start = startPos,
         endpos = endPos,
         filter = filter,
+        mask = TRACE_MASK,
     } )
 
     if not tr.Hit then return end
@@ -53,10 +58,15 @@ local function addDot( startPos, dir, filter )
     if hitNormal == VECTOR_ZERO then return end
 
     local hitPos = tr.HitPos
+    local contents = tr.Contents
     local color
 
     if tr.HitSky then
         color = SKY_COLOR
+    elseif bitBand( contents, CONTENTS_WATER ) ~= 0 then
+        color = WATER_COLOR
+    elseif bitBand( contents, CONTENTS_SLIME ) ~= 0 then
+        color = SLIME_COLOR
     else
         color = renderGetSurfaceColor( hitPos - dir * 5, hitPos + dir * 5 )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
