@@ -40,15 +40,15 @@ local function getSoundForPool()
 end
 
 local function getSound( snd )
-    snd = soundLookup[snd]
+    local replacement = soundLookup[snd]
 
     -- Only shuffle sounds as needed, not all at once.
-    if not snd then
-        snd = getSoundForPool()
-        soundLookup[snd] = snd
+    if not replacement then
+        replacement = getSoundForPool()
+        soundLookup[snd] = replacement
     end
 
-    return snd
+    return replacement
 end
 
 
