@@ -32,7 +32,21 @@ local function getOriginalTexture( mat )
     local texture = originalTextures[matName]
     if texture ~= nil then return texture end
 
-    texture = mat:GetTexture( "$basetexture" ) or false
+    local textureStr = mat:GetString( "$basetexture" )
+    texture = false
+
+    -- Materials with no basetexture have nil for GetString() but return the error texture for GetTexture().
+    -- As such, first check the raw string, if it's empty or nil then consider it textureless, else check the texture object.
+    if textureStr ~= nil and textureStr ~= "" then
+        texture = mat:GetTexture( "$basetexture" ) or false
+
+        -- If the texture is an error texture, it's not a valid texture.
+        -- If the texture string is explicitly "error" however, it is intentional and should be kept.
+        if texture and textureStr ~= "error" and ( texture:IsError() or texture:IsErrorTexture() ) then
+            texture = false
+        end
+    end
+
     originalTextures[matName] = texture
     table.insert( originalTexturesList, texture )
     table.insert( scrapedMaterialsList, mat )
