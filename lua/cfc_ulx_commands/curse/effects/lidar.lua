@@ -175,9 +175,13 @@ CFCUlxCurse.RegisterEffect( {
                 drawMeshes()
             cam.End3D()
 
+            cam.Start2D()
+                render.RenderHUD( 0, 0, ScrW(), ScrH() )
+            cam.End2D()
+
             if showDotHint then
                 cam.Start2D()
-                    drawSimpleText( "Hold E to place dots", "DermaLarge", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                    drawSimpleText( "Hold E to place dots", "DermaLarge", ScrW() / 2, ScrH() / 2 + 50, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
                 cam.End2D()
             end
 
