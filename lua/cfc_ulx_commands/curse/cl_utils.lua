@@ -79,7 +79,7 @@ function CFCUlxCurse.MarchFolderCached( folder, path, forceRecache, dropRoot )
 end
 
 
------ SETUP ----
+----- SETUP -----
 
 net.Receive( "CFC_ULXCommands_Curse_StartEffect", function()
     local effectName = net.ReadString()
