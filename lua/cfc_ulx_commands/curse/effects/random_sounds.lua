@@ -131,7 +131,7 @@ CFCUlxCurse.RegisterEffect( {
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,
-    excludeFromOnetime = nil,
+    excludeFromOnetime = true, -- More overwhelming sensory-wise compared to SoundShuffle, and has lag at the start.
     incompatibileEffects = {},
     groups = {
         "Wrap:Sound",
