@@ -8,17 +8,15 @@ CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local soundLookup = {}
+local allSounds = nil
+local allSoundsLength = nil
 local entityMeta = FindMetaTable( "Entity" )
 
 local mathRandom = math.random
 local stringFind = string.find
 
 
-local function getSound( snd )
-    return soundLookup[snd] or snd
-end
-
-local function getSoundForPool( allSounds, allSoundsLength )
+local function getSoundForPool()
     local attempts = 10
     local snd = nil
 
@@ -40,6 +38,18 @@ local function getSoundForPool( allSounds, allSoundsLength )
     return snd
 end
 
+local function getSound( snd )
+    snd = soundLookup[snd]
+
+    -- Only shuffle sounds as needed, not all at once.
+    if not snd then
+        snd = getSoundForPool()
+        soundLookup[snd] = snd
+    end
+
+    return snd
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -47,13 +57,10 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        local allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
-        local allSoundsLength = #allSounds
+        allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
+        allSoundsLength = #allSounds
 
-        for i = 1, allSoundsLength do
-            local snd = allSounds[i]
-            soundLookup[snd] = getSoundForPool( allSounds, allSoundsLength )
-        end
+        table.Empty( soundLookup )
 
         globals.CreateSound = globals.CreateSound or CreateSound
         globals.EmitSound = globals.EmitSound or EmitSound
