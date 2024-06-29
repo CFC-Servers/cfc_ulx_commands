@@ -17,7 +17,7 @@ local entityMeta = FindMetaTable( "Entity" )
 
 local mathRandom = math.random
 local stringFind = string.find
-local SoundDuration = SoundDuration
+local soundDuration = SoundDuration
 
 
 local function getSound()
@@ -34,7 +34,7 @@ local function getSoundForPool( allSounds, allSoundsLength )
         -- Not perfect, but covers a lot of cases.
         local isBad =
             stringFind( snd, "loop" ) or
-            SoundDuration( snd ) > SOUND_DURATION_MAX
+            soundDuration( snd ) > SOUND_DURATION_MAX
 
         if isBad then
             attempts = attempts - 1
