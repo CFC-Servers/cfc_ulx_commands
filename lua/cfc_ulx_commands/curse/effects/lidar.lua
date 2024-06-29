@@ -239,6 +239,12 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {},
-    groups = {},
-    incompatibleGroups = {},
+    groups = {
+        "VisualOnly",
+        "ScreenOverlay",
+    },
+    incompatibleGroups = {
+        "ScreenOverlay",
+        "PP",
+    },
 } )
