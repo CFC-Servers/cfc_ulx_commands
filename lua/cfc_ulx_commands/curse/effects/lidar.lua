@@ -1,8 +1,8 @@
 local EFFECT_NAME = "Lidar"
 local VERTS_PER_MESH = 500 * 3
-local MESH_LIMIT = 100
+local MESH_LIMIT = 5000
 local SCAN_INTERVAL = 0.01
-local DOTS_PER_SCAN = 25
+local DOTS_PER_SCAN = 50
 local DOT_SPREAD = 45
 local DOT_SIZE = 3
 local SKY_COLOR = Color( 130, 230, 230, 255 )
