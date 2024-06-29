@@ -41,12 +41,11 @@ end
 
 local function getSound( snd )
     local replacement = soundLookup[snd]
+    if replacement then return replacement end -- Already shuffled, maintain the same replacement.
 
     -- Only shuffle sounds as needed, not all at once.
-    if not replacement then
-        replacement = getSoundForPool()
-        soundLookup[snd] = replacement
-    end
+    replacement = getSoundForPool()
+    soundLookup[snd] = replacement
 
     return replacement
 end
