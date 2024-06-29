@@ -1,5 +1,7 @@
 local EFFECT_NAME = "RandomSounds"
 local POOL_SIZE = 100 -- Smaller pool sizes help reduce lag from loading new sounds on the fly (most notable with footsteps).
+local POOL_BATCH_SIZE = 10 -- Builds up the pool in batches over time, since it requires sounds to be loaded to see if they're good.
+local POOL_BATCH_INTERVAL = 2
 local SOUND_DURATION_MAX = 5
 
 
@@ -10,6 +12,7 @@ local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local poolSounds = {}
 local poolSoundsLength = nil
+local poolSoundsTargetLength = nil
 local entityMeta = FindMetaTable( "Entity" )
 
 local mathRandom = math.random
@@ -43,6 +46,18 @@ local function getSoundForPool( allSounds, allSoundsLength )
     return snd
 end
 
+local function addBatchToPool( allSounds, allSoundsLength )
+    local i = poolSoundsLength + 1
+    local max = math.min( i + POOL_BATCH_SIZE - 1, poolSoundsTargetLength )
+
+    while i <= max do
+        poolSounds[i] = getSoundForPool( allSounds, allSoundsLength )
+        i = i + 1
+    end
+
+    poolSoundsLength = max
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -53,10 +68,16 @@ CFCUlxCurse.RegisterEffect( {
         local allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
         local allSoundsLength = #allSounds
 
-        poolSoundsLength = math.min( #allSounds, POOL_SIZE )
+        poolSoundsLength = 0
+        poolSoundsTargetLength = math.min( POOL_SIZE, allSoundsLength )
+        addBatchToPool( allSounds, allSoundsLength ) -- Add an initial batch so we can start playing sounds right away.
 
-        for i = 1, poolSoundsLength do
-            poolSounds[i] = getSoundForPool( allSounds, allSoundsLength )
+        local passes = math.ceil( POOL_SIZE / POOL_BATCH_SIZE ) - 1 -- -1 because we already added the first batch.
+
+        if passes > 0 then
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "FillPool", POOL_BATCH_INTERVAL, passes, function()
+                addBatchToPool( allSounds, allSoundsLength )
+            end )
         end
 
         globals.CreateSound = globals.CreateSound or CreateSound
