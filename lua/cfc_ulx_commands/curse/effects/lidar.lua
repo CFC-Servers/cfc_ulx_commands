@@ -4,6 +4,7 @@ local MESH_LIMIT = 100
 local SCAN_INTERVAL = 0.01
 local DOTS_PER_SCAN = 25
 local DOT_SPREAD = 45
+local DOT_SIZE = 3
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 
 
@@ -67,9 +68,15 @@ local function addDot( startPos, dir, filter )
     for _ = 1, 3 do
         offsetAng:RotateAroundAxis( hitNormal, -ROTATE_THIRD )
 
+        local offset = offsetAng:Forward()
+
+        if DOT_SIZE ~= 1 then
+            offset = offset * DOT_SIZE
+        end
+
         curVertCount = curVertCount + 1
         curMeshData[curVertCount] = {
-            pos = hitPos + offsetAng:Forward(),
+            pos = hitPos + offset,
             color = color,
             normal = hitNormal,
         }
