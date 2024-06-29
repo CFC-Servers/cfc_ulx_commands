@@ -10,6 +10,8 @@ local EFFECT_NAME_LOWER = string.lower( EFFECT_NAME )
 CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] or {}
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
+local allSounds = nil
+local allSoundsLength = nil
 local poolSounds = {}
 local poolSoundsLength = nil
 local poolSoundsTargetLength = nil
@@ -24,7 +26,7 @@ local function getSound()
     return poolSounds[mathRandom( 1, poolSoundsLength )]
 end
 
-local function getSoundForPool( allSounds, allSoundsLength )
+local function getSoundForPool()
     local attempts = 10
     local snd = nil
 
@@ -46,12 +48,12 @@ local function getSoundForPool( allSounds, allSoundsLength )
     return snd
 end
 
-local function addBatchToPool( allSounds, allSoundsLength )
+local function addBatchToPool()
     local i = poolSoundsLength + 1
     local max = math.min( i + POOL_BATCH_SIZE - 1, poolSoundsTargetLength )
 
     while i <= max do
-        poolSounds[i] = getSoundForPool( allSounds, allSoundsLength )
+        poolSounds[i] = getSoundForPool()
         i = i + 1
     end
 
@@ -65,19 +67,17 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        local allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
-        local allSoundsLength = #allSounds
+        allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
+        allSoundsLength = #allSounds
 
         poolSoundsLength = 0
         poolSoundsTargetLength = math.min( POOL_SIZE, allSoundsLength )
-        addBatchToPool( allSounds, allSoundsLength ) -- Add an initial batch so we can start playing sounds right away.
+        addBatchToPool() -- Add an initial batch so we can start playing sounds right away.
 
         local passes = math.ceil( POOL_SIZE / POOL_BATCH_SIZE ) - 1 -- -1 because we already added the first batch.
 
         if passes > 0 then
-            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "FillPool", POOL_BATCH_INTERVAL, passes, function()
-                addBatchToPool( allSounds, allSoundsLength )
-            end )
+            CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "FillPool", POOL_BATCH_INTERVAL, passes, addBatchToPool )
         end
 
         globals.CreateSound = globals.CreateSound or CreateSound
