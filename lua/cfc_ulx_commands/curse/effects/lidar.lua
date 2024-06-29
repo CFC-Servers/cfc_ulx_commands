@@ -1,33 +1,39 @@
 local EFFECT_NAME = "Lidar"
-local DOT_MAX = 15000
-local DOTS_PER_FRAME = 25
-local DOT_SIZE = 5
+local VERTS_PER_MESH = 500 * 3
+local MESH_LIMIT = 100
+local SCAN_INTERVAL = 0.01
+local DOTS_PER_SCAN = 25
 local DOT_SPREAD = 45
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 
 
-
-local DOT_SIZE_HALF = DOT_SIZE / 2
 local DOT_SPREAD_HALF = DOT_SPREAD / 2
+local ROTATE_THIRD = 360 / 3
+local VECTOR_ZERO = Vector( 0, 0, 0 )
 
-local dots = {}
-local dotCount = 0
-local dotHead = 1
+local meshes = {}
+local curMesh = nil
+local curMeshData = {}
+local meshCount = 0
+local meshHead = 1
+local curVertCount = 0
 local placingDots = false
 local showDotHint = false
+local lidarMat = nil
 
+local mathRand = math.Rand
 local utilTraceLine = util.TraceLine
 local playerGetAll = player.GetAll
 local renderGetSurfaceColor = render.GetSurfaceColor
+local renderSetMaterial = render.SetMaterial
 local drawSimpleText = draw.SimpleText
 local surfaceSetDrawColor = surface.SetDrawColor
-local surfaceDrawRect = surface.DrawRect
 
 
 local function spreadDirFast( ang, right, up )
     ang = Angle( ang.p, ang.y, ang.r )
-    ang:RotateAroundAxis( right, math.Rand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
-    ang:RotateAroundAxis( up, math.Rand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
+    ang:RotateAroundAxis( right, mathRand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
+    ang:RotateAroundAxis( up, mathRand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
 
     return ang:Forward()
 end
@@ -42,6 +48,9 @@ local function addDot( startPos, dir, filter )
 
     if not tr.Hit then return end
 
+    local hitNormal = tr.HitNormal
+    if hitNormal == VECTOR_ZERO then return end
+
     local hitPos = tr.HitPos
     local color
 
@@ -52,23 +61,56 @@ local function addDot( startPos, dir, filter )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
     end
 
-    local dot = dots[dotHead]
-    dot.pos = hitPos
-    dot.color = color
+    local offsetAng = Vector( hitNormal.z, hitNormal.x, hitNormal.y ):Angle()
+    offsetAng:RotateAroundAxis( hitNormal, mathRand( 0, 180 ) )
 
-    dotHead = dotHead + 1
+    for _ = 1, 3 do
+        offsetAng:RotateAroundAxis( hitNormal, -ROTATE_THIRD )
+
+        curVertCount = curVertCount + 1
+        curMeshData[curVertCount] = {
+            pos = hitPos + offsetAng:Forward(),
+            color = color,
+            normal = hitNormal,
+        }
+    end
+end
+
+local function updateCurMesh()
+    if curMesh then
+        curMesh:Destroy()
+    end
+
+    curMesh = Mesh()
+    curMesh:BuildFromTriangles( curMeshData )
+
+    -- Split off into a new mesh
+    if curVertCount <= VERTS_PER_MESH then return end
+
+    local oldMesh = meshes[meshHead]
+
+    if oldMesh then
+        oldMesh:Destroy()
+    end
+
+    meshes[meshHead] = curMesh
+    curMesh = nil
+    curMeshData = {}
+    curVertCount = 0
+
+    meshHead = meshHead + 1
 
     -- Keep incrementing dotCount until we reach DOT_MAX.
     -- Keep incrementing dotHead until the max is reached, then wrap around to 1.
     -- This lets us replace old dots without needing to shift indices around with table.remove().
-    if dotCount < DOT_MAX then
-        dotCount = dotCount + 1
+    if meshCount < MESH_LIMIT then
+        meshCount = meshCount + 1
 
-        if dotCount == DOT_MAX then
-            dotHead = 1
+        if meshCount == MESH_LIMIT then
+            meshHead = 1
         end
-    elseif dotHead > dotCount then
-        dotHead = 1
+    elseif meshHead > meshCount then
+        meshHead = 1
     end
 end
 
@@ -77,51 +119,34 @@ local function addDots( eyePos, eyeAng )
     local eyeUp = eyeAng:Up()
     local filter = playerGetAll()
 
-    for _ = 1, DOTS_PER_FRAME do
+    for _ = 1, DOTS_PER_SCAN do
         local dir = spreadDirFast( eyeAng, eyeRight, eyeUp )
 
         addDot( eyePos, dir, filter )
     end
+
+    updateCurMesh()
 end
 
-local function prepareDotsForDrawing()
-    for i = 1, dotCount do
-        local dot = dots[i]
-        local pos = dot.pos
+local function drawMeshes()
+    surfaceSetDrawColor( 255, 255, 255, 255 )
+    renderSetMaterial( lidarMat )
 
-        local scrPos = pos:ToScreen()
-        local visible = scrPos.visible
-
-        dot.visible = visible
-
-        if visible then
-            dot.x = scrPos.x
-            dot.y = scrPos.y
-        end
+    for i = 1, meshCount do
+        meshes[i]:Draw()
     end
-end
 
-local function drawDots()
-    surfaceSetDrawColor( 0, 0, 0, 255 )
-    surfaceDrawRect( 0, 0, ScrW(), ScrH() )
-
-    for i = 1, dotCount do
-        local dot = dots[i]
-
-        if dot.visible then
-            local color = dot.color
-
-            surfaceSetDrawColor( color )
-            surfaceDrawRect( dot.x - DOT_SIZE_HALF, dot.y - DOT_SIZE_HALF, DOT_SIZE, DOT_SIZE )
-        end
+    if curMesh then
+        curMesh:Draw()
     end
 end
 
 
-do
-    for i = 1, DOT_MAX do
-        dots[i] = {}
-    end
+if CLIENT then
+    lidarMat = CreateMaterial( "cfc_ulx_commands_curse_lidar", "UnlitGeneric", {
+        ["$basetexture"] = "color/white",
+        ["$vertexcolor"] = 1,
+    } )
 end
 
 
@@ -133,25 +158,15 @@ CFCUlxCurse.RegisterEffect( {
 
         placingDots = false
         showDotHint = true
-        dotCount = 0
-        dotHead = 1
+        curMesh = nil
+        curMeshData = {}
+        meshCount = 0
+        meshHead = 1
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "CustomRender", function()
-            local eyePos = cursedPly:EyePos()
-            local eyeAng = cursedPly:EyeAngles()
-
-            if placingDots then
-                addDots( eyePos, eyeAng )
-            end
-
-            -- Vector:ToScreen() needs a 3D context, while surface.DrawRect() needs a 2D context.
             cam.Start3D()
-                prepareDotsForDrawing()
+                drawMeshes()
             cam.End3D()
-
-            cam.Start2D()
-                drawDots()
-            cam.End2D()
 
             if showDotHint then
                 cam.Start2D()
@@ -160,6 +175,15 @@ CFCUlxCurse.RegisterEffect( {
             end
 
             return true
+        end )
+
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Scan", SCAN_INTERVAL, 0, function()
+            if not placingDots then return end
+
+            local eyePos = cursedPly:EyePos()
+            local eyeAng = cursedPly:EyeAngles()
+
+            addDots( eyePos, eyeAng )
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "KeyPress", "Input", function( _, key )
@@ -182,6 +206,21 @@ CFCUlxCurse.RegisterEffect( {
 
     onEnd = function()
         if SERVER then return end
+
+        for i = 1, MESH_LIMIT do
+            local oldMesh = meshes[i]
+
+            if oldMesh then
+                oldMesh:Destroy()
+            end
+
+            meshes[i] = nil
+        end
+
+        if curMesh then
+            curMesh:Destroy()
+            curMesh = nil
+        end
     end,
 
     minDuration = 60,
