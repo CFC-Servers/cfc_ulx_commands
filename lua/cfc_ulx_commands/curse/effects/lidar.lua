@@ -41,7 +41,6 @@ local lidarMat = nil
 local mathRand = math.Rand
 local bitBand = bit.band
 local utilTraceLine = util.TraceLine
-local playerGetAll = player.GetAll
 local renderGetSurfaceColor = render.GetSurfaceColor
 local renderSetMaterial = render.SetMaterial
 local drawSimpleText = draw.SimpleText
