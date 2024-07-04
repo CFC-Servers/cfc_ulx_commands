@@ -1,18 +1,29 @@
 local EFFECT_NAME = "Lidar"
+
 local MESH_LIMIT = 8000
 local VERTS_PER_MESH = 500 * 3
 local VERTS_PER_EXPIRABLE_MESH = 50 * 3
+
 local MESH_EXPIRE_TIME = 2
 local SCAN_INTERVAL = 0.01
 local DOTS_PER_SCAN = 75
 local DOT_SPREAD = 60
 local DOT_SIZE = 3
 local DOT_HITBOX_SIZE = 2
+
+local BALL_SPEED = 300
+local BALL_DURATION = 120
+local BALL_MODEL = "models/hunter/misc/sphere075x075.mdl"
+local BALL_SCAN_INTERVAL = 0.03
+local BALL_COLOR = Color( 0, 230, 255, 255 )
+local BALL_RADIUS = 36 / 2
+
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 local WATER_COLOR = Color( 50, 100, 225, 255 )
 local SLIME_COLOR = Color( 140, 120, 15, 255 )
 local PLAYER_COLOR = Color( 255, 0, 0, 255 )
 local NPC_COLOR = Color( 200, 0, 255, 255 )
+
 local TRACE_MASK = MASK_SOLID + CONTENTS_WATER + CONTENTS_SLIME
 local TRACE_MASK_HITBOXES = MASK_SHOT + CONTENTS_WATER + CONTENTS_SLIME
 
@@ -37,6 +48,7 @@ local curExpirableVertCount = 0
 local placingDots = false
 local showDotHint = false
 local lidarMat = nil
+local ballEnt = nil
 
 local mathRand = math.Rand
 local bitBand = bit.band
@@ -45,6 +57,11 @@ local renderGetSurfaceColor = CLIENT and render.GetSurfaceColor
 local renderSetMaterial = CLIENT and render.SetMaterial
 local drawSimpleText = CLIENT and draw.SimpleText
 local surfaceSetDrawColor = CLIENT and surface.SetDrawColor
+
+
+if SERVER then
+    util.PrecacheModel( "BALL_MODEL" )
+end
 
 
 local function spreadDirFast( ang, right, up )
@@ -260,6 +277,33 @@ local function drawMeshes()
     end
 end
 
+local function spawnBall( pos, dir )
+    if IsValid( ballEnt ) then
+        ballEnt:Remove()
+    end
+
+    ballEnt = ents.CreateClientProp( BALL_MODEL )
+    ballEnt:SetPos( pos )
+    ballEnt:Spawn()
+
+    local physObj = ballEnt:GetPhysicsObject()
+    physObj:EnableGravity( false )
+    physObj:SetVelocity( dir * BALL_SPEED )
+
+    CFCUlxCurse.CreateEffectTimer( LocalPlayer(), EFFECT_NAME, "RemoveBall", BALL_DURATION, 0, function()
+        if not IsValid( ballEnt ) then return end
+
+        ballEnt:Remove()
+    end )
+end
+
+local function drawBall()
+    if not IsValid( ballEnt ) then return end
+
+    render.SetColorMaterial()
+    render.DrawSphere( ballEnt:GetPos(), BALL_RADIUS, 50, 50, BALL_COLOR )
+end
+
 
 if CLIENT then
     lidarMat = CreateMaterial( "cfc_ulx_commands_curse_lidar", "UnlitGeneric", {
@@ -290,6 +334,7 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "CustomRender", function()
             cam.Start3D()
                 drawMeshes()
+                drawBall()
             cam.End3D()
 
             cam.Start2D()
@@ -299,6 +344,7 @@ CFCUlxCurse.RegisterEffect( {
             if showDotHint then
                 cam.Start2D()
                     drawSimpleText( "Hold E to place dots", "DermaLarge", ScrW() / 2, ScrH() / 2 + 50, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+                    drawSimpleText( "Press Alt + E to spawn a scanner sphere", "DermaLarge", ScrW() / 2, ScrH() / 2 + 50 + 50, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
                 cam.End2D()
             end
 
@@ -314,12 +360,25 @@ CFCUlxCurse.RegisterEffect( {
             addDots( eyePos, eyeAng )
         end )
 
+        CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "BallScan", BALL_SCAN_INTERVAL, 0, function()
+            if not IsValid( ballEnt ) then return end
+
+            local pos = ballEnt:GetPos()
+            local ang = Angle( math.Rand( -45, 45 ), math.Rand( -180, 180 ), 0 )
+
+            addDots( pos, ang )
+        end )
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "KeyPress", "Input", function( _, key )
             if not IsFirstTimePredicted() then return end
 
             if key == IN_USE then
                 placingDots = true
                 showDotHint = false
+
+                if input.IsKeyDown( KEY_LALT ) then
+                    spawnBall( cursedPly:EyePos(), cursedPly:EyeAngles():Forward() )
+                end
             end
         end )
 
@@ -329,6 +388,22 @@ CFCUlxCurse.RegisterEffect( {
             if key == IN_USE then
                 placingDots = false
             end
+        end )
+
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Tick", "MaintainBallSpeed", function()
+            if not IsValid( ballEnt ) then return end
+
+            local physObj = ballEnt:GetPhysicsObject()
+            local vel = physObj:GetVelocity()
+            local speed = vel:Length()
+
+            if speed == 0 then
+                ballEnt:Remove()
+
+                return
+            end
+
+            physObj:SetVelocity( BALL_SPEED * vel / speed )
         end )
     end,
 
@@ -360,6 +435,10 @@ CFCUlxCurse.RegisterEffect( {
         if curExpirableMesh then
             curExpirableMesh:Destroy()
             curExpirableMesh = nil
+        end
+
+        if IsValid( ballEnt ) then
+            ballEnt:Remove()
         end
     end,
 
