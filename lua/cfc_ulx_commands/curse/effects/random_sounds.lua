@@ -1,7 +1,7 @@
 local EFFECT_NAME = "RandomSounds"
-local POOL_SIZE = 100 -- Smaller pool sizes help reduce lag from loading new sounds on the fly (most notable with footsteps).
-local POOL_BATCH_SIZE = 10 -- Builds up the pool in batches over time, since it requires sounds to be loaded to see if they're good.
-local POOL_BATCH_INTERVAL = 1
+local POOL_SIZE = 50 -- Smaller pool sizes help reduce lag from loading new sounds on the fly (most notable with footsteps).
+local POOL_BATCH_SIZE = 5 -- Builds up the pool in batches over time, since it requires sounds to be loaded to see if they're good.
+local POOL_BATCH_INTERVAL = 2
 
 
 -- Create global table
