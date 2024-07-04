@@ -11,23 +11,13 @@ local tableInsert = table.insert
 local stringSub = string.sub
 
 
---[[
-    - Returns a sequential list of all files in a folder, recursively.
-    - Includes the full file path and extension for each file.
-    
-    folder: (string)
-        - The folder to march. Exclude the trailing slash.
-        - sound, models, materials/models, etc.
-    path: (string)
-        - https://wiki.facepunch.com/gmod/File_Search_Paths
-        - GAME, DATA, etc.
-    out: (optional) (table)
-        - The table to append the file paths to.
-        - If nil, a new table will be created.
-
-    RETURNS: out (table)
-        - A table of file paths.
---]]
+--- Recursively gathers a list of all files in a given directory
+--- (Includes the full file path and extension for each file)
+---
+--- @param folder string The folder to match, excluding the trailing slash (e.g. "sound", "models", etc.)
+--- @param path string Search Path (e.g. "GAME", "DATA", etc.)
+--- @param out? table The table to append the file paths to
+--- @returns string[] out The collected file paths
 function CFCUlxCurse.MarchFolder( folder, path, out )
     folder = folder .. "/"
     out = out or {}
@@ -45,12 +35,12 @@ function CFCUlxCurse.MarchFolder( folder, path, out )
     return out
 end
 
---[[
-    - Similar to MarchFolder, but caches the results for each unique root folder/path combination.
-    - Provide forceRecahce as true to ignore the cache and recalculate the files.
-    - Prodive dropRoot as true to strip 'folder/' from the start of each file path.
-        - This being true/false results in using a different cache.
---]]
+--- Recursively gathers a list of all files in a given directory and caches the result
+--- @param folder string The folder to match, excluding the trailing slash (e.g. "sound", "models", etc.)
+--- @param path string Search Path (e.g. "GAME", "DATA", etc.)
+--- @param forceRecache boolean? Whether or not to skip the cache (default: false)
+--- @param dropRoot boolean? Whether or not to drop the first folder from each file path
+--- @return string[] out The collected file paths
 function CFCUlxCurse.MarchFolderCached( folder, path, forceRecache, dropRoot )
     local mainCache = dropRoot and marchFolderCacheDroppedRoot or marchFolderCache
     local perPathCache = mainCache[path]
