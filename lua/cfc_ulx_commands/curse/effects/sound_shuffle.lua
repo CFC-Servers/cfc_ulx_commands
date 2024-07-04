@@ -35,8 +35,6 @@ CFCUlxCurse.RegisterEffect( {
 
         libGetAllSounds.GetSounds()
 
-        table.Empty( soundLookup )
-
         globals.CreateSound = globals.CreateSound or CreateSound
         globals.EmitSound = globals.EmitSound or EmitSound
         globals.SoundDuration = globals.SoundDuration or SoundDuration
@@ -95,6 +93,8 @@ CFCUlxCurse.RegisterEffect( {
         surface.PlaySound = globals.surfacePlaySound
 
         RunConsoleCommand( "stopsound" )
+
+        table.Empty( soundLookup )
     end,
 
     minDuration = nil,
