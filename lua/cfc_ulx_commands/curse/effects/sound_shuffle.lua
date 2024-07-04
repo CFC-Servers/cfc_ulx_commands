@@ -18,24 +18,23 @@ local string_sub = string.sub
 local G_SoundDuration = globals.SoundDuration or SoundDuration
 
 
+-- Not perfect, but covers a lot of cases.
+local function isSoundGood( snd )
+    if string_find( snd, "loop" ) then return false end
+    if string_sub( snd, 1, 6 ) == "synth/" then return false end
+    if G_SoundDuration( snd ) > SOUND_DURATION_MAX then return false end
+
+    return true
+end
+
 local function getSoundForPool()
-    local attempts = 10
-    local snd = nil
+    local snd
 
-    while attempts > 0 do
+    -- Must provide a sound every time, so allow bad sounds to be used if no good ones are found in the limit.
+    -- Want to minimize hotloading tons of sound files, since it uses disk time.
+    for _ = 1, 10 do
         snd = allSounds[math_random( 1, allSoundsLength )]
-
-        -- Not perfect, but covers a lot of cases.
-        local isBad =
-            string_find( snd, "loop" ) or
-            string_sub( snd, 1, 6 ) == "synth/" or
-            G_SoundDuration( snd ) > SOUND_DURATION_MAX
-
-        if isBad then
-            attempts = attempts - 1
-        else
-            break
-        end
+        if isSoundGood( snd ) then break end
     end
 
     return snd
