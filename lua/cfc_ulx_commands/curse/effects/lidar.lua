@@ -41,10 +41,10 @@ local lidarMat = nil
 local mathRand = math.Rand
 local bitBand = bit.band
 local utilTraceLine = util.TraceLine
-local renderGetSurfaceColor = render.GetSurfaceColor
-local renderSetMaterial = render.SetMaterial
-local drawSimpleText = draw.SimpleText
-local surfaceSetDrawColor = surface.SetDrawColor
+local renderGetSurfaceColor = CLIENT and render.GetSurfaceColor
+local renderSetMaterial = CLIENT and render.SetMaterial
+local drawSimpleText = CLIENT and draw.SimpleText
+local surfaceSetDrawColor = CLIENT and surface.SetDrawColor
 
 
 local function spreadDirFast( ang, right, up )
