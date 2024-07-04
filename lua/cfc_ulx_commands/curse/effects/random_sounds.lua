@@ -2,7 +2,6 @@ local EFFECT_NAME = "RandomSounds"
 local POOL_SIZE = 100 -- Smaller pool sizes help reduce lag from loading new sounds on the fly (most notable with footsteps).
 local POOL_BATCH_SIZE = 10 -- Builds up the pool in batches over time, since it requires sounds to be loaded to see if they're good.
 local POOL_BATCH_INTERVAL = 1
-local SOUND_DURATION_MAX = 5
 
 
 -- Create global table
@@ -10,43 +9,18 @@ local EFFECT_NAME_LOWER = string.lower( EFFECT_NAME )
 CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] or {}
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
-local allSounds = nil
-local allSoundsLength = nil
+local libGetAllSounds = CFCUlxCurse.IncludeEffectUtil( "get_all_sounds" )
+
 local poolSounds = {}
 local poolSoundsLength = nil
 local poolSoundsTargetLength = nil
 local entityMeta = FindMetaTable( "Entity" )
 
 local math_random = math.random
-local string_find = string.find
-local string_sub = string.sub
-local G_SoundDuration = SoundDuration
 
 
 local function getSound()
     return poolSounds[math_random( 1, poolSoundsLength )]
-end
-
--- Not perfect, but covers a lot of cases.
-local function isSoundGood( snd )
-    if string_find( snd, "loop" ) then return false end
-    if string_sub( snd, 1, 6 ) == "synth/" then return false end
-    if G_SoundDuration( snd ) > SOUND_DURATION_MAX then return false end
-
-    return true
-end
-
-local function getSoundForPool()
-    local snd
-
-    -- Must provide a sound every time, so allow bad sounds to be used if no good ones are found in the limit.
-    -- Want to minimize hotloading tons of sound files, since it uses disk time.
-    for _ = 1, 10 do
-        snd = allSounds[math_random( 1, allSoundsLength )]
-        if isSoundGood( snd ) then break end
-    end
-
-    return snd
 end
 
 local function addBatchToPool()
@@ -54,7 +28,7 @@ local function addBatchToPool()
     local max = math.min( i + POOL_BATCH_SIZE - 1, poolSoundsTargetLength )
 
     while i <= max do
-        poolSounds[i] = getSoundForPool()
+        poolSounds[i] = libGetAllSounds.SampleSound()
         i = i + 1
     end
 
@@ -68,8 +42,8 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        allSounds = CFCUlxCurse.MarchFolderCached( "sound", "GAME", false, true )
-        allSoundsLength = #allSounds
+        local allSounds = libGetAllSounds.GetSounds()
+        local allSoundsLength = #allSounds
 
         poolSoundsLength = 0
         poolSoundsTargetLength = math.min( POOL_SIZE, allSoundsLength )

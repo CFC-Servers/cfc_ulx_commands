@@ -1,14 +1,7 @@
 CFCUlxCurse = CFCUlxCurse or {}
-CFCUlxCurse._marchFolderCache = CFCUlxCurse._marchFolderCache or {}
-CFCUlxCurse._marchFolderCacheDroppedRoot = CFCUlxCurse._marchFolderCacheDroppedRoot or {}
-
-
-local marchFolderCache = CFCUlxCurse._marchFolderCache
-local marchFolderCacheDroppedRoot = CFCUlxCurse._marchFolderCacheDroppedRoot
 
 local file_Find = file.Find
 local table_insert = table.insert
-local string_sub = string.sub
 
 
 --- Recursively gathers a list of all files in a given directory
@@ -35,33 +28,33 @@ function CFCUlxCurse.MarchFolder( folder, path, out )
     return out
 end
 
---- Recursively gathers a list of all files in a given directory and caches the result
+--- Recursively gathers a list of all files in a given directory, filtered by functions
+--- (Includes the full file path and extension for each file)
+---
 --- @param folder string The folder to match, excluding the trailing slash (e.g. "sound", "models", etc.)
 --- @param path string Search Path (e.g. "GAME", "DATA", etc.)
---- @param forceRecache boolean? Whether or not to skip the cache (default: false)
---- @param dropRoot boolean? Whether or not to drop the first folder from each file path
---- @return string[] out The collected file paths
-function CFCUlxCurse.MarchFolderCached( folder, path, forceRecache, dropRoot )
-    local mainCache = dropRoot and marchFolderCacheDroppedRoot or marchFolderCache
-    local perPathCache = mainCache[path]
+--- @param fileFilter? function A function to filter files by (leadingPath, fileName) => boolean
+--- @param folderFilter? function A function to filter folders by (leadingPath, folderName) => boolean
+--- @param out? table The table to append the file paths to
+--- @returns string[] out The collected file paths
+function CFCUlxCurse.MarchFolderFiltered( folder, path, fileFilter, folderFilter, out )
+    folder = folder .. "/"
+    fileFilter = fileFilter or function() return true end
+    folderFilter = folderFilter or function() return true end
+    out = out or {}
 
-    if not perPathCache then
-        perPathCache = {}
-        mainCache[path] = perPathCache
+    local fileNames, folderNames = file_Find( folder .. "*", path )
+
+    -- It's best to filter things here rather than have scripts later do table.remove() on really long tables.
+    for _, fileName in ipairs( fileNames ) do
+        if fileFilter( folder, fileName ) then
+            table_insert( out, folder .. fileName )
+        end
     end
 
-    local cached = perPathCache[folder]
-    if cached and not forceRecache then return cached end
-
-    local out = CFCUlxCurse.MarchFolder( folder, path )
-
-    perPathCache[folder] = out
-
-    if dropRoot then
-        local subStart = #folder + 2
-
-        for i = 1, #out do
-            out[i] = string_sub( out[i], subStart )
+    for _, folderName in ipairs( folderNames ) do
+        if folderFilter( folder, folderName ) then
+            CFCUlxCurse.MarchFolderFiltered( folder .. folderName, path, fileFilter, folderFilter, out )
         end
     end
 
