@@ -1,6 +1,22 @@
 local lib = {}
 
-local SOUND_DURATION_MAX = 5
+local SOUND_DURATION_MAX = 4
+local BAD_FOLDERS = {
+    ["synth"] = true,
+    ["music"] = true,
+    ["alarms"] = true,
+    ["ambience"] = true,
+    ["atmosphere"] = true,
+    ["chatter"] = true,
+    ["explosions"] = true,
+    ["fire"] = true,
+    ["gas"] = true,
+    ["intro"] = true,
+    ["tones"] = true,
+    ["wind"] = true,
+    ["apache"] = true,
+    ["commentary"] = true,
+}
 
 local allSounds = nil
 local allSoundsLength = nil
@@ -24,11 +40,14 @@ function lib.GetSounds()
         "GAME",
         function( _, fileName )
             if string_find( fileName, "loop" ) then return false end
+            if string_find( fileName, "lp" ) then return false end
+            if string_find( fileName, "idle" ) then return false end
+            if string_find( fileName, "hum" ) then return false end
 
             return true
         end,
         function( _, folderName )
-            if folderName == "synth" then return false end
+            if BAD_FOLDERS[folderName] then return false end
 
             return true
         end,
