@@ -63,7 +63,7 @@ CFCUlxCurse.RegisterEffect( {
         globals.surfacePlaySound = globals.surfacePlaySound or surface.PlaySound
 
         CreateSound = function( ent, _snd, ... )
-            globals.CreateSound( ent, getSound(), ... )
+            return globals.CreateSound( ent, getSound(), ... )
         end
 
         EmitSound = function( _snd, ... )
