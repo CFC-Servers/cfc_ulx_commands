@@ -18,6 +18,9 @@ local BALL_SCAN_INTERVAL = 0.03
 local BALL_COLOR = Color( 0, 230, 255, 255 )
 local BALL_RADIUS = 36 / 2
 
+local SCAN_NORMAL_SOUND = "physics/metal/soda_can_impact_soft1.wav"
+local SCAN_PLAYER_SOUND = "buttons/button17.wav"
+
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 local WATER_COLOR = Color( 50, 100, 225, 255 )
 local SLIME_COLOR = Color( 140, 120, 15, 255 )
@@ -92,6 +95,7 @@ local function addDot( startPos, dir, filter )
     local color
     local putOnExpirableMesh = false
     local size = DOT_SIZE
+    local snd = SCAN_NORMAL_SOUND
 
     hitEnt = IsValid( hitEnt ) and hitEnt or nil
 
@@ -125,8 +129,10 @@ local function addDot( startPos, dir, filter )
     elseif hitEnt and hitEnt:IsPlayer() then
         color = PLAYER_COLOR
         putOnExpirableMesh = true
+        snd = SCAN_PLAYER_SOUND
     elseif hitEnt and hitEnt:IsNPC() then
         color = NPC_COLOR
+        snd = SCAN_PLAYER_SOUND
     else
         color = renderGetSurfaceColor( hitPos - dir * 5, hitPos + dir * 5 )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
@@ -162,6 +168,8 @@ local function addDot( startPos, dir, filter )
             }
         end
     end
+
+    EmitSound( snd, hitPos, 0, CHAN_AUTO, 0.1, 75, 0, mathRand( 80, 110 ) )
 end
 
 local function updateCurMesh()
