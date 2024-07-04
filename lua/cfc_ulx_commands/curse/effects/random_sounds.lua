@@ -59,6 +59,7 @@ CFCUlxCurse.RegisterEffect( {
         globals.EmitSound = globals.EmitSound or EmitSound
         globals.EntityEmitSound = globals.EntityEmitSound or entityMeta.EmitSound
         globals.soundPlay = globals.soundPlay or sound.Play
+        globals.soundPlayFile = globals.soundPlayFile or sound.PlayFile
         globals.surfacePlaySound = globals.surfacePlaySound or surface.PlaySound
 
         CreateSound = function( ent, _snd, ... )
@@ -75,6 +76,11 @@ CFCUlxCurse.RegisterEffect( {
 
         sound.Play = function( _snd, ... )
             globals.soundPlay( getSound(), ... )
+        end
+
+        sound.PlayFile = function( _snd, ... )
+            -- sound.PlayFile() expects the leading "sound/"
+            globals.soundPlayFile( "sound/" .. getSound(), ... )
         end
 
         surface.PlaySound = function()
@@ -96,6 +102,7 @@ CFCUlxCurse.RegisterEffect( {
         EmitSound = globals.EmitSound
         entityMeta.EmitSound = globals.EntityEmitSound
         sound.Play = globals.soundPlay
+        sound.PlayFile = globals.soundPlayFile
         surface.PlaySound = globals.surfacePlaySound
 
         RunConsoleCommand( "stopsound" )

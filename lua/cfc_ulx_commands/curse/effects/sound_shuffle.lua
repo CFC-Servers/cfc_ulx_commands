@@ -10,6 +10,9 @@ local libGetAllSounds = CFCUlxCurse.IncludeEffectUtil( "get_all_sounds" )
 
 local soundLookup = {}
 local entityMeta = FindMetaTable( "Entity" )
+local stringSubStartToRemoveSoundFolder = string.len( "sound/" ) + 1
+
+local string_sub = string.sub
 
 
 local function getSound( snd )
@@ -39,6 +42,7 @@ CFCUlxCurse.RegisterEffect( {
         globals.SoundDuration = globals.SoundDuration or SoundDuration
         globals.EntityEmitSound = globals.EntityEmitSound or entityMeta.EmitSound
         globals.soundPlay = globals.soundPlay or sound.Play
+        globals.soundPlayFile = globals.soundPlayFile or sound.PlayFile
         globals.surfacePlaySound = globals.surfacePlaySound or surface.PlaySound
 
         CreateSound = function( ent, snd, ... )
@@ -61,6 +65,12 @@ CFCUlxCurse.RegisterEffect( {
             globals.soundPlay( getSound( snd ), ... )
         end
 
+        sound.PlayFile = function( snd, ... )
+            -- sound.PlayFile() expects the leading "sound/"
+            snd = string_sub( snd, stringSubStartToRemoveSoundFolder )
+            globals.soundPlayFile( "sound/" .. getSound( snd ), ... )
+        end
+
         surface.PlaySound = function( snd )
             globals.surfacePlaySound( getSound( snd ) )
         end
@@ -81,6 +91,7 @@ CFCUlxCurse.RegisterEffect( {
         SoundDuration = globals.SoundDuration
         entityMeta.EmitSound = globals.EntityEmitSound
         sound.Play = globals.soundPlay
+        sound.PlayFile = globals.soundPlayFile
         surface.PlaySound = globals.surfacePlaySound
 
         RunConsoleCommand( "stopsound" )
