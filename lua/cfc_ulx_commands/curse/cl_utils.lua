@@ -6,9 +6,9 @@ CFCUlxCurse._marchFolderCacheDroppedRoot = CFCUlxCurse._marchFolderCacheDroppedR
 local marchFolderCache = CFCUlxCurse._marchFolderCache
 local marchFolderCacheDroppedRoot = CFCUlxCurse._marchFolderCacheDroppedRoot
 
-local fileFind = file.Find
-local tableInsert = table.insert
-local stringSub = string.sub
+local file_Find = file.Find
+local table_insert = table.insert
+local string_sub = string.sub
 
 
 --- Recursively gathers a list of all files in a given directory
@@ -22,10 +22,10 @@ function CFCUlxCurse.MarchFolder( folder, path, out )
     folder = folder .. "/"
     out = out or {}
 
-    local fileNames, folderNames = fileFind( folder .. "*", path )
+    local fileNames, folderNames = file_Find( folder .. "*", path )
 
     for _, fileName in ipairs( fileNames ) do
-        tableInsert( out, folder .. fileName )
+        table_insert( out, folder .. fileName )
     end
 
     for _, folderName in ipairs( folderNames ) do
@@ -61,7 +61,7 @@ function CFCUlxCurse.MarchFolderCached( folder, path, forceRecache, dropRoot )
         local subStart = #folder + 2
 
         for i = 1, #out do
-            out[i] = stringSub( out[i], subStart )
+            out[i] = string_sub( out[i], subStart )
         end
     end
 

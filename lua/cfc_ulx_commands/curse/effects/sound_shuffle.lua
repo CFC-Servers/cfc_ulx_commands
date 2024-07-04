@@ -12,10 +12,10 @@ local allSounds = nil
 local allSoundsLength = nil
 local entityMeta = FindMetaTable( "Entity" )
 
-local mathRandom = math.random
-local stringFind = string.find
-local stringSub = string.sub
-local soundDuration = globals.SoundDuration or SoundDuration
+local math_random = math.random
+local string_find = string.find
+local string_sub = string.sub
+local G_SoundDuration = globals.SoundDuration or SoundDuration
 
 
 local function getSoundForPool()
@@ -23,13 +23,13 @@ local function getSoundForPool()
     local snd = nil
 
     while attempts > 0 do
-        snd = allSounds[mathRandom( 1, allSoundsLength )]
+        snd = allSounds[math_random( 1, allSoundsLength )]
 
         -- Not perfect, but covers a lot of cases.
         local isBad =
-            stringFind( snd, "loop" ) or
-            stringSub( snd, 1, 6 ) == "synth/" or
-            soundDuration( snd ) > SOUND_DURATION_MAX
+            string_find( snd, "loop" ) or
+            string_sub( snd, 1, 6 ) == "synth/" or
+            G_SoundDuration( snd ) > SOUND_DURATION_MAX
 
         if isBad then
             attempts = attempts - 1
