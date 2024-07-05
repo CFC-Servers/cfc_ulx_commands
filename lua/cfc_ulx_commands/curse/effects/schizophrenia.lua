@@ -1,23 +1,23 @@
 local EFFECT_NAME = "Schizophrenia"
 local SPAWN_ATTEMPT_INTERVAL = 0.05
-local CROSSBOW_CHANCE = 0.001
-local BULLET_CHANCE = 0.001
+local CROSSBOW_CHANCE = 0.001 -- Per spawn attempt.
+local BULLET_CHANCE = 0.001 -- Per spawn attempt.
 
-local DISAPPEAR_DELAY_MIN = 0.5
-local DISAPPEAR_DELAY_MAX = 1
+local GHOST_SPAWN_CHANCE = 0.05 -- Per spawn attempt. 
+local GHOST_SPAWN_RADIUS_MIN = 100
+local GHOST_SPAWN_RADIUS_MAX = 2000
+local GHOST_SPAWN_COOLDOWN = 5
+local GHOST_SPAWN_ATTEMPTS = 10
+local GHOST_SPAWN_LIMIT = 5
 
-local FLEE_SPEED_MIN = 1500
-local FLEE_SPEED_MAX = 2500
+local GHOST_DISAPPEAR_DELAY_MIN = 0.5
+local GHOST_DISAPPEAR_DELAY_MAX = 1
 
-local DISAPPEAR_MARGIN = 100
-local APPEAR_MARGIN = 200
+local GHOST_FLEE_SPEED_MIN = 1500
+local GHOST_FLEE_SPEED_MAX = 2500
 
-local SPAWN_RADIUS_MIN = 100
-local SPAWN_RADIUS_MAX = 2000
-local SPAWN_CHANCE = 0.05
-local SPAWN_COOLDOWN = 5
-local SPAWN_ATTEMPTS = 10
-local SPAWN_LIMIT = 5
+local GHOST_DISAPPEAR_MARGIN = 100
+local GHOST_APPEAR_MARGIN = 200
 
 local SOUND_CHANCE = 0.01
 local SOUND_COOLDOWN = 5
@@ -140,7 +140,7 @@ local SOUND_LIST = {
     "npc/antlion_guard/foot_heavy2.wav",
 }
 
-local UNDO_CHANCE = 0.05
+local UNDO_CHANCE = 0.05 -- Per key press.
 local UNDO_COOLDOWN = 30
 local UNDO_KEY_TRIGGER_BLACKLIST = {
     [KEY_W] = true,
@@ -167,6 +167,8 @@ local UNDO_KEY_TRIGGER_BLACKLIST = {
     [MOUSE_WHEEL_UP] = true,
     [MOUSE_WHEEL_DOWN] = true,
 }
+
+-- END CONFIG
 
 
 local PI_DOUBLE = math.pi * 2
@@ -227,7 +229,7 @@ local function getFleeDir( pos, eyePos, eyeDir )
 end
 
 local function delayedRemove( ent )
-    local delay = math.Rand( DISAPPEAR_DELAY_MIN, DISAPPEAR_DELAY_MAX )
+    local delay = math.Rand( GHOST_DISAPPEAR_DELAY_MIN, GHOST_DISAPPEAR_DELAY_MAX )
 
     timer.Simple( delay, function()
         if IsValid( ent ) then
@@ -237,8 +239,8 @@ local function delayedRemove( ent )
 end
 
 local function poofVisibleGhosts()
-    local edgeW = ScrW() - DISAPPEAR_MARGIN
-    local edgeH = ScrH() - DISAPPEAR_MARGIN
+    local edgeW = ScrW() - GHOST_DISAPPEAR_MARGIN
+    local edgeH = ScrH() - GHOST_DISAPPEAR_MARGIN
 
     local eyePos = EyePos()
     local eyeDir = EyeVector()
@@ -256,10 +258,10 @@ local function poofVisibleGhosts()
                 local y = scrPos.y
 
                 -- If the ghost is far enough into the screen, remove it.
-                if x > DISAPPEAR_MARGIN and x < edgeW and y > DISAPPEAR_MARGIN and y < edgeH then
+                if x > GHOST_DISAPPEAR_MARGIN and x < edgeW and y > GHOST_DISAPPEAR_MARGIN and y < edgeH then
                     local fleeDir = getFleeDir( pos, eyePos, eyeDir )
 
-                    ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel = fleeDir * math.Rand( FLEE_SPEED_MIN, FLEE_SPEED_MAX )
+                    ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel = fleeDir * math.Rand( GHOST_FLEE_SPEED_MIN, GHOST_FLEE_SPEED_MAX )
 
                     table.remove( ghosts, i )
                     table.insert( fleeingGhosts, ghost )
@@ -292,17 +294,17 @@ end
 local function trySpawnGhost()
     local now = CurTime()
     if now < nextSpawnTime then return end
-    if #ghosts >= SPAWN_LIMIT then return end
-    if SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > SPAWN_CHANCE then return end
+    if #ghosts >= GHOST_SPAWN_LIMIT then return end
+    if GHOST_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > GHOST_SPAWN_CHANCE then return end
 
-    local edgeW = ScrW() + APPEAR_MARGIN
-    local edgeH = ScrH() + APPEAR_MARGIN
+    local edgeW = ScrW() + GHOST_APPEAR_MARGIN
+    local edgeH = ScrH() + GHOST_APPEAR_MARGIN
 
-    local attemptsLeft = SPAWN_ATTEMPTS
+    local attemptsLeft = GHOST_SPAWN_ATTEMPTS
     local spawnCenter = LocalPlayer():GetPos() + VECTOR_UP_SHORT
 
     while attemptsLeft > 0 do
-        local spawnPos = spawnCenter + randomInCircle( math.Rand( SPAWN_RADIUS_MIN, SPAWN_RADIUS_MAX ) )
+        local spawnPos = spawnCenter + randomInCircle( math.Rand( GHOST_SPAWN_RADIUS_MIN, GHOST_SPAWN_RADIUS_MAX ) )
         local tr = util.TraceLine( { start = spawnPos, endpos = spawnPos + VECTOR_DOWN_LONG } )
 
         if tr.Fraction ~= 0 then
@@ -315,13 +317,13 @@ local function trySpawnGhost()
                 local x = scrPos.x
                 local y = scrPos.y
 
-                if x < -APPEAR_MARGIN or x > edgeW or y < -APPEAR_MARGIN or y > edgeH then
+                if x < -GHOST_APPEAR_MARGIN or x > edgeW or y < -GHOST_APPEAR_MARGIN or y > edgeH then
                     visible = false
                 end
             end
 
             if not visible then
-                nextSpawnTime = now + SPAWN_COOLDOWN
+                nextSpawnTime = now + GHOST_SPAWN_COOLDOWN
                 makePlayerCopy( getRandomPlayer(), spawnPos, Angle( 0, math.Rand( -180, 180 ), 0 ) )
 
                 break
