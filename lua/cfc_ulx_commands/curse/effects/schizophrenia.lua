@@ -1,5 +1,6 @@
 local EFFECT_NAME = "Schizophrenia"
 local SPAWN_ATTEMPT_INTERVAL = 0.05
+local CROSSBOW_CHANCE = 0.001
 
 local DISAPPEAR_DELAY_MIN = 0.5
 local DISAPPEAR_DELAY_MAX = 1
@@ -313,6 +314,58 @@ local function tryPlaySound()
     sound.Play( path, pos )
 end
 
+local function tryCrossbowImpact()
+    if CROSSBOW_CHANCE == 0 then return end
+    if math.Rand( 0, 1 ) > CROSSBOW_CHANCE then return end
+
+    local ply = LocalPlayer()
+    local ang = Angle( math.Rand( 0, 45 ), ply:EyeAngles().y + math.Rand( -45, 45 ), 0 )
+    local dir = ang:Forward()
+    local startPos = ply:GetPos()
+
+    local binaryChoice = math.random( 0, 1 ) == 0
+    startPos = startPos + ( binaryChoice and 1 or -1 ) * math.Rand( 50, 100 ) * ply:GetRight()
+    startPos = startPos + Vector( 0, 0, math.Rand( -50, 50 ) )
+    startPos = startPos - dir * 200
+
+    local tr = util.TraceLine( {
+        start = startPos,
+        endpos = startPos + dir * 500,
+    } )
+
+    if not tr.Hit then return end
+    if tr.HitNormal == VECTOR_ZERO then return end
+
+    local hitPos = tr.HitPos
+    local dirBack = -dir
+
+    local eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    util.Effect( "BoltImpact", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 2 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    util.Effect( "Sparks", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 1 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    eff:SetDamageType( DMG_BULLET )
+    eff:SetSurfaceProp( tr.SurfaceProps )
+    eff:SetEntity( game.GetWorld() )
+    util.Effect( "Impact", eff )
+
+    EmitSound( "weapons/crossbow/hit1.wav", hitPos, 0, CHAN_AUTO, 1, 75, 0, 105, 0 )
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -331,6 +384,7 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
             trySpawnGhost()
             tryPlaySound()
+            tryCrossbowImpact()
         end )
     end,
 
