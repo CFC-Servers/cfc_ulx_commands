@@ -1,6 +1,7 @@
 local EFFECT_NAME = "Schizophrenia"
 local SPAWN_ATTEMPT_INTERVAL = 0.05
 local CROSSBOW_CHANCE = 0.001
+local BULLET_CHANCE = 0.001
 
 local DISAPPEAR_DELAY_MIN = 0.5
 local DISAPPEAR_DELAY_MAX = 1
@@ -366,6 +367,58 @@ local function tryCrossbowImpact()
     EmitSound( "weapons/crossbow/hit1.wav", hitPos, 0, CHAN_AUTO, 1, 75, 0, 105, 0 )
 end
 
+local function tryBulletWhiz()
+    if BULLET_CHANCE == 0 then return end
+    if math.Rand( 0, 1 ) > BULLET_CHANCE then return end
+
+    local ply = LocalPlayer()
+    local ang = Angle( math.Rand( 0, 45 ), ply:EyeAngles().y + math.Rand( -30, 30 ), 0 )
+    local dir = ang:Forward()
+    local startPos = ply:GetPos()
+
+    local binaryChoice = math.random( 0, 1 ) == 0
+    startPos = startPos + ( binaryChoice and 1 or -1 ) * math.Rand( 10, 30 ) * ply:GetRight()
+    startPos = startPos + Vector( 0, 0, math.Rand( 45, 75 ) )
+
+    local startPosNear = startPos
+    startPos = startPos - dir * 200
+
+    local tr = util.TraceLine( {
+        start = startPos,
+        endpos = startPos + dir * 5000,
+    } )
+
+    if not tr.Hit then return end
+    if tr.HitNormal == VECTOR_ZERO then return end
+
+    local hitPos = tr.HitPos
+    local dirBack = -dir
+
+    local eyePos = EyePos()
+    startPosNear = eyePos + ( startPosNear - eyePos ) * 0.1
+
+    local eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetStart( startPos + dirBack * 1000 )
+    eff:SetScale( 5000 )
+    util.Effect( "Tracer", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( startPosNear )
+    util.Effect( "TracerSound", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 1 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    eff:SetDamageType( DMG_BULLET )
+    eff:SetSurfaceProp( tr.SurfaceProps )
+    eff:SetEntity( game.GetWorld() )
+    util.Effect( "Impact", eff )
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -385,6 +438,7 @@ CFCUlxCurse.RegisterEffect( {
             trySpawnGhost()
             tryPlaySound()
             tryCrossbowImpact()
+            tryBulletWhiz()
         end )
     end,
 
