@@ -168,6 +168,23 @@ local UNDO_KEY_TRIGGER_BLACKLIST = {
     [MOUSE_WHEEL_DOWN] = true,
 }
 
+local HAT_MAN_SPAWN_CHANCE = 0.005
+local HAT_MAN_SPAWN_RADIUS_MIN = 200
+local HAT_MAN_SPAWN_RADIUS_MAX = 1500
+local HAT_MAN_SPAWN_COOLDOWN = 30
+local HAT_MAN_SPAWN_ATTEMPTS = 10
+local HAT_MAN_SILENT_REMOVE_DISTANCE = 3000
+local HAT_MAN_COLOR = Color( 70, 70, 70, 255 )
+local HAT_MAN_HAT_COLOR = Color( 0, 0, 0, 255 )
+local HAT_MAN_SOUND_CHANCE = 0.025
+local HAT_MAN_SOUND_COOLDOWN = 5
+local HAT_MAN_SOUNDS = {
+    "ambient/creatures/town_scared_breathing1.wav",
+    "ambient/creatures/town_scared_breathing2.wav",
+    "ambient/creatures/town_scared_sob1.wav",
+    "ambient/creatures/town_scared_sob2.wav",
+}
+
 -- END CONFIG
 
 
@@ -175,10 +192,17 @@ local PI_DOUBLE = math.pi * 2
 local VECTOR_ZERO = Vector( 0, 0, 0 )
 local VECTOR_UP_SHORT = Vector( 0, 0, 10 )
 local VECTOR_DOWN_LONG = Vector( 0, 0, -10000 )
+local VECTOR_PLAYER_HULL_MINS = Vector( -16, -16, 0 )
+local VECTOR_PLAYER_HULL_MAXS = Vector( 16, 16, 72 )
+local ANGLE_ZERO = Angle( 0, 0, 0 )
 
 local ghosts = {}
 local fleeingGhosts = {}
-local nextSpawnTime = 0
+local hatMan = nil
+local hatManHat = nil
+local nextGhostSpawnTime = 0
+local nextHatManSpawnTime = 0
+local nextHatManSoundTime = 0
 local nextSoundTime = 0
 local nextUndoTime = 0
 
@@ -291,20 +315,15 @@ local function moveFleeingGhosts()
     end
 end
 
-local function trySpawnGhost()
-    local now = CurTime()
-    if now < nextSpawnTime then return end
-    if #ghosts >= GHOST_SPAWN_LIMIT then return end
-    if GHOST_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > GHOST_SPAWN_CHANCE then return end
-
+local function findGhostSpawnPos( attemptCount, radiusMin, radiusMax )
     local edgeW = ScrW() + GHOST_APPEAR_MARGIN
     local edgeH = ScrH() + GHOST_APPEAR_MARGIN
 
-    local attemptsLeft = GHOST_SPAWN_ATTEMPTS
+    local attemptsLeft = attemptCount
     local spawnCenter = LocalPlayer():GetPos() + VECTOR_UP_SHORT
 
     while attemptsLeft > 0 do
-        local spawnPos = spawnCenter + randomInCircle( math.Rand( GHOST_SPAWN_RADIUS_MIN, GHOST_SPAWN_RADIUS_MAX ) )
+        local spawnPos = spawnCenter + randomInCircle( math.Rand( radiusMin, radiusMax ) )
         local tr = util.TraceLine( { start = spawnPos, endpos = spawnPos + VECTOR_DOWN_LONG } )
 
         if tr.Fraction ~= 0 then
@@ -323,15 +342,119 @@ local function trySpawnGhost()
             end
 
             if not visible then
-                nextSpawnTime = now + GHOST_SPAWN_COOLDOWN
-                makePlayerCopy( getRandomPlayer(), spawnPos, Angle( 0, math.Rand( -180, 180 ), 0 ) )
-
-                break
+                return spawnPos
             end
         end
 
         attemptsLeft = attemptsLeft - 1
     end
+end
+
+local function trySpawnGhost()
+    local now = CurTime()
+    if now < nextGhostSpawnTime then return end
+    if #ghosts >= GHOST_SPAWN_LIMIT then return end
+    if GHOST_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > GHOST_SPAWN_CHANCE then return end
+
+    local pos = findGhostSpawnPos( GHOST_SPAWN_ATTEMPTS, GHOST_SPAWN_RADIUS_MIN, GHOST_SPAWN_RADIUS_MAX )
+    if not pos then return end
+
+    nextGhostSpawnTime = now + GHOST_SPAWN_COOLDOWN
+    makePlayerCopy( getRandomPlayer(), pos, Angle( 0, math.Rand( -180, 180 ), 0 ) )
+end
+
+local function trySpawnHatMan()
+    if IsValid( hatMan ) then return end
+
+    local now = CurTime()
+    if now < nextHatManSpawnTime then return end
+    if HAT_MAN_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > HAT_MAN_SPAWN_CHANCE then return end
+
+    local pos = findGhostSpawnPos( HAT_MAN_SPAWN_ATTEMPTS, HAT_MAN_SPAWN_RADIUS_MIN, HAT_MAN_SPAWN_RADIUS_MAX )
+    if not pos then return end
+
+    local ang = ( LocalPlayer():GetPos() - pos ):Angle()
+    ang.p = 0
+
+    hatMan = ClientsideModel( "models/player/gman_high.mdl" )
+    hatMan:SetPos( pos )
+    hatMan:SetAngles( ang )
+    hatMan:Spawn()
+    hatMan:SetSequence( 3 )
+    hatMan:SetColor( HAT_MAN_COLOR )
+    hatMan:SetSubMaterial( 1, "models/props_c17/FurnitureFabric003a" ) -- Hands won't respect color changes otherwise
+    hatMan:SetPredictable( true ) -- Required for FollowBone to work.
+    hatMan:SetupBones()
+
+    -- FollowBone and SetParent are incredibly messed up on client-only models.
+    -- This took several hours of trial and error and testing various attachment methods to get working.
+    local hatPos = pos + ang:Forward() * 1 + ang:Right() * 2
+    local _, hatAng = LocalToWorld( VECTOR_ZERO, Angle( 0, -80, -90 ), VECTOR_ZERO, ang )
+
+    hatManHat = ClientsideModel( "models/player/items/humans/top_hat.mdl" )
+    hatManHat:SetPos( hatPos )
+    hatManHat:SetAngles( hatAng )
+    hatManHat:Spawn()
+    hatManHat:SetColor( HAT_MAN_HAT_COLOR )
+    hatManHat:FollowBone( hatMan, 6 )
+end
+
+local function removeHatMan()
+    if IsValid( hatMan ) then
+        for _, snd in ipairs( HAT_MAN_SOUNDS ) do
+            hatMan:StopSound( snd )
+        end
+
+        hatMan:Remove()
+        hatMan = nil
+    end
+
+    if IsValid( hatManHat ) then
+        hatManHat:Remove()
+        hatManHat = nil
+    end
+end
+
+local function poofHatMan()
+    if not IsValid( hatMan ) then return end
+
+    local eyePos = EyePos()
+    local eyeDir = EyeVector()
+    local hatManPos = hatMan:GetPos()
+    local toHatMan = hatManPos - eyePos
+
+    -- Facing the opposite way, definitely not looking at the hat man.
+    if toHatMan:Dot( eyeDir ) < 0 then
+        if toHatMan:Length() > HAT_MAN_SILENT_REMOVE_DISTANCE then
+            removeHatMan()
+        end
+
+        return
+    end
+
+    hatMan:SetEyeTarget( eyePos )
+
+    -- If looking directly at the hat man, poof him and play a sound.
+    local aimPos = LocalPlayer():GetEyeTrace().HitPos
+    local hit = util.IntersectRayWithOBB( eyePos, aimPos - eyePos, hatManPos, ANGLE_ZERO, VECTOR_PLAYER_HULL_MINS, VECTOR_PLAYER_HULL_MAXS )
+    if not hit then return end
+
+    nextHatManSpawnTime = CurTime() + HAT_MAN_SPAWN_COOLDOWN
+    surface.PlaySound( "ambient/creatures/town_moan1.wav" )
+    removeHatMan()
+end
+
+local function tryPlayHatManSound()
+    if not IsValid( hatMan ) then return end
+
+    local now = CurTime()
+    if now < nextHatManSoundTime then return end
+    if HAT_MAN_SOUND_CHANCE ~= 1 and math.Rand( 0, 1 ) > HAT_MAN_SOUND_CHANCE then return end
+
+    local snd = HAT_MAN_SOUNDS[math.random( 1, #HAT_MAN_SOUNDS )]
+
+    nextHatManSoundTime = now + HAT_MAN_SOUND_COOLDOWN
+    hatMan:EmitSound( snd, 90, math.Rand( 80, 100 ) )
 end
 
 local function tryPlaySound()
@@ -524,13 +647,16 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        nextSpawnTime = 0
+        nextGhostSpawnTime = 0
+        nextHatManSpawnTime = 0
+        nextHatManSoundTime = 0
         nextSoundTime = 0
         nextUndoTime = 0
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Schizo", function()
             poofVisibleGhosts()
             moveFleeingGhosts()
+            poofHatMan()
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonDown", "Schizo", function( _, key )
@@ -541,6 +667,8 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
             trySpawnGhost()
+            trySpawnHatMan()
+            tryPlayHatManSound()
             tryPlaySound()
             tryCrossbowImpact()
             tryBulletWhiz()
@@ -555,6 +683,7 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         table.Empty( ghosts )
+        removeHatMan()
     end,
 
     minDuration = 120,
