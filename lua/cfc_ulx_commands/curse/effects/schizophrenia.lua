@@ -140,6 +140,34 @@ local SOUND_LIST = {
     "npc/antlion_guard/foot_heavy2.wav",
 }
 
+local UNDO_CHANCE = 0.05
+local UNDO_COOLDOWN = 30
+local UNDO_KEY_TRIGGER_BLACKLIST = {
+    [KEY_W] = true,
+    [KEY_A] = true,
+    [KEY_S] = true,
+    [KEY_D] = true,
+    [KEY_SPACE] = true,
+    [KEY_LSHIFT] = true,
+    [KEY_LCONTROL] = true,
+    [KEY_RSHIFT] = true,
+    [KEY_RCONTROL] = true,
+    [KEY_LEFT] = true,
+    [KEY_RIGHT] = true,
+    [KEY_UP] = true,
+    [KEY_DOWN] = true,
+    [KEY_ESCAPE] = true,
+    [KEY_TAB] = true,
+
+    [MOUSE_LEFT] = true,
+    [MOUSE_RIGHT] = true,
+    [MOUSE_MIDDLE] = true,
+    [MOUSE_4] = true,
+    [MOUSE_5] = true,
+    [MOUSE_WHEEL_UP] = true,
+    [MOUSE_WHEEL_DOWN] = true,
+}
+
 
 local PI_DOUBLE = math.pi * 2
 local VECTOR_ZERO = Vector( 0, 0, 0 )
@@ -150,6 +178,7 @@ local ghosts = {}
 local fleeingGhosts = {}
 local nextSpawnTime = 0
 local nextSoundTime = 0
+local nextUndoTime = 0
 
 
 local function randomInCircle( radius )
@@ -419,6 +448,73 @@ local function tryBulletWhiz()
     util.Effect( "Impact", eff )
 end
 
+-- Taken from GM:OnUndo
+-- https://github.com/Facepunch/garrysmod/blob/master/garrysmod/gamemodes/sandbox/gamemode/cl_init.lua
+local function makeUndoHint( name, customText )
+    if not customText then
+        local strId = "#Undone_" .. name
+        customText = language.GetPhrase( strId )
+
+        if strId == customText then
+            customText = string.format( language.GetPhrase( "hint.undoneX" ), language.GetPhrase( name ) )
+        end
+    end
+
+    local strMatch = string.match( customText, "^Undone (.*)$" )
+    if strMatch then
+        customText = string.format( language.GetPhrase( "hint.undoneX" ), language.GetPhrase( strMatch ) )
+    end
+
+    notification.AddLegacy( customText, NOTIFY_UNDO, 2 )
+    surface.PlaySound( "buttons/button15.wav" )
+end
+
+local function tryFakeUndo( key )
+    if not undo then return end
+    if UNDO_KEY_TRIGGER_BLACKLIST[key] then return end
+    if UNDO_CHANCE == 0 then return end
+
+    local now = CurTime()
+    if now < nextUndoTime then return end
+    if math.Rand( 0, 1 ) > UNDO_CHANCE then return end
+
+    local undoEntry = undo.GetTable()[1]
+    if not undoEntry then return end
+
+    nextUndoTime = now + UNDO_COOLDOWN
+
+    local name = undoEntry.Name
+    local customText = nil
+
+    if string.StartsWith( name, "Prop" ) then
+        -- "Prop (models/hunter/plates/plate1x1.mdl)" -> name = "Prop", customText = nil
+        name = "Prop"
+    elseif string.StartsWith( name, "Ragdoll" ) then
+        -- "Ragdoll (models/Kleiner.mdl)" -> name = "Ragdoll", customText = nil
+        name = "Ragdoll"
+    elseif string.StartsWith( name, "Effect" ) then
+        -- "Effect (models/props_c17/pushbroom.mdl)" -> name = "Effect", customText = nil
+        name = "Effect"
+    elseif string.StartsWith( name, "NPC" ) then
+        -- "NPC (npc_monk)" -> name = "NPC", customText = nil
+        name = "NPC"
+    elseif string.StartsWith( name, "Scripted Entity" ) then
+        -- "Scripted Entity (sent_spawnpoint)" -> name = "SENT", customText = "Undone Mobile Spawnpoint V2"
+        local class = string.sub( name, 18, -2 )
+        local sentTbl = scripted_ents.GetStored( class )
+
+        if sentTbl then
+            customText = "Undone " .. ( sentTbl.t.PrintName or class )
+            name = "SENT"
+        end
+    end
+
+    -- AdvDupe2, Starfall, and E2 all use name as-is, and don't need special cases.
+    -- Primitives technically use customText, but in a way that makes it identical to just using name as-is.
+
+    makeUndoHint( name, customText )
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -428,10 +524,17 @@ CFCUlxCurse.RegisterEffect( {
 
         nextSpawnTime = 0
         nextSoundTime = 0
+        nextUndoTime = 0
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Schizo", function()
             poofVisibleGhosts()
             moveFleeingGhosts()
+        end )
+
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonDown", "Schizo", function( _, key )
+            if not IsFirstTimePredicted() then return end
+
+            tryFakeUndo( key )
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
