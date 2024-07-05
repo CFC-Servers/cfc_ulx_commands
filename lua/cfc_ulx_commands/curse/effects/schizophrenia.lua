@@ -557,8 +557,8 @@ CFCUlxCurse.RegisterEffect( {
         table.Empty( ghosts )
     end,
 
-    minDuration = 60,
-    maxDuration = 120,
+    minDuration = 120,
+    maxDuration = 180,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {},
