@@ -1,6 +1,6 @@
 local EFFECT_NAME = "Blindness"
 local FOG_START = 800
-local FOG_END = 700
+local FOG_END = 1000
 local FOG_START_MULT = -100
 local FOG_DENSITY = 1.999
 
