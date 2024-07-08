@@ -20,6 +20,7 @@ local effectNameToID = {}
 local onetimeEffectIDs = {}
 local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, listenerName = string }, ... }, effectNameTwo = ..., ... }
 local effectTimers = {} -- Player -> { effectNameOne = { string, ... }, effectNameTwo = ..., ... }
+local includedEffectUtils = {}
 local getRandomCompatibleEffect
 local storeEffectIncompatibilities
 local storeEffectGroups
@@ -436,6 +437,23 @@ function CFCUlxCurse.RemoveEffectTimers( cursedPly, effectName )
     end
 
     plyTimersByEffect[effectName] = nil
+end
+
+-- Networks and includes a shared effect utility file, returning the result.
+function CFCUlxCurse.IncludeEffectUtil( fileName )
+    local utilResult = includedEffectUtils[fileName]
+    if utilResult then return utilResult end
+
+    local path = "cfc_ulx_commands/curse/effects/utils/" .. fileName .. ".lua"
+
+    if SERVER then
+        AddCSLuaFile( path )
+    end
+
+    utilResult = include( path )
+    includedEffectUtils[fileName] = utilResult
+
+    return utilResult
 end
 
 
