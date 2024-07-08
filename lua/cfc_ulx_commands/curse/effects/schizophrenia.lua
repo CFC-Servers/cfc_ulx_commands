@@ -1,21 +1,23 @@
 local EFFECT_NAME = "Schizophrenia"
 local SPAWN_ATTEMPT_INTERVAL = 0.05
+local CROSSBOW_CHANCE = 0.001 -- Per spawn attempt.
+local BULLET_CHANCE = 0.001 -- Per spawn attempt.
 
-local DISAPPEAR_DELAY_MIN = 0.5
-local DISAPPEAR_DELAY_MAX = 1
+local GHOST_SPAWN_CHANCE = 0.05 -- Per spawn attempt. 
+local GHOST_SPAWN_RADIUS_MIN = 100
+local GHOST_SPAWN_RADIUS_MAX = 2000
+local GHOST_SPAWN_COOLDOWN = 5
+local GHOST_SPAWN_ATTEMPTS = 10
+local GHOST_SPAWN_LIMIT = 5
 
-local FLEE_SPEED_MIN = 1500
-local FLEE_SPEED_MAX = 2500
+local GHOST_DISAPPEAR_DELAY_MIN = 0.5
+local GHOST_DISAPPEAR_DELAY_MAX = 1
 
-local DISAPPEAR_MARGIN = 100
-local APPEAR_MARGIN = 200
+local GHOST_FLEE_SPEED_MIN = 1500
+local GHOST_FLEE_SPEED_MAX = 2500
 
-local SPAWN_RADIUS_MIN = 100
-local SPAWN_RADIUS_MAX = 2000
-local SPAWN_CHANCE = 0.05
-local SPAWN_COOLDOWN = 5
-local SPAWN_ATTEMPTS = 10
-local SPAWN_LIMIT = 5
+local GHOST_DISAPPEAR_MARGIN = 100
+local GHOST_APPEAR_MARGIN = 200
 
 local SOUND_CHANCE = 0.01
 local SOUND_COOLDOWN = 5
@@ -138,16 +140,71 @@ local SOUND_LIST = {
     "npc/antlion_guard/foot_heavy2.wav",
 }
 
+local UNDO_CHANCE = 0.05 -- Per key press.
+local UNDO_COOLDOWN = 30
+local UNDO_KEY_TRIGGER_BLACKLIST = {
+    [KEY_W] = true,
+    [KEY_A] = true,
+    [KEY_S] = true,
+    [KEY_D] = true,
+    [KEY_SPACE] = true,
+    [KEY_LSHIFT] = true,
+    [KEY_LCONTROL] = true,
+    [KEY_RSHIFT] = true,
+    [KEY_RCONTROL] = true,
+    [KEY_LEFT] = true,
+    [KEY_RIGHT] = true,
+    [KEY_UP] = true,
+    [KEY_DOWN] = true,
+    [KEY_ESCAPE] = true,
+    [KEY_TAB] = true,
+
+    [MOUSE_LEFT] = true,
+    [MOUSE_RIGHT] = true,
+    [MOUSE_MIDDLE] = true,
+    [MOUSE_4] = true,
+    [MOUSE_5] = true,
+    [MOUSE_WHEEL_UP] = true,
+    [MOUSE_WHEEL_DOWN] = true,
+}
+
+local HAT_MAN_SPAWN_CHANCE = 0.005
+local HAT_MAN_SPAWN_RADIUS_MIN = 200
+local HAT_MAN_SPAWN_RADIUS_MAX = 1500
+local HAT_MAN_SPAWN_COOLDOWN = 30
+local HAT_MAN_SPAWN_ATTEMPTS = 10
+local HAT_MAN_SILENT_REMOVE_DISTANCE = 3000
+local HAT_MAN_COLOR = Color( 70, 70, 70, 255 )
+local HAT_MAN_HAT_COLOR = Color( 0, 0, 0, 255 )
+local HAT_MAN_SOUND_CHANCE = 0.025
+local HAT_MAN_SOUND_COOLDOWN = 5
+local HAT_MAN_SOUNDS = {
+    "ambient/creatures/town_scared_breathing1.wav",
+    "ambient/creatures/town_scared_breathing2.wav",
+    "ambient/creatures/town_scared_sob1.wav",
+    "ambient/creatures/town_scared_sob2.wav",
+}
+
+-- END CONFIG
+
 
 local PI_DOUBLE = math.pi * 2
 local VECTOR_ZERO = Vector( 0, 0, 0 )
 local VECTOR_UP_SHORT = Vector( 0, 0, 10 )
 local VECTOR_DOWN_LONG = Vector( 0, 0, -10000 )
+local VECTOR_PLAYER_HULL_MINS = Vector( -16, -16, 0 )
+local VECTOR_PLAYER_HULL_MAXS = Vector( 16, 16, 72 )
+local ANGLE_ZERO = Angle( 0, 0, 0 )
 
 local ghosts = {}
 local fleeingGhosts = {}
-local nextSpawnTime = 0
+local hatMan = nil
+local hatManHat = nil
+local nextGhostSpawnTime = 0
+local nextHatManSpawnTime = 0
+local nextHatManSoundTime = 0
 local nextSoundTime = 0
+local nextUndoTime = 0
 
 
 local function randomInCircle( radius )
@@ -196,7 +253,7 @@ local function getFleeDir( pos, eyePos, eyeDir )
 end
 
 local function delayedRemove( ent )
-    local delay = math.Rand( DISAPPEAR_DELAY_MIN, DISAPPEAR_DELAY_MAX )
+    local delay = math.Rand( GHOST_DISAPPEAR_DELAY_MIN, GHOST_DISAPPEAR_DELAY_MAX )
 
     timer.Simple( delay, function()
         if IsValid( ent ) then
@@ -206,8 +263,8 @@ local function delayedRemove( ent )
 end
 
 local function poofVisibleGhosts()
-    local edgeW = ScrW() - DISAPPEAR_MARGIN
-    local edgeH = ScrH() - DISAPPEAR_MARGIN
+    local edgeW = ScrW() - GHOST_DISAPPEAR_MARGIN
+    local edgeH = ScrH() - GHOST_DISAPPEAR_MARGIN
 
     local eyePos = EyePos()
     local eyeDir = EyeVector()
@@ -225,10 +282,10 @@ local function poofVisibleGhosts()
                 local y = scrPos.y
 
                 -- If the ghost is far enough into the screen, remove it.
-                if x > DISAPPEAR_MARGIN and x < edgeW and y > DISAPPEAR_MARGIN and y < edgeH then
+                if x > GHOST_DISAPPEAR_MARGIN and x < edgeW and y > GHOST_DISAPPEAR_MARGIN and y < edgeH then
                     local fleeDir = getFleeDir( pos, eyePos, eyeDir )
 
-                    ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel = fleeDir * math.Rand( FLEE_SPEED_MIN, FLEE_SPEED_MAX )
+                    ghost._cfcUlxCommands_Curses_Schizophrenia_FleeVel = fleeDir * math.Rand( GHOST_FLEE_SPEED_MIN, GHOST_FLEE_SPEED_MAX )
 
                     table.remove( ghosts, i )
                     table.insert( fleeingGhosts, ghost )
@@ -258,20 +315,15 @@ local function moveFleeingGhosts()
     end
 end
 
-local function trySpawnGhost()
-    local now = CurTime()
-    if now < nextSpawnTime then return end
-    if #ghosts >= SPAWN_LIMIT then return end
-    if SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > SPAWN_CHANCE then return end
+local function findGhostSpawnPos( attemptCount, radiusMin, radiusMax )
+    local edgeW = ScrW() + GHOST_APPEAR_MARGIN
+    local edgeH = ScrH() + GHOST_APPEAR_MARGIN
 
-    local edgeW = ScrW() + APPEAR_MARGIN
-    local edgeH = ScrH() + APPEAR_MARGIN
-
-    local attemptsLeft = SPAWN_ATTEMPTS
+    local attemptsLeft = attemptCount
     local spawnCenter = LocalPlayer():GetPos() + VECTOR_UP_SHORT
 
     while attemptsLeft > 0 do
-        local spawnPos = spawnCenter + randomInCircle( math.Rand( SPAWN_RADIUS_MIN, SPAWN_RADIUS_MAX ) )
+        local spawnPos = spawnCenter + randomInCircle( math.Rand( radiusMin, radiusMax ) )
         local tr = util.TraceLine( { start = spawnPos, endpos = spawnPos + VECTOR_DOWN_LONG } )
 
         if tr.Fraction ~= 0 then
@@ -284,21 +336,125 @@ local function trySpawnGhost()
                 local x = scrPos.x
                 local y = scrPos.y
 
-                if x < -APPEAR_MARGIN or x > edgeW or y < -APPEAR_MARGIN or y > edgeH then
+                if x < -GHOST_APPEAR_MARGIN or x > edgeW or y < -GHOST_APPEAR_MARGIN or y > edgeH then
                     visible = false
                 end
             end
 
             if not visible then
-                nextSpawnTime = now + SPAWN_COOLDOWN
-                makePlayerCopy( getRandomPlayer(), spawnPos, Angle( 0, math.Rand( -180, 180 ), 0 ) )
-
-                break
+                return spawnPos
             end
         end
 
         attemptsLeft = attemptsLeft - 1
     end
+end
+
+local function trySpawnGhost()
+    local now = CurTime()
+    if now < nextGhostSpawnTime then return end
+    if #ghosts >= GHOST_SPAWN_LIMIT then return end
+    if GHOST_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > GHOST_SPAWN_CHANCE then return end
+
+    local pos = findGhostSpawnPos( GHOST_SPAWN_ATTEMPTS, GHOST_SPAWN_RADIUS_MIN, GHOST_SPAWN_RADIUS_MAX )
+    if not pos then return end
+
+    nextGhostSpawnTime = now + GHOST_SPAWN_COOLDOWN
+    makePlayerCopy( getRandomPlayer(), pos, Angle( 0, math.Rand( -180, 180 ), 0 ) )
+end
+
+local function trySpawnHatMan()
+    if IsValid( hatMan ) then return end
+
+    local now = CurTime()
+    if now < nextHatManSpawnTime then return end
+    if HAT_MAN_SPAWN_CHANCE ~= 1 and math.Rand( 0, 1 ) > HAT_MAN_SPAWN_CHANCE then return end
+
+    local pos = findGhostSpawnPos( HAT_MAN_SPAWN_ATTEMPTS, HAT_MAN_SPAWN_RADIUS_MIN, HAT_MAN_SPAWN_RADIUS_MAX )
+    if not pos then return end
+
+    local ang = ( LocalPlayer():GetPos() - pos ):Angle()
+    ang.p = 0
+
+    hatMan = ClientsideModel( "models/player/gman_high.mdl" )
+    hatMan:SetPos( pos )
+    hatMan:SetAngles( ang )
+    hatMan:Spawn()
+    hatMan:SetSequence( 3 )
+    hatMan:SetColor( HAT_MAN_COLOR )
+    hatMan:SetSubMaterial( 1, "models/props_c17/FurnitureFabric003a" ) -- Hands won't respect color changes otherwise
+    hatMan:SetPredictable( true ) -- Required for FollowBone to work.
+    hatMan:SetupBones()
+
+    -- FollowBone and SetParent are incredibly messed up on client-only models.
+    -- This took several hours of trial and error and testing various attachment methods to get working.
+    local hatPos = pos + ang:Forward() * 1 + ang:Right() * 2
+    local _, hatAng = LocalToWorld( VECTOR_ZERO, Angle( 0, -80, -90 ), VECTOR_ZERO, ang )
+
+    hatManHat = ClientsideModel( "models/player/items/humans/top_hat.mdl" )
+    hatManHat:SetPos( hatPos )
+    hatManHat:SetAngles( hatAng )
+    hatManHat:Spawn()
+    hatManHat:SetColor( HAT_MAN_HAT_COLOR )
+    hatManHat:FollowBone( hatMan, 6 )
+end
+
+local function removeHatMan()
+    if IsValid( hatMan ) then
+        for _, snd in ipairs( HAT_MAN_SOUNDS ) do
+            hatMan:StopSound( snd )
+        end
+
+        hatMan:Remove()
+        hatMan = nil
+    end
+
+    if IsValid( hatManHat ) then
+        hatManHat:Remove()
+        hatManHat = nil
+    end
+end
+
+local function poofHatMan()
+    if not IsValid( hatMan ) then return end
+
+    local eyePos = EyePos()
+    local eyeDir = EyeVector()
+    local hatManPos = hatMan:GetPos()
+    local toHatMan = hatManPos - eyePos
+
+    -- Facing the opposite way, definitely not looking at the hat man.
+    if toHatMan:Dot( eyeDir ) < 0 then
+        if toHatMan:Length() > HAT_MAN_SILENT_REMOVE_DISTANCE then
+            removeHatMan()
+        end
+
+        return
+    end
+
+    hatMan:SetEyeTarget( eyePos )
+
+    -- If looking directly at the hat man, poof him and play a sound.
+    local aimPos = LocalPlayer():GetEyeTrace().HitPos
+    local hit = util.IntersectRayWithOBB( eyePos, aimPos - eyePos, hatManPos, ANGLE_ZERO, VECTOR_PLAYER_HULL_MINS, VECTOR_PLAYER_HULL_MAXS )
+    if not hit then return end
+
+    nextHatManSpawnTime = CurTime() + HAT_MAN_SPAWN_COOLDOWN
+    surface.PlaySound( "ambient/creatures/town_moan1.wav" )
+    removeHatMan()
+end
+
+local function tryPlayHatManSound()
+    if not IsValid( hatMan ) then return end
+
+    local now = CurTime()
+    if now < nextHatManSoundTime then return end
+    if HAT_MAN_SOUND_CHANCE ~= 1 and math.Rand( 0, 1 ) > HAT_MAN_SOUND_CHANCE then return end
+
+    local snd = HAT_MAN_SOUNDS[math.random( 1, #HAT_MAN_SOUNDS )]
+
+    nextHatManSoundTime = now + HAT_MAN_SOUND_COOLDOWN
+    hatMan:EmitSound( snd, 90, math.Rand( 80, 100 ) )
 end
 
 local function tryPlaySound()
@@ -313,6 +469,177 @@ local function tryPlaySound()
     sound.Play( path, pos )
 end
 
+local function tryCrossbowImpact()
+    if CROSSBOW_CHANCE == 0 then return end
+    if math.Rand( 0, 1 ) > CROSSBOW_CHANCE then return end
+
+    local ply = LocalPlayer()
+    local ang = Angle( math.Rand( 0, 45 ), ply:EyeAngles().y + math.Rand( -45, 45 ), 0 )
+    local dir = ang:Forward()
+    local startPos = ply:GetPos()
+
+    local binaryChoice = math.random( 0, 1 ) == 0
+    startPos = startPos + ( binaryChoice and 1 or -1 ) * math.Rand( 50, 100 ) * ply:GetRight()
+    startPos = startPos + Vector( 0, 0, math.Rand( -50, 50 ) )
+    startPos = startPos - dir * 200
+
+    local tr = util.TraceLine( {
+        start = startPos,
+        endpos = startPos + dir * 500,
+    } )
+
+    if not tr.Hit then return end
+    if tr.HitNormal == VECTOR_ZERO then return end
+
+    local hitPos = tr.HitPos
+    local dirBack = -dir
+
+    local eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    util.Effect( "BoltImpact", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 2 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    util.Effect( "Sparks", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 1 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    eff:SetDamageType( DMG_BULLET )
+    eff:SetSurfaceProp( tr.SurfaceProps )
+    eff:SetEntity( game.GetWorld() )
+    util.Effect( "Impact", eff )
+
+    EmitSound( "weapons/crossbow/hit1.wav", hitPos, 0, CHAN_AUTO, 1, 75, 0, 105, 0 )
+end
+
+local function tryBulletWhiz()
+    if BULLET_CHANCE == 0 then return end
+    if math.Rand( 0, 1 ) > BULLET_CHANCE then return end
+
+    local ply = LocalPlayer()
+    local ang = Angle( math.Rand( 0, 45 ), ply:EyeAngles().y + math.Rand( -30, 30 ), 0 )
+    local dir = ang:Forward()
+    local startPos = ply:GetPos()
+
+    local binaryChoice = math.random( 0, 1 ) == 0
+    startPos = startPos + ( binaryChoice and 1 or -1 ) * math.Rand( 10, 30 ) * ply:GetRight()
+    startPos = startPos + Vector( 0, 0, math.Rand( 45, 75 ) )
+
+    local startPosNear = startPos
+    startPos = startPos - dir * 200
+
+    local tr = util.TraceLine( {
+        start = startPos,
+        endpos = startPos + dir * 5000,
+    } )
+
+    if not tr.Hit then return end
+    if tr.HitNormal == VECTOR_ZERO then return end
+
+    local hitPos = tr.HitPos
+    local dirBack = -dir
+
+    local eyePos = EyePos()
+    startPosNear = eyePos + ( startPosNear - eyePos ) * 0.1
+
+    local eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetStart( startPos + dirBack * 1000 )
+    eff:SetScale( 5000 )
+    util.Effect( "Tracer", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( startPosNear )
+    util.Effect( "TracerSound", eff )
+
+    eff = EffectData()
+    eff:SetOrigin( hitPos )
+    eff:SetNormal( dirBack )
+    eff:SetScale( 1 )
+    eff:SetMagnitude( 1 )
+    eff:SetRadius( 1 )
+    eff:SetDamageType( DMG_BULLET )
+    eff:SetSurfaceProp( tr.SurfaceProps )
+    eff:SetEntity( game.GetWorld() )
+    util.Effect( "Impact", eff )
+end
+
+-- Taken from GM:OnUndo
+-- https://github.com/Facepunch/garrysmod/blob/master/garrysmod/gamemodes/sandbox/gamemode/cl_init.lua
+local function makeUndoHint( name, customText )
+    if not customText then
+        local strId = "#Undone_" .. name
+        customText = language.GetPhrase( strId )
+
+        if strId == customText then
+            customText = string.format( language.GetPhrase( "hint.undoneX" ), language.GetPhrase( name ) )
+        end
+    end
+
+    local strMatch = string.match( customText, "^Undone (.*)$" )
+    if strMatch then
+        customText = string.format( language.GetPhrase( "hint.undoneX" ), language.GetPhrase( strMatch ) )
+    end
+
+    notification.AddLegacy( customText, NOTIFY_UNDO, 2 )
+    surface.PlaySound( "buttons/button15.wav" )
+end
+
+local function tryFakeUndo( key )
+    if not undo then return end
+    if UNDO_KEY_TRIGGER_BLACKLIST[key] then return end
+    if UNDO_CHANCE == 0 then return end
+
+    local now = CurTime()
+    if now < nextUndoTime then return end
+    if math.Rand( 0, 1 ) > UNDO_CHANCE then return end
+
+    local undoEntry = undo.GetTable()[1]
+    if not undoEntry then return end
+
+    nextUndoTime = now + UNDO_COOLDOWN
+
+    local name = undoEntry.Name
+    local customText = nil
+
+    if string.StartsWith( name, "Prop" ) then
+        -- "Prop (models/hunter/plates/plate1x1.mdl)" -> name = "Prop", customText = nil
+        name = "Prop"
+    elseif string.StartsWith( name, "Ragdoll" ) then
+        -- "Ragdoll (models/Kleiner.mdl)" -> name = "Ragdoll", customText = nil
+        name = "Ragdoll"
+    elseif string.StartsWith( name, "Effect" ) then
+        -- "Effect (models/props_c17/pushbroom.mdl)" -> name = "Effect", customText = nil
+        name = "Effect"
+    elseif string.StartsWith( name, "NPC" ) then
+        -- "NPC (npc_monk)" -> name = "NPC", customText = nil
+        name = "NPC"
+    elseif string.StartsWith( name, "Scripted Entity" ) then
+        -- "Scripted Entity (sent_spawnpoint)" -> name = "SENT", customText = "Undone Mobile Spawnpoint V2"
+        local class = string.sub( name, 18, -2 )
+        local sentTbl = scripted_ents.GetStored( class )
+
+        if sentTbl then
+            customText = "Undone " .. ( sentTbl.t.PrintName or class )
+            name = "SENT"
+        end
+    end
+
+    -- AdvDupe2, Starfall, and E2 all use name as-is, and don't need special cases.
+    -- Primitives technically use customText, but in a way that makes it identical to just using name as-is.
+
+    makeUndoHint( name, customText )
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -320,17 +647,31 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        nextSpawnTime = 0
+        nextGhostSpawnTime = 0
+        nextHatManSpawnTime = 0
+        nextHatManSoundTime = 0
         nextSoundTime = 0
+        nextUndoTime = 0
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Schizo", function()
             poofVisibleGhosts()
             moveFleeingGhosts()
+            poofHatMan()
+        end )
+
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerButtonDown", "Schizo", function( _, key )
+            if not IsFirstTimePredicted() then return end
+
+            tryFakeUndo( key )
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Schizo", SPAWN_ATTEMPT_INTERVAL, 0, function()
             trySpawnGhost()
+            trySpawnHatMan()
+            tryPlayHatManSound()
             tryPlaySound()
+            tryCrossbowImpact()
+            tryBulletWhiz()
         end )
     end,
 
@@ -342,10 +683,11 @@ CFCUlxCurse.RegisterEffect( {
         end
 
         table.Empty( ghosts )
+        removeHatMan()
     end,
 
-    minDuration = 60,
-    maxDuration = 120,
+    minDuration = 120,
+    maxDuration = 180,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {},
