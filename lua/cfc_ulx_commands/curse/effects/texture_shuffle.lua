@@ -32,8 +32,27 @@ local function getOriginalTexture( mat )
     local texture = originalTextures[matName]
     if texture ~= nil then return texture end
 
-    texture = mat:GetTexture( "$basetexture" ) or false
+    local textureStr = mat:GetString( "$basetexture" )
+    texture = false
+
+    -- Materials with no basetexture have nil for :GetString() but return the error texture for :GetTexture().
+    -- As such, first check the raw string, if it's empty or nil then consider it textureless, else check the texture object.
+    if textureStr ~= nil and textureStr ~= "" then
+        texture = mat:GetTexture( "$basetexture" ) or false
+
+        -- If the texture is an error texture, it's not a valid texture.
+        -- If the texture string is explicitly "error" however, it is intentional and should be kept.
+        if texture and textureStr ~= "error" and ( texture:IsError() or texture:IsErrorTexture() ) then
+            texture = false
+        end
+    end
+
     originalTextures[matName] = texture
+
+    -- Don't add textureless materials to the pool, both for giving and receiving texture changes.
+    -- Even using :SetUndefined() on certain materials (e.g. water) makes them bug out, so don't touch them at all.
+    if not texture then return false end
+
     table.insert( originalTexturesList, texture )
     table.insert( scrapedMaterialsList, mat )
 
@@ -59,8 +78,6 @@ local function getOriginalTextureFromName( matName )
     return getOriginalTexture( mat )
 end
 
--- Some textures don't have a $basetexture.
--- So, when reverting them or applying their (lack of a) texture to other materials, it needs :SetUndefined().
 local function setTextureSafe( mat, texture )
     if texture then
         mat:SetTexture( "$basetexture", texture )
@@ -70,7 +87,9 @@ local function setTextureSafe( mat, texture )
 end
 
 local function changeTexture( mat, texture )
-    setTextureSafe( mat, texture )
+    if not texture then return end -- Don't change to a nil/broken texture. This should never occur, but just in case.
+
+    mat:SetTexture( "$basetexture", texture )
     modifiedMaterials[mat:GetName()] = mat
 end
 
