@@ -47,6 +47,7 @@ local curMeshData = {}
 local curExpirableMesh = nil
 local curExpirableMeshChanged = false
 local curExpirableMeshData = {}
+local curExpirableMeshExpireTime = math.huge
 local meshCount = 0
 local expirableMeshCount = 0
 local meshHead = 1
@@ -233,6 +234,7 @@ local function updateCurExpirableMesh()
     curExpirableMesh = Mesh()
     curExpirableMesh:BuildFromTriangles( curExpirableMeshData )
     curExpirableMeshChanged = false
+    curExpirableMeshExpireTime = CurTime() + MESH_EXPIRE_TIME
 
     -- Split off into a new mesh
     if curExpirableVertCount <= VERTS_PER_EXPIRABLE_MESH then return end
@@ -261,6 +263,17 @@ local function addDots( eyePos, eyeAng )
 
     updateCurMesh()
     updateCurExpirableMesh()
+end
+
+local function expireCurExpirableMesh()
+    if not curExpirableMesh then return end
+    if CurTime() < curExpirableMeshExpireTime then return end
+
+    curExpirableMesh:Destroy()
+    curExpirableMesh = nil
+    curExpirableMeshData = {}
+    curExpirableVertCount = 0
+    curExpirableMeshChanged = false
 end
 
 local function drawMeshes()
@@ -357,6 +370,7 @@ CFCUlxCurse.RegisterEffect( {
         curExpirableMesh = nil
         curExpirableMeshData = {}
         curExpirableVertCount = 0
+        curExpirableMeshExpireTime = math.huge
         meshCount = 0
         expirableMeshCount = 0
         meshHead = 1
@@ -382,12 +396,14 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Scan", SCAN_INTERVAL, 0, function()
-            if not placingDots then return end
+            expireCurExpirableMesh()
 
-            local eyePos = cursedPly:EyePos()
-            local eyeAng = cursedPly:EyeAngles()
+            if placingDots then
+                local eyePos = cursedPly:EyePos()
+                local eyeAng = cursedPly:EyeAngles()
 
-            addDots( eyePos, eyeAng )
+                addDots( eyePos, eyeAng )
+            end
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "BallScan", BALL_SCAN_INTERVAL, 0, function()
