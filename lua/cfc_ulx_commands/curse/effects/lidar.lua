@@ -6,7 +6,7 @@ local VERTS_PER_EXPIRABLE_MESH = 50 * 3
 
 local MESH_EXPIRE_TIME = 2
 local SCAN_INTERVAL = 0.01
-local DOTS_PER_SCAN = 75
+local DOTS_PER_SCAN = 50
 local DOT_SPREAD = 60
 local DOT_SIZE = 3
 local DOT_HITBOX_SIZE = 2
