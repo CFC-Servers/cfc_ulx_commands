@@ -6,10 +6,13 @@ local VERTS_PER_EXPIRABLE_MESH = 50 * 3
 
 local MESH_EXPIRE_TIME = 2
 local SCAN_INTERVAL = 0.01
-local DOTS_PER_SCAN = 75
+local DOTS_PER_SCAN = 50
 local DOT_SPREAD = 60
 local DOT_SIZE = 3
 local DOT_HITBOX_SIZE = 2
+
+local BONUS_SCAN_SPREAD = 5
+local BONUS_SCAN_PLAYER = 2 -- If a player or NPC is hit, adds a few bonus scans, to make it easier to see them.
 
 local BALL_SPEED = 300
 local BALL_DURATION = 120
@@ -32,6 +35,7 @@ local TRACE_MASK_HITBOXES = MASK_SHOT + CONTENTS_WATER + CONTENTS_SLIME
 
 
 local DOT_SPREAD_HALF = DOT_SPREAD / 2
+local BONUS_SCAN_SPREAD_HALF = BONUS_SCAN_SPREAD / 2
 local ROTATE_THIRD = 360 / 3
 local VECTOR_ZERO = Vector( 0, 0, 0 )
 
@@ -43,6 +47,7 @@ local curMeshData = {}
 local curExpirableMesh = nil
 local curExpirableMeshChanged = false
 local curExpirableMeshData = {}
+local curExpirableMeshExpireTime = math.huge
 local meshCount = 0
 local expirableMeshCount = 0
 local meshHead = 1
@@ -52,6 +57,8 @@ local placingDots = false
 local showDotHint = false
 local lidarMat = nil
 local ballEnt = nil
+
+local addBonusDots
 
 local mathRand = math.Rand
 local bitBand = bit.band
@@ -67,15 +74,15 @@ if SERVER then
 end
 
 
-local function spreadDirFast( ang, right, up )
+local function spreadDirFast( ang, right, up, spreadHalf )
     ang = Angle( ang.p, ang.y, ang.r )
-    ang:RotateAroundAxis( right, mathRand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
-    ang:RotateAroundAxis( up, mathRand( -DOT_SPREAD_HALF, DOT_SPREAD_HALF ) )
+    ang:RotateAroundAxis( right, mathRand( -spreadHalf, spreadHalf ) )
+    ang:RotateAroundAxis( up, mathRand( -spreadHalf, spreadHalf ) )
 
     return ang:Forward()
 end
 
-local function addDot( startPos, dir, filter )
+local function addDot( startPos, dir, filter, allowBonusScans )
     local endPos = startPos + dir * 50000
     local tr = utilTraceLine( {
         start = startPos,
@@ -112,6 +119,10 @@ local function addDot( startPos, dir, filter )
         if tr2.Hit then
             if newEnt == hitEnt then
                 size = DOT_HITBOX_SIZE
+
+                if allowBonusScans then
+                    addBonusDots( dir, startPos, filter, BONUS_SCAN_PLAYER )
+                end
             end
 
             hitPos = tr2.HitPos
@@ -223,6 +234,7 @@ local function updateCurExpirableMesh()
     curExpirableMesh = Mesh()
     curExpirableMesh:BuildFromTriangles( curExpirableMeshData )
     curExpirableMeshChanged = false
+    curExpirableMeshExpireTime = CurTime() + MESH_EXPIRE_TIME
 
     -- Split off into a new mesh
     if curExpirableVertCount <= VERTS_PER_EXPIRABLE_MESH then return end
@@ -244,13 +256,24 @@ local function addDots( eyePos, eyeAng )
     local filter = LocalPlayer()
 
     for _ = 1, DOTS_PER_SCAN do
-        local dir = spreadDirFast( eyeAng, eyeRight, eyeUp )
+        local dir = spreadDirFast( eyeAng, eyeRight, eyeUp, DOT_SPREAD_HALF )
 
-        addDot( eyePos, dir, filter )
+        addDot( eyePos, dir, filter, true )
     end
 
     updateCurMesh()
     updateCurExpirableMesh()
+end
+
+local function expireCurExpirableMesh()
+    if not curExpirableMesh then return end
+    if CurTime() < curExpirableMeshExpireTime then return end
+
+    curExpirableMesh:Destroy()
+    curExpirableMesh = nil
+    curExpirableMeshData = {}
+    curExpirableVertCount = 0
+    curExpirableMeshChanged = false
 end
 
 local function drawMeshes()
@@ -312,6 +335,18 @@ local function drawBall()
     render.DrawSphere( ballEnt:GetPos(), BALL_RADIUS, 50, 50, BALL_COLOR )
 end
 
+addBonusDots = function( dir, startPos, filter, amount )
+    local ang = dir:Angle()
+    local right = ang:Right()
+    local up = ang:Up()
+
+    for _ = 1, amount do
+        local bonusDir = spreadDirFast( ang, right, up, BONUS_SCAN_SPREAD_HALF )
+
+        addDot( startPos, bonusDir, filter, false )
+    end
+end
+
 
 if CLIENT then
     lidarMat = CreateMaterial( "cfc_ulx_commands_curse_lidar", "UnlitGeneric", {
@@ -335,6 +370,7 @@ CFCUlxCurse.RegisterEffect( {
         curExpirableMesh = nil
         curExpirableMeshData = {}
         curExpirableVertCount = 0
+        curExpirableMeshExpireTime = math.huge
         meshCount = 0
         expirableMeshCount = 0
         meshHead = 1
@@ -360,12 +396,14 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Scan", SCAN_INTERVAL, 0, function()
-            if not placingDots then return end
+            expireCurExpirableMesh()
 
-            local eyePos = cursedPly:EyePos()
-            local eyeAng = cursedPly:EyeAngles()
+            if placingDots then
+                local eyePos = cursedPly:EyePos()
+                local eyeAng = cursedPly:EyeAngles()
 
-            addDots( eyePos, eyeAng )
+                addDots( eyePos, eyeAng )
+            end
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "BallScan", BALL_SCAN_INTERVAL, 0, function()
