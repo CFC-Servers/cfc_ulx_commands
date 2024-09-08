@@ -29,18 +29,14 @@ local wireframeMat
 if CLIENT then
     ignorezMat = CreateMaterial( "cfc_ulx_commands_curse_cyberspace_ignorez", "UnlitGeneric", {
         ["$ignorez"] = 1,
-        --["$color2"] = BACKGROUND_COLOR:ToVector(),
         ["$color2"] = "[" .. tostring( BACKGROUND_COLOR:ToVector() ) .. "]",
     } )
-    --ignorezMat:SetVector( "$color2", BACKGROUND_COLOR:ToVector() )
 
     wireframeMat = CreateMaterial( "cfc_ulx_commands_curse_cyberspace_wireframe", "UnlitGeneric", {
         ["$model"] = 1,
         ["$wireframe"] = 1,
-        --["$color2"] = WIREFRAME_COLOR:ToVector(),
         ["$color2"] = "[" .. tostring( WIREFRAME_COLOR:ToVector() ) .. "]",
     } )
-    --wireframeMat:SetVector( "$color2", WIREFRAME_COLOR:ToVector() )
 end
 
 
@@ -231,7 +227,6 @@ local function drawEnts()
     render.MaterialOverride( wireframeMat )
     render.SetShadowsDisabled( true )
 
-    --for _, ent in ipairs( ents.FindInSphere( EyePos(), SIGHT_RADIUS ) ) do -- Breaks near area portals
     for _, ent in ipairs( ents.GetAll() ) do
         if
             ent.DrawModel and
