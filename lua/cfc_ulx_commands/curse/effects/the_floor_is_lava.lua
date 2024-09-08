@@ -1,5 +1,7 @@
 local EFFECT_NAME = "TheFloorIsLava"
 local GRACE_DURATION = 5 -- Must be an integer.
+local DAMAGE_PER_TICK = 10 -- 0 to instakill.
+local DAMAGE_TICK_RATE = 0.2 -- In seconds.
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -10,6 +12,7 @@ CFCUlxCurse.RegisterEffect( {
 
         local underGrace = false
         local world = game.GetWorld()
+        local nextDamageTime = 0
 
 
         local function applyGracePeriod()
@@ -31,6 +34,12 @@ CFCUlxCurse.RegisterEffect( {
             end )
         end
 
+        local function kill()
+            PrintMessage( HUD_PRINTCONSOLE, cursedPly:Nick() .. " burned to a crisp playing The Floor is Lava!" )
+            cursedPly:Kill()
+        end
+
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "ApplyGracePeriod", function( ply )
             if ply ~= cursedPly then return end
 
@@ -38,6 +47,8 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Kill", function()
+            local now = CurTime()
+            if now < nextDamageTime then return end
             if underGrace then return end
             if not cursedPly:Alive() then return end
             if cursedPly.frozen then return end
@@ -45,8 +56,21 @@ CFCUlxCurse.RegisterEffect( {
             if not cursedPly:OnGround() then return end
             if cursedPly:GetGroundEntity() ~= world then return end
 
-            PrintMessage( HUD_PRINTCONSOLE, cursedPly:Nick() .. " burned to a crisp playing The Floor is Lava!" )
-            cursedPly:Kill()
+            if DAMAGE_PER_SECOND == 0 then
+                kill()
+
+                return
+            end
+
+            cursedPly:Ignite( 100 )
+            cursedPly:SetHealth( math.max( 0, cursedPly:Health() - DAMAGE_PER_TICK ) )
+            cursedPly:EmitSound( "player/pl_burnpain" .. math.random( 1, 3 ) ..  ".wav" )
+
+            nextDamageTime = now + DAMAGE_TICK_RATE
+
+            if cursedPly:Health() <= 0 then
+                kill()
+            end
         end )
 
 
@@ -64,6 +88,7 @@ CFCUlxCurse.RegisterEffect( {
         if CLIENT then return end
 
         ulx.clearExclusive( cursedPly )
+        cursedPly:Extinguish()
     end,
 
     minDuration = nil,
