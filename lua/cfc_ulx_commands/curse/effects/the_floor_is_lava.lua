@@ -40,6 +40,7 @@ CFCUlxCurse.RegisterEffect( {
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Kill", function()
             if underGrace then return end
             if not cursedPly:Alive() then return end
+            if cursedPly.frozen then return end
             if cursedPly:WaterLevel() > 0 then return end
             if not cursedPly:OnGround() then return end
             if cursedPly:GetGroundEntity() ~= world then return end
