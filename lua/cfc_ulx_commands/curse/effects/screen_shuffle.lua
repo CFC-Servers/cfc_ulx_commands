@@ -73,7 +73,6 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "Shuffle", shuffleInterval, 0, shuffleGrid )
 
-        --CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PostRenderVGUI", "Shuffle", function()
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawHUD", "Shuffle", function()
             render.UpdateScreenEffectTexture()
 
