@@ -106,6 +106,7 @@ CFCUlxCurse.RegisterEffect( {
     incompatibileEffects = {
         "ColorModify",
         "ColorModifyContinuous",
+        "ScreenShuffle",
     },
     groups = {
         "VisualOnly",

@@ -57,6 +57,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = true,
     incompatibileEffects = {
         "ScreenMirror",
+        "ScreenShuffle",
         "MirrorWorld",
     },
     groups = {
