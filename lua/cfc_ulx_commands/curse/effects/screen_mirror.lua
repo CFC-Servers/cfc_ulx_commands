@@ -16,11 +16,13 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDPaintBackground", "LBozo", function()
-            surface.SetDrawColor( 255, 255, 255, 255 )
-            surface.SetMaterial( gameMat )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawHUD", "LBozo", function()
+            cam.Start2D()
+                surface.SetDrawColor( 255, 255, 255, 255 )
+                surface.SetMaterial( gameMat )
 
-            surface.DrawTexturedRectUV( 0, 0, ScrW() / 2, ScrH(), 1, 0, 0.5, 1 )
+                surface.DrawTexturedRectUV( 0, 0, ScrW() / 2, ScrH(), 1, 0, 0.5, 1 )
+            cam.End2D()
         end )
     end,
 
