@@ -302,7 +302,7 @@ end
     - Adds an effect hook for a specific player.
     - For use only within the onStart() of effects.
 --]]
-function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerName, func )
+function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerName, func, priority )
     effectName = string.lower( effectName )
 
     local plyHooksByEffect = effectHooks[cursedPly]
@@ -326,7 +326,7 @@ function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerNam
         listenerName = listenerName,
     } )
 
-    hook.Add( hookName, listenerName, func )
+    hook.Add( hookName, listenerName, func, priority )
 end
 
 -- Removes an effect's hook for a specific player.
