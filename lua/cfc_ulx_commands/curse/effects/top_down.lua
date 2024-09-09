@@ -100,6 +100,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {
+        "Cyberspace",
+        "SuperCyberspace",
         "Isometric",
         "ResidentEvil",
     },
