@@ -49,7 +49,7 @@ CFCUlxCurse.RegisterEffect( {
             } )
         end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawViewModels", "FlipTheScreen", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawViewModels", "SubtractiveOverlay", function()
             cam.Start2D()
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
@@ -75,7 +75,7 @@ CFCUlxCurse.RegisterEffect( {
             cam.End2D()
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "FlipTheScreen", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "CaptureTheScreen", function()
             local now = CurTime()
             if now < nextCaptureTime then return end
 
