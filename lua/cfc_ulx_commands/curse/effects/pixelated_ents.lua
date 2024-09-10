@@ -57,7 +57,7 @@ CFCUlxCurse.RegisterEffect( {
             render.UpdateScreenEffectTexture()
 
             cam.Start2D()
-            render.SetRenderTarget( pixelRT )
+            render.PushRenderTarget( pixelRT, 0, 0, ScrW(), ScrH() )
                 render.Clear( 0, 0, 0, 255, true, true )
                 surface.SetMaterial( gameMat2 )
                 surface.SetDrawColor( 255, 255, 255, 255 )
@@ -65,7 +65,7 @@ CFCUlxCurse.RegisterEffect( {
                 render.PushFilterMin( TEXFILTER.POINT )
                 surface.DrawTexturedRectUV( 0, 0, ScrW() * compressionMult, ScrH() * compressionMult, 0, 0, 1, 1 )
                 render.PopFilterMin()
-            render.SetRenderTarget()
+            render.PopRenderTarget()
             cam.End2D()
         end )
 
@@ -90,7 +90,7 @@ CFCUlxCurse.RegisterEffect( {
             render.SetStencilCompareFunction( STENCIL_EQUAL )
 
             cam.Start2D()
-                surface.SetMaterial( pixelMat )
+                surface.SetMaterial( pixelMat, 0, 0, ScrW(), ScrH() )
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
                 render.PushFilterMag( TEXFILTER.POINT )
