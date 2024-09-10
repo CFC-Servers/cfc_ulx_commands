@@ -494,6 +494,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {
         "ScreenScroll",
+        "Sunbeams",
     },
     groups = {
         "VisualOnly",
