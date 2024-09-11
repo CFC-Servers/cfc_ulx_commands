@@ -70,6 +70,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {
         "DrunkBlur",
+        "FilmDevelopment",
         "MotionBlur",
         "PixelatedEnts",
     },

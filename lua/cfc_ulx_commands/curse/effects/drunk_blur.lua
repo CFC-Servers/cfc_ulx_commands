@@ -30,6 +30,7 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
     incompatibileEffects = {
+        "FilmDevelopment",
         "MotionBlur",
         "MotionSight",
         "Pixelated",

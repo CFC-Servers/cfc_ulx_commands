@@ -31,6 +31,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = true,
     incompatibileEffects = {
         "DrunkBlur",
+        "FilmDevelopment",
         "MotionSight",
         "Pixelated",
     },

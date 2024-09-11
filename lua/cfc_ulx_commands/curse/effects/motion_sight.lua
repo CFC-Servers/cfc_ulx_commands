@@ -107,6 +107,7 @@ CFCUlxCurse.RegisterEffect( {
         "ColorModify",
         "ColorModifyContinuous",
         "DrunkBlur",
+        "FilmDevelopment",
         "MotionBlur",
         "ScreenMirror",
         "ScreenScroll",
