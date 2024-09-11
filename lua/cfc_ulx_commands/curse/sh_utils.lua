@@ -18,7 +18,7 @@ CFCUlxCurse.EffectGroupIncompatibilities = {} -- lowercase curse name -> lookup 
 
 local effectNameToID = {}
 local onetimeEffectIDs = {}
-local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, listenerName = string }, ... }, effectNameTwo = ..., ... }
+local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, listenerName = string, listenerNameEff = string }, ... }, effectNameTwo = ..., ... }
 local effectTimers = {} -- Player -> { effectNameOne = { string, ... }, effectNameTwo = ..., ... }
 local includedEffectUtils = {}
 local getRandomCompatibleEffect
@@ -319,14 +319,15 @@ function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerNam
         plyHooksByEffect[effectName] = plyHooks
     end
 
-    listenerName = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. listenerName .. "_" .. cursedPly:SteamID64()
+    local listenerNameEff = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. listenerName .. "_" .. cursedPly:SteamID64()
 
     table.insert( plyHooks, {
         hookName = hookName,
         listenerName = listenerName,
+        listenerNameEff = listenerNameEff,
     } )
 
-    hook.Add( hookName, listenerName, func, priority )
+    hook.Add( hookName, listenerNameEff, func, priority )
 end
 
 -- Removes an effect's hook for a specific player.
@@ -343,7 +344,7 @@ function CFCUlxCurse.RemoveEffectHook( cursedPly, effectName, hookName, listener
         local hookData = plyHooks[i]
 
         if hookData.hookName == hookName and hookData.listenerName == listenerName then
-            hook.Remove( hookName, listenerName )
+            hook.Remove( hookName, hookData.listenerNameEff )
             table.remove( plyHooks, i )
         end
     end
@@ -363,7 +364,7 @@ function CFCUlxCurse.RemoveEffectHooks( cursedPly, effectName )
     if not plyHooks then return end
 
     for _, hookData in ipairs( plyHooks ) do
-        hook.Remove( hookData.hookName, hookData.listenerName )
+        hook.Remove( hookData.hookName, hookData.listenerNameEff )
     end
 
     plyHooksByEffect[effectName] = nil
