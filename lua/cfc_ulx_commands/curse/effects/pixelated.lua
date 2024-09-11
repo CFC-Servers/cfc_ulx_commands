@@ -69,6 +69,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {
+        "DrunkBlur",
+        "MotionBlur",
         "PixelatedEnts",
     },
     groups = {

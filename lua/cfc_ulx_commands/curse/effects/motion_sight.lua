@@ -106,6 +106,8 @@ CFCUlxCurse.RegisterEffect( {
     incompatibileEffects = {
         "ColorModify",
         "ColorModifyContinuous",
+        "DrunkBlur",
+        "MotionBlur",
         "ScreenMirror",
         "ScreenScroll",
         "ScreenShuffle",
