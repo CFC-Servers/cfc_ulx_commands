@@ -29,16 +29,13 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatibileEffects = {
-        "DrunkBlur",
-        "FilmDevelopment",
-        "MotionSight",
-        "Pixelated",
-    },
+    incompatibileEffects = {},
     groups = {
         "VisualOnly",
+        "MotionBlur",
     },
     incompatibleGroups = {
         "HaltRenderScene",
+        "MotionBlur",
     },
 } )

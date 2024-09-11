@@ -122,5 +122,6 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenOverlay",
         "Wrap:Halo.Add",
         "HaltRenderScene",
+        "MotionBlur",
     },
 } )

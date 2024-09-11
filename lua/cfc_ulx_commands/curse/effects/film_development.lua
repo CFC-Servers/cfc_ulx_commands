@@ -66,15 +66,13 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = 1,
     excludeFromOnetime = true,
-    incompatibileEffects = {
-        "MotionBlur",
-        "MotionSight",
-        "Pixelated",
-    },
+    incompatibileEffects = {},
     groups = {
         "VisualOnly",
+        "MotionBlur",
     },
     incompatibleGroups = {
         "HaltRenderScene",
+        "MotionBlur",
     },
 } )
