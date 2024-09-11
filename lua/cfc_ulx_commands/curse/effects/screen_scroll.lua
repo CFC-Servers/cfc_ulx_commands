@@ -3,13 +3,15 @@ local SPEED_MIN = 0.03
 local SPEED_MAX = 0.06
 
 
-local gameMat
+local gameMat2
 
 if CLIENT then
-    gameMat = CreateMaterial( "cfc_ulx_commands_curse_game_rt", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_PowerOfTwoFB"
+    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
+        ["$basetexture"] = "_rt_fullframefb",
+        ["$ignorez"] = 1,
     } )
 end
+
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -24,9 +26,11 @@ CFCUlxCurse.RegisterEffect( {
         speed = speed * ( math.random( 0, 1 ) == 0 and -1 or 1 )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawHUD", "LBozo", function()
+            render.UpdateScreenEffectTexture()
+
             cam.Start2D()
                 surface.SetDrawColor( 255, 255, 255, 255 )
-                surface.SetMaterial( gameMat )
+                surface.SetMaterial( gameMat2 )
 
                 offset = ( offset + speed * FrameTime() ) % 1
 
@@ -58,15 +62,13 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = 1.5,
     excludeFromOnetime = true,
     incompatibileEffects = {
-        "ScreenMirror",
-        "ScreenShuffle",
-        "MirrorWorld",
+        "MotionSight",
     },
     groups = {
         "VisualOnly",
         "ScreenOverlay",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
+        "HaltRenderScene",
     },
 } )

@@ -499,8 +499,10 @@ CFCUlxCurse.RegisterEffect( {
     groups = {
         "VisualOnly",
         "ScreenOverlay",
+        "HaltRenderScene",
     },
     incompatibleGroups = {
+        "HaltRenderScene",
         "ScreenOverlay",
         "PP",
     },

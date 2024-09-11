@@ -107,15 +107,15 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {
-        -- Compatible with *some* ScreenOverlay effects, but not all.
-        "Lidar",
         "MotionSight",
         "Pixelated",
         --"PixelatedEnts", -- Scuffed as hell, but hilarious.
-        "ScreenScroll",
     },
     groups = {
         "VisualOnly",
+        "ScreenOverlay",
     },
-    incompatibleGroups = {},
+    incompatibleGroups = {
+        "HaltRenderScene",
+    },
 } )

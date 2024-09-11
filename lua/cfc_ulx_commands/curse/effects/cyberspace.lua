@@ -298,6 +298,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {
         "Isometric",
+        "SuperCyberspace",
         "TopDown",
     },
     groups = {
@@ -305,7 +306,6 @@ CFCUlxCurse.RegisterEffect( {
         "ScreenOverlay",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
         "PP",
     },
 } )
@@ -329,13 +329,15 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatibileEffects = {},
+    incompatibileEffects = {
+        "Cyberspace",
+    },
     groups = {
         "VisualOnly",
         "ScreenOverlay",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
+        "HaltRenderScene",
         "PP",
     },
 } )

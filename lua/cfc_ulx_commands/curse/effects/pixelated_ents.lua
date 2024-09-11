@@ -110,13 +110,15 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatibileEffects = {},
+    incompatibileEffects = {
+        "Pixelated",
+    },
     groups = {
         "VisualOnly",
         "ScreenOverlay",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
+        "HaltRenderScene",
         "PP",
     },
 } )

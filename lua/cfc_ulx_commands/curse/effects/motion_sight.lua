@@ -106,6 +106,8 @@ CFCUlxCurse.RegisterEffect( {
     incompatibileEffects = {
         "ColorModify",
         "ColorModifyContinuous",
+        "ScreenMirror",
+        "ScreenScroll",
         "ScreenShuffle",
     },
     groups = {
@@ -116,5 +118,6 @@ CFCUlxCurse.RegisterEffect( {
     incompatibleGroups = {
         "ScreenOverlay",
         "Wrap:Halo.Add",
+        "HaltRenderScene",
     },
 } )

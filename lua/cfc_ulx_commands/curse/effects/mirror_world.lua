@@ -76,10 +76,7 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatibileEffects = {
-        "ScreenMirror",
-        "ScreenScroll",
-    },
+    incompatibileEffects = {},
     groups = {
         "ScreenOverlay",
         "Input",
@@ -87,7 +84,7 @@ CFCUlxCurse.RegisterEffect( {
         "AD",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
+        "HaltRenderScene",
         "ViewAngles",
         "AD",
     },

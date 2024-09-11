@@ -26,11 +26,11 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = 120,
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
-    incompatibileEffects = {
-        "Lidar",
-    },
+    incompatibileEffects = {},
     groups = {
         "VisualOnly",
     },
-    incompatibleGroups = {},
+    incompatibleGroups = {
+        "HaltRenderScene",
+    },
 } )
