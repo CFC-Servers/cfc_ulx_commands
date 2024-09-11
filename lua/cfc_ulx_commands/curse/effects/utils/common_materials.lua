@@ -10,4 +10,10 @@ return {
         ["$basetexture"] = "_rt_fullframefb",
         ["$ignorez"] = 1,
     } ),
+
+    gameMatVertexColor = CreateMaterial( "cfc_ulx_commands_curse_game_rt_vertex_color", "UnlitGeneric", {
+        ["$basetexture"] = "_rt_fullframefb",
+        ["$ignorez"] = 1,
+        ["$vertexcolor"] = 1,
+    } ),
 }

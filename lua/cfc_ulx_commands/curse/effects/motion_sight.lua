@@ -96,6 +96,7 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
     incompatibileEffects = {
+        "ChromaticAberration",
         "ColorModify",
         "ColorModifyContinuous",
         "DrunkBlur",
