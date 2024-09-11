@@ -3,14 +3,7 @@ local SPEED_MIN = 0.03
 local SPEED_MAX = 0.06
 
 
-local gameMat2
-
-if CLIENT then
-    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb",
-        ["$ignorez"] = 1,
-    } )
-end
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 
 
 
@@ -30,7 +23,7 @@ CFCUlxCurse.RegisterEffect( {
 
             cam.Start2D()
                 surface.SetDrawColor( 255, 255, 255, 255 )
-                surface.SetMaterial( gameMat2 )
+                surface.SetMaterial( gameMatIgnorez )
 
                 offset = ( offset + speed * FrameTime() ) % 1
 

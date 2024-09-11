@@ -5,14 +5,7 @@ local SHUFFLE_INTERVAL_MIN = 4
 local SHUFFLE_INTERVAL_MAX = 15
 
 
-local gameMat2
-
-if CLIENT then
-    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb",
-        ["$ignorez"] = 1,
-    } )
-end
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -77,7 +70,7 @@ CFCUlxCurse.RegisterEffect( {
             render.UpdateScreenEffectTexture()
 
             cam.Start2D()
-                surface.SetMaterial( gameMat2 )
+                surface.SetMaterial( gameMatIgnorez )
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
                 for x = 1, gridSize do

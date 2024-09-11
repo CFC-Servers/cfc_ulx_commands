@@ -12,16 +12,11 @@ local BAD_CLASSES = {
 }
 
 
-local gameMat2
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 local pixelRT
 local pixelMat
 
 if CLIENT then
-    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb",
-        ["$ignorez"] = 1,
-    } )
-
     pixelRT = GetRenderTarget( "cfc_ulx_commands_curse_pixelated_ents_rt", RT_SIZE, RT_SIZE )
 
     pixelMat = CreateMaterial( "cfc_ulx_commands_curse_pixelated_ents", "UnlitGeneric", {
@@ -59,7 +54,7 @@ CFCUlxCurse.RegisterEffect( {
             cam.Start2D()
             render.PushRenderTarget( pixelRT, 0, 0, ScrW(), ScrH() )
                 render.Clear( 0, 0, 0, 255, true, true )
-                surface.SetMaterial( gameMat2 )
+                surface.SetMaterial( gameMatIgnorez )
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
                 render.PushFilterMin( TEXFILTER.POINT )

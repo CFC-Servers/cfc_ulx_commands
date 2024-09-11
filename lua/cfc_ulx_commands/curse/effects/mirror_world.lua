@@ -9,15 +9,7 @@ CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local vectorMeta = FindMetaTable( "Vector" )
-local gameMat2
-
-
-if CLIENT then
-    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb",
-        ["$ignorez"] = 1,
-    } )
-end
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -42,7 +34,7 @@ CFCUlxCurse.RegisterEffect( {
             cam.Start2D()
                 render.UpdateScreenEffectTexture()
 
-                surface.SetMaterial( gameMat2 )
+                surface.SetMaterial( gameMatIgnorez )
                 surface.SetDrawColor( 255, 255, 255, 255 )
                 surface.DrawTexturedRectUV( 0, 0, ScrW(), ScrH(), 1, 0, 0, 1 )
             cam.End2D()
