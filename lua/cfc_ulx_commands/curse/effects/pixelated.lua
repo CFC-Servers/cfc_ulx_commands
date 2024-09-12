@@ -45,7 +45,7 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawHUD", "Pixelate", function()
             cam.Start2D()
-                surface.SetMaterial( pixelMat, 0, 0, ScrW(), ScrH() )
+                surface.SetMaterial( pixelMat )
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
                 render.PushFilterMag( TEXFILTER.POINT )
