@@ -24,7 +24,7 @@ local BALL_RADIUS = 36 / 2
 
 local SCAN_NORMAL_SOUND = "physics/metal/soda_can_impact_soft1.wav"
 local SCAN_PLAYER_SOUND = "buttons/button17.wav"
-local SCAN_THE_MINI_ORB_SOUND = "buttons/button17.wav"
+local SCAN_THE_MINI_ORB_SOUND = "physics/metal/metal_sheet_impact_bullet2.wav"
 
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 local WATER_COLOR = Color( 50, 100, 225, 255 )
