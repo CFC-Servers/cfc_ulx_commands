@@ -253,10 +253,7 @@ local function onCurseStart( effectName, cursedPly )
         worldBrushes = game.GetWorld():GetBrushSurfaces()
     end
 
-    local firstPass = false
-
     CFCUlxCurse.AddEffectHook( cursedPly, effectName, "RenderScene", "CustomRender", function()
-        firstPass = true
         render.SetShadowsDisabled( true )
     end )
 
@@ -265,7 +262,6 @@ local function onCurseStart( effectName, cursedPly )
     end )
 
     CFCUlxCurse.AddEffectHook( cursedPly, effectName, "PreDrawOpaqueRenderables", "CustomRender", function( _, skybox, skybox3d )
-        if not firstPass then return true end -- Only draw our stuff once per frame, since this is called multiple times
         if skybox or skybox3d then return true end
 
         firstPass = false
