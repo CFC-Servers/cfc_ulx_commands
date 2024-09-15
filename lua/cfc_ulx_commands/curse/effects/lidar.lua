@@ -24,7 +24,7 @@ local BALL_RADIUS = 36 / 2
 
 local SCAN_NORMAL_SOUND = "physics/metal/soda_can_impact_soft1.wav"
 local SCAN_PLAYER_SOUND = "buttons/button17.wav"
-local SCAN_THE_MINI_ORB_COLOR_SOUND = "buttons/button17.wav"
+local SCAN_THE_MINI_ORB_SOUND = "buttons/button17.wav"
 
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 local WATER_COLOR = Color( 50, 100, 225, 255 )
@@ -155,7 +155,7 @@ local function addDot( startPos, dir, filter, allowBonusScans )
     elseif isTheMiniOrb then
         color = THE_MINI_ORB_COLOR
         putOnExpirableMesh = true
-        snd = SCAN_THE_MINI_ORB_COLOR_SOUND
+        snd = SCAN_THE_MINI_ORB_SOUND
     else
         color = renderGetSurfaceColor( hitPos - dir * 5, hitPos + dir * 5 )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
