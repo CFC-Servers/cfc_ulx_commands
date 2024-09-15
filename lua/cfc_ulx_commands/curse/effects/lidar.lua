@@ -147,15 +147,16 @@ local function addDot( startPos, dir, filter, allowBonusScans )
         color = SLIME_COLOR
     elseif isPlayer then
         color = PLAYER_COLOR
-        putOnExpirableMesh = true
         snd = SCAN_PLAYER_SOUND
+        putOnExpirableMesh = true
     elseif isNPC then
         color = NPC_COLOR
         snd = SCAN_PLAYER_SOUND
+        putOnExpirableMesh = true
     elseif isTheMiniOrb then
         color = THE_MINI_ORB_COLOR
-        putOnExpirableMesh = true
         snd = SCAN_THE_MINI_ORB_SOUND
+        putOnExpirableMesh = true
     else
         color = renderGetSurfaceColor( hitPos - dir * 5, hitPos + dir * 5 )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
