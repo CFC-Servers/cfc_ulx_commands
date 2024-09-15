@@ -23,6 +23,8 @@ CFCUlxCurse.RegisterEffect( {
         theMiniOrb:SetMaterial( "models/XQM//LightLinesRed" )
         theMiniOrb:SetPos( spawnPos )
         theMiniOrb:Spawn()
+        theMiniOrb:SetModelScale( 2 )
+        theMiniOrb:Activate()
         theMiniOrb:SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER )
         theMiniOrb:EmitSound( "ambient/energy/weld1.wav", 85, 90, 1, CHAN_AUTO )
         theMiniOrb:SetNWBool( "cfc_ulx_curse_is_the_mini_orb", true )
