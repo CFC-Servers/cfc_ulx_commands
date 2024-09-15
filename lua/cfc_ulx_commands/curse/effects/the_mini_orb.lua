@@ -1,6 +1,6 @@
 local EFFECT_NAME = "TheMiniOrb" -- Not mini orb. The Mini Orb. Praise be The Orb.
 local SPEED_START = 10
-local SPEED_MAX = 350
+local SPEED_MAX = 300
 local SPEED_RATE = ( SPEED_MAX - SPEED_START ) / 10
 
 
