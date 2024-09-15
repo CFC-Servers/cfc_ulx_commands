@@ -12,7 +12,8 @@ local DOT_SIZE = 3
 local DOT_HITBOX_SIZE = 2
 
 local BONUS_SCAN_SPREAD = 5
-local BONUS_SCAN_PLAYER = 2 -- If a player or NPC is hit, adds a few bonus scans, to make it easier to see them.
+local BONUS_SCAN_SPREAD_THE_MINI_ORB = 2
+local BONUS_SCAN_AMOUNT = 2 -- If a player or NPC is hit, adds a few bonus scans, to make it easier to see them.
 
 local BALL_SPEED = 300
 local BALL_DURATION = 120
@@ -23,11 +24,13 @@ local BALL_RADIUS = 36 / 2
 
 local SCAN_NORMAL_SOUND = "physics/metal/soda_can_impact_soft1.wav"
 local SCAN_PLAYER_SOUND = "buttons/button17.wav"
+local SCAN_THE_MINI_ORB_COLOR_SOUND = "buttons/button17.wav"
 
 local SKY_COLOR = Color( 130, 230, 230, 255 )
 local WATER_COLOR = Color( 50, 100, 225, 255 )
 local SLIME_COLOR = Color( 140, 120, 15, 255 )
-local PLAYER_COLOR = Color( 255, 0, 0, 255 )
+local PLAYER_COLOR = Color( 255, 80, 0, 255 )
+local THE_MINI_ORB_COLOR = Color( 255, 0, 0, 255 )
 local NPC_COLOR = Color( 200, 0, 255, 255 )
 
 local TRACE_MASK = MASK_SOLID + CONTENTS_WATER + CONTENTS_SLIME
@@ -36,6 +39,7 @@ local TRACE_MASK_HITBOXES = MASK_SHOT + CONTENTS_WATER + CONTENTS_SLIME
 
 local DOT_SPREAD_HALF = DOT_SPREAD / 2
 local BONUS_SCAN_SPREAD_HALF = BONUS_SCAN_SPREAD / 2
+local BONUS_SCAN_SPREAD_THE_MINI_ORB_HALF = BONUS_SCAN_SPREAD_THE_MINI_ORB / 2
 local ROTATE_THIRD = 360 / 3
 local VECTOR_ZERO = Vector( 0, 0, 0 )
 
@@ -59,6 +63,7 @@ local lidarMat = nil
 local ballEnt = nil
 
 local addBonusDots
+local getEntInfo
 
 local mathRand = math.Rand
 local bitBand = bit.band
@@ -104,9 +109,10 @@ local function addDot( startPos, dir, filter, allowBonusScans )
     local size = DOT_SIZE
     local snd = SCAN_NORMAL_SOUND
 
-    hitEnt = IsValid( hitEnt ) and hitEnt or nil
+    local isPlayer, isNPC, isTheMiniOrb
+    hitEnt, isPlayer, isNPC, isTheMiniOrb = getEntInfo( hitEnt )
 
-    if hitEnt and ( hitEnt:IsPlayer() or hitEnt:IsNPC() ) then
+    if isPlayer or isNPC or isTheMiniOrb then
         local tr2 = utilTraceLine( {
             start = startPos,
             endpos = endPos,
@@ -119,15 +125,17 @@ local function addDot( startPos, dir, filter, allowBonusScans )
         if tr2.Hit then
             if newEnt == hitEnt then
                 size = DOT_HITBOX_SIZE
+                local bonusSpreadHalf = isTheMiniOrb and BONUS_SCAN_SPREAD_THE_MINI_ORB_HALF or BONUS_SCAN_SPREAD_HALF
 
                 if allowBonusScans then
-                    addBonusDots( dir, startPos, filter, BONUS_SCAN_PLAYER )
+                    addBonusDots( dir, startPos, filter, BONUS_SCAN_AMOUNT, bonusSpreadHalf )
                 end
             end
 
             hitPos = tr2.HitPos
             hitNormal = tr2.HitNormal
             hitEnt = newEnt
+            hitEnt, isPlayer, isNPC, isTheMiniOrb = getEntInfo( hitEnt )
         end
     end
 
@@ -137,13 +145,17 @@ local function addDot( startPos, dir, filter, allowBonusScans )
         color = WATER_COLOR
     elseif bitBand( contents, CONTENTS_SLIME ) ~= 0 then
         color = SLIME_COLOR
-    elseif hitEnt and hitEnt:IsPlayer() then
+    elseif isPlayer then
         color = PLAYER_COLOR
         putOnExpirableMesh = true
         snd = SCAN_PLAYER_SOUND
-    elseif hitEnt and hitEnt:IsNPC() then
+    elseif isNPC then
         color = NPC_COLOR
         snd = SCAN_PLAYER_SOUND
+    elseif isTheMiniOrb then
+        color = THE_MINI_ORB_COLOR
+        putOnExpirableMesh = true
+        snd = SCAN_THE_MINI_ORB_COLOR_SOUND
     else
         color = renderGetSurfaceColor( hitPos - dir * 5, hitPos + dir * 5 )
         color = Color( color.x * 255, color.y * 255, color.z * 255, 255 )
@@ -335,16 +347,31 @@ local function drawBall()
     render.DrawSphere( ballEnt:GetPos(), BALL_RADIUS, 50, 50, BALL_COLOR )
 end
 
-addBonusDots = function( dir, startPos, filter, amount )
+addBonusDots = function( dir, startPos, filter, amount, spreadHalf )
     local ang = dir:Angle()
     local right = ang:Right()
     local up = ang:Up()
 
     for _ = 1, amount do
-        local bonusDir = spreadDirFast( ang, right, up, BONUS_SCAN_SPREAD_HALF )
+        local bonusDir = spreadDirFast( ang, right, up, spreadHalf )
 
         addDot( startPos, bonusDir, filter, false )
     end
+end
+
+getEntInfo = function( ent )
+    ent = IsValid( ent ) and ent
+    local isPlayer
+    local isNPC
+    local isTheMiniOrb
+
+    if ent then
+        isPlayer = ent:IsPlayer()
+        isNPC = ent:IsNPC()
+        isTheMiniOrb = ent:GetNWBool( "cfc_ulx_curse_is_the_mini_orb", false )
+    end
+
+    return ent, isPlayer, isNPC, isTheMiniOrb
 end
 
 
