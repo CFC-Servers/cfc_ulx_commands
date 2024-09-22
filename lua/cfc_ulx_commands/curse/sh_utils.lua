@@ -18,8 +18,8 @@ CFCUlxCurse.EffectGroupIncompatibilities = {} -- lowercase curse name -> lookup 
 
 local effectNameToID = {}
 local onetimeEffectIDs = {}
-local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, listenerName = string }, ... }, effectNameTwo = ..., ... }
-local effectTimers = {} -- Player -> { effectNameOne = { string, ... }, effectNameTwo = ..., ... }
+local effectHooks = {} -- Player -> { effectNameOne = { { hookName = string, listenerName = string, listenerNameEff = string }, ... }, effectNameTwo = ..., ... }
+local effectTimers = {} -- Player -> { effectNameOne = { { timerName = string, timerNameEff = string }, ... }, effectNameTwo = ..., ... }
 local includedEffectUtils = {}
 local getRandomCompatibleEffect
 local storeEffectIncompatibilities
@@ -302,7 +302,7 @@ end
     - Adds an effect hook for a specific player.
     - For use only within the onStart() of effects.
 --]]
-function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerName, func )
+function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerName, func, priority )
     effectName = string.lower( effectName )
 
     local plyHooksByEffect = effectHooks[cursedPly]
@@ -319,14 +319,15 @@ function CFCUlxCurse.AddEffectHook( cursedPly, effectName, hookName, listenerNam
         plyHooksByEffect[effectName] = plyHooks
     end
 
-    listenerName = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. listenerName .. "_" .. cursedPly:SteamID64()
+    local listenerNameEff = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. listenerName .. "_" .. cursedPly:SteamID64()
 
     table.insert( plyHooks, {
         hookName = hookName,
         listenerName = listenerName,
+        listenerNameEff = listenerNameEff,
     } )
 
-    hook.Add( hookName, listenerName, func )
+    hook.Add( hookName, listenerNameEff, func, priority )
 end
 
 -- Removes an effect's hook for a specific player.
@@ -343,7 +344,7 @@ function CFCUlxCurse.RemoveEffectHook( cursedPly, effectName, hookName, listener
         local hookData = plyHooks[i]
 
         if hookData.hookName == hookName and hookData.listenerName == listenerName then
-            hook.Remove( hookName, listenerName )
+            hook.Remove( hookName, hookData.listenerNameEff )
             table.remove( plyHooks, i )
         end
     end
@@ -363,7 +364,7 @@ function CFCUlxCurse.RemoveEffectHooks( cursedPly, effectName )
     if not plyHooks then return end
 
     for _, hookData in ipairs( plyHooks ) do
-        hook.Remove( hookData.hookName, hookData.listenerName )
+        hook.Remove( hookData.hookName, hookData.listenerNameEff )
     end
 
     plyHooksByEffect[effectName] = nil
@@ -391,10 +392,14 @@ function CFCUlxCurse.CreateEffectTimer( cursedPly, effectName, timerName, interv
         plyTimersByEffect[effectName] = plyTimers
     end
 
-    timerName = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. timerName .. "_" .. cursedPly:SteamID64()
+    local timerNameEff = "CFC_ULXCommands_Curse_" .. effectName .. "_" .. timerName .. "_" .. cursedPly:SteamID64()
 
-    table.insert( plyTimers, timerName )
-    timer.Create( timerName, interval, repitions, func )
+    table.insert( plyTimers, {
+        timerName = timerName,
+        timerNameEff = timerNameEff,
+    } )
+
+    timer.Create( timerNameEff, interval, repitions, func )
 
     return timerName
 end
@@ -410,10 +415,10 @@ function CFCUlxCurse.RemoveEffectTimer( cursedPly, effectName, timerName )
     if not plyTimers then return end
 
     for i = #plyTimers, 1, -1 do
-        local plyTimer = plyTimers[i]
+        local timerData = plyTimers[i]
 
-        if plyTimer == timerName then
-            timer.Remove( timerName )
+        if timerData.timerName == timerName then
+            timer.Remove( timerData.timerNameEff )
             table.remove( plyTimers, i )
         end
     end
@@ -432,8 +437,8 @@ function CFCUlxCurse.RemoveEffectTimers( cursedPly, effectName )
     local plyTimers = plyTimersByEffect[effectName]
     if not plyTimers then return end
 
-    for _, plyTimer in ipairs( plyTimers ) do
-        timer.Remove( plyTimer )
+    for _, timerData in ipairs( plyTimers ) do
+        timer.Remove( timerData.timerNameEff )
     end
 
     plyTimersByEffect[effectName] = nil

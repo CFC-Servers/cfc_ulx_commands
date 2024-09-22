@@ -57,6 +57,7 @@ CFCUlxCurse.RegisterEffect( {
         "PPColorModify"
     },
     incompatibleGroups = {
+        "HaltRenderScene",
         "PPColorModify",
     },
 } )

@@ -52,5 +52,7 @@ CFCUlxCurse.RegisterEffect( {
     excludeFromOnetime = nil,
     incompatibileEffects = {},
     groups = {},
-    incompatibleGroups = {},
+    incompatibleGroups = {
+        "HaltRenderScene",
+    },
 } )

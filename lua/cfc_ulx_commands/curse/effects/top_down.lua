@@ -64,7 +64,7 @@ CFCUlxCurse.RegisterEffect( {
                     bottom = scrHH * zoomFrac,
                 },
             }
-        end )
+        end, HOOK_HIGH )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "Think", "Zoom", function()
             if orthoDistDir ~= 0 then
@@ -100,6 +100,8 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {
+        "Cyberspace",
+        "SuperCyberspace",
         "Isometric",
         "ResidentEvil",
     },

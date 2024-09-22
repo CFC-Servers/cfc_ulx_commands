@@ -123,7 +123,7 @@ CFCUlxCurse.RegisterEffect( {
             }
 
             return view
-        end )
+        end, HOOK_HIGH )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "CheckLineOfSight", LOS_DETECTION_INTERVAL, 0, function()
             local startPos = camPos

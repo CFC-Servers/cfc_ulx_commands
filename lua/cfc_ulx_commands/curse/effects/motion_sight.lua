@@ -7,19 +7,11 @@ local EFFECT_NAME_LOWER = string.lower( EFFECT_NAME )
 CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] or {}
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
-local gameMat2
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 local motionSightRT1
 local motionSightRT2
 local motionSightMat1
 local motionSightMat2
-
-
-if CLIENT then
-    gameMat2 = CreateMaterial( "cfc_ulx_commands_curse_game_rt_2", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_fullframefb",
-        ["$ignorez"] = 1,
-    } )
-end
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -49,16 +41,16 @@ CFCUlxCurse.RegisterEffect( {
             } )
         end
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawViewModels", "FlipTheScreen", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawViewModels", "SubtractiveOverlay", function()
             cam.Start2D()
                 surface.SetDrawColor( 255, 255, 255, 255 )
 
                 -- Draw the current screen to the second RT so that it receives the same aliasing/bluring as the first RT.
-                -- This fixes single-pixel differences that would show up if we just used RT1 and gameMat2.
+                -- This fixes single-pixel differences that would show up if we just used RT1 and gameMatIgnorez.
                 render.UpdateScreenEffectTexture()
 
                 render.PushRenderTarget( motionSightRT2 )
-                    surface.SetMaterial( gameMat2 )
+                    surface.SetMaterial( gameMatIgnorez )
                     surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
                 render.PopRenderTarget()
 
@@ -75,7 +67,7 @@ CFCUlxCurse.RegisterEffect( {
             cam.End2D()
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "FlipTheScreen", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "RenderScene", "CaptureTheScreen", function()
             local now = CurTime()
             if now < nextCaptureTime then return end
 
@@ -85,7 +77,7 @@ CFCUlxCurse.RegisterEffect( {
             cam.Start2D()
             render.PushRenderTarget( motionSightRT1 )
                 surface.SetDrawColor( 255, 255, 255, 255 )
-                surface.SetMaterial( gameMat2 )
+                surface.SetMaterial( gameMatIgnorez )
                 surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
                 render.OverrideBlend( false )
             render.PopRenderTarget()
@@ -104,8 +96,15 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
     incompatibileEffects = {
+        "ChromaticAberration",
         "ColorModify",
         "ColorModifyContinuous",
+        "DrunkBlur",
+        "FilmDevelopment",
+        "MotionBlur",
+        "ScreenMirror",
+        "ScreenScroll",
+        "ScreenShuffle",
     },
     groups = {
         "VisualOnly",
@@ -115,5 +114,7 @@ CFCUlxCurse.RegisterEffect( {
     incompatibleGroups = {
         "ScreenOverlay",
         "Wrap:Halo.Add",
+        "HaltRenderScene",
+        "MotionBlur",
     },
 } )
