@@ -312,7 +312,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         onCurseStart( EFFECT_NAME_SUPER, cursedPly )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME_SUPER, "RenderScene", "ESP_Mode", function()
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME_SUPER, "RenderScene", "WorldMatOverride", function()
             render.WorldMaterialOverride( wireframeMat )
         end )
     end,
