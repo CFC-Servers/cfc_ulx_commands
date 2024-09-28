@@ -162,15 +162,24 @@ end
     ply: (optional) (Player)
         - If specified, will only return an effect that the player can receive.
         - Will return nil if the player cannot receive any effects from this pool.
+    excludedEffects: (optional) (table)
+        - A lookup table from curse name to true, of effects to exclude from the draw pool.
+        - Case-sensitive, equivalent to effectData.nameUpper (e.g. "TopDown")
 --]]
-function CFCUlxCurse.GetRandomEffect( ply )
-    if not ply then
-        local id = math.random( #CFCUlxCurse.Effects )
+function CFCUlxCurse.GetRandomEffect( ply, excludedEffects )
+    excludedEffects = excludedEffects or {}
 
-        return CFCUlxCurse.Effects[id]
+    local effectPool = {}
+
+    for _, effectData in ipairs( CFCUlxCurse.Effects ) do
+        if not excludedEffects[effectData.nameUpper] then
+            table.insert( effectPool, effectData )
+        end
     end
 
-    return getRandomCompatibleEffect( ply, CFCUlxCurse.Effects )
+    if not ply then return effectPool[math.random( #effectPool )] end
+
+    return getRandomCompatibleEffect( ply, effectPool )
 end
 
 --[[
@@ -180,19 +189,24 @@ end
     ply: (optional) (Player)
         - If specified, will only return an effect that the player can receive.
         - Will return nil if the player cannot receive any effects from this pool.
+    excludedEffects: (optional) (table)
+        - A lookup table from curse name to true, of effects to exclude from the draw pool.
+        - Case-sensitive, equivalent to effectData.nameUpper (e.g. "TopDown")
 --]]
-function CFCUlxCurse.GetRandomOnetimeEffect( ply )
-    if not ply then
-        local id = onetimeEffectIDs[math.random( #onetimeEffectIDs )]
-
-        return CFCUlxCurse.Effects[id]
-    end
+function CFCUlxCurse.GetRandomOnetimeEffect( ply, excludedEffects )
+    excludedEffects = excludedEffects or {}
 
     local effectPool = {}
 
-    for i, id in ipairs( onetimeEffectIDs ) do
-        effectPool[i] = CFCUlxCurse.Effects[id]
+    for _, id in ipairs( onetimeEffectIDs ) do
+        local effectData = CFCUlxCurse.Effects[id]
+
+        if not excludedEffects[effectData.nameUpper] then
+            table.insert( effectPool, effectData )
+        end
     end
+
+    if not ply then return effectPool[math.random( #effectPool )] end
 
     return getRandomCompatibleEffect( ply, effectPool )
 end
