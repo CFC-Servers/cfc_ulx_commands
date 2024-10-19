@@ -10,6 +10,7 @@ function cmd.clearPac( callingPlayer, targetPlayers )
 
     for _, ply in ipairs( targetPlayers ) do
         pace.ClearOutfit( ply )
+        pac.emut.RemoveMutationsForPlayer( ply )
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A cleared #T's pac", targetPlayers )
