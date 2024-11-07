@@ -21,9 +21,11 @@ CFCUlxCurse.RegisterEffect( {
     maxDuration = nil,
     onetimeDurationMult = nil,
     excludeFromOnetime = true,
-    incompatibileEffects = {},
+    incompatibileEffects = {
+        "DoSomeHarm"
+    },
     groups = {
-		"DisableDamage"
-	},
+        "DisableDamage"
+    },
     incompatibleGroups = {},
 } )
