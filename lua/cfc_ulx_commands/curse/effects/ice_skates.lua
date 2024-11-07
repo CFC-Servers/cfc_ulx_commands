@@ -24,17 +24,17 @@ CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-        
+
 		if SERVER then
 			cursedPly:SetFriction( FRICTION_MULT )
 			cursedPly:SprintDisable()
 		end
-		
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "MuteFootsteps", function( ply )
             if ply ~= cursedPly then return end
             return true
         end)
-        
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData, _ )
             if ply ~= cursedPly then return end
             if not ply:IsOnGround() then return end
