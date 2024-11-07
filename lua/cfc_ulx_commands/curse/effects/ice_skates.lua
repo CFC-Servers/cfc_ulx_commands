@@ -1,6 +1,6 @@
 local EFFECT_NAME = "IceSkates"
 local FRICTION_MULT = 0
-local MAX_SPEED = 5 --%/speed, soft limit
+local MAX_SPEED = 4 --%/speed, soft limit
 local MAX_ACCEL = 1 --%/speed hu/s^2
 
 local function sign(x)
@@ -24,12 +24,7 @@ CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-
-		if SERVER then
-			cursedPly:SetFriction( FRICTION_MULT )
-			cursedPly:SprintDisable()
-		end
-
+        
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "MuteFootsteps", function( ply )
             if ply ~= cursedPly then return end
             return true
@@ -37,8 +32,20 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData, _ )
             if ply ~= cursedPly then return end
-            if not ply:IsOnGround() then return end
-
+            if not ply:IsOnGround() then
+                if SERVER then
+                    cursedPly:SetFriction( 1 )
+                    cursedPly:SprintEnable()
+                end
+                
+                return 
+            end
+            
+            if SERVER then
+                cursedPly:SetFriction( FRICTION_MULT )
+                cursedPly:SprintDisable()
+            end
+            
             local curVel = moveData:GetVelocity()
             local curSpeedXY = curVel:Length2D()
 
@@ -48,8 +55,14 @@ CFCUlxCurse.RegisterEffect( {
             local D = moveData:KeyDown(IN_MOVERIGHT)
 
             local stopped = not (W or A or S or D)
-            local moveDir = ply:GetForward() * sign(moveData:GetForwardSpeed()) + ply:GetRight() * sign(moveData:GetSideSpeed())
-            moveDir = stopped and Vector() or moveDir:GetNormalized()
+            local moveDir
+
+            if stopped then
+                moveDir = Vector()
+            else
+                moveDir = ply:GetForward() * sign(moveData:GetForwardSpeed()) + ply:GetRight() * sign(moveData:GetSideSpeed())
+                moveDir:Normalize()
+            end
 
             local speedGoal = MAX_SPEED * ply:GetMaxSpeed()
             local desiredVel = moveDir * speedGoal
