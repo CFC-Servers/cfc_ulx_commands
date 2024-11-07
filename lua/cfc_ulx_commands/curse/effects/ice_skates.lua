@@ -2,6 +2,19 @@ local EFFECT_NAME = "IceSkates"
 local FRICTION_MULT = 0
 local MAX_SPEED = 4 --%/speed, soft limit
 local MAX_ACCEL = 1 --%/speed hu/s^2
+local SKATE_SOUND = "physics/plastic/plastic_box_scrape_smooth_loop2.wav"
+
+-- Sound
+local SPARKS_PITCH = 150
+local SPARKS_PITCH_MAX = 200
+local SPARKS_VOLUME = 0.25
+
+local SPARKS_PERCENT_THRESHOLD = 0.25
+
+local SPARKS_MAGNITUDE = 1.25
+local SPARKS_RADIUS = 4
+local SPARKS_SCALE = 1
+
 
 local function sign(x)
     if x > 0 then return 1 end
@@ -19,12 +32,17 @@ local function approachVector( current, target, change )
 end
 
 
-
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
 
     onStart = function( cursedPly )
-        
+
+        local skateSound = CreateSound(cursedPly, SKATE_SOUND)
+        skateSound:Play()
+        skateSound:ChangeVolume(0)
+
+        cursedPly.CFCUlxCurseIceSkateSound = skateSound
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "MuteFootsteps", function( ply )
             if ply ~= cursedPly then return end
             return true
@@ -36,16 +54,17 @@ CFCUlxCurse.RegisterEffect( {
                 if SERVER then
                     cursedPly:SetFriction( 1 )
                     cursedPly:SprintEnable()
+                    skateSound:ChangeVolume(0, 0.1)
                 end
-                
+
                 return 
             end
-            
+
             if SERVER then
                 cursedPly:SetFriction( FRICTION_MULT )
                 cursedPly:SprintDisable()
             end
-            
+
             local curVel = moveData:GetVelocity()
             local curSpeedXY = curVel:Length2D()
 
@@ -71,6 +90,22 @@ CFCUlxCurse.RegisterEffect( {
             local deaccelBoost = math.max(curSpeedXY - MAX_SPEED*ply:GetWalkSpeed(), 0)
 
             moveData:SetVelocity( approachVector( curVel, desiredVel, (MAX_ACCEL*ply:GetMaxSpeed() + deaccelBoost)*FrameTime() ) )
+
+            local speedPercent = math.min(curSpeedXY/speedGoal, 1)
+            skateSound:ChangePitch( SPARKS_PITCH + speedPercent*(SPARKS_PITCH_MAX - SPARKS_PITCH) )
+            skateSound:ChangeVolume( SPARKS_VOLUME*speedPercent )
+
+            if speedPercent > SPARKS_PERCENT_THRESHOLD then
+                local sparkEffect = EffectData()
+                sparkEffect:SetOrigin(ply:GetPos())
+                sparkEffect:SetNormal(Vector(0,0,1))
+                sparkEffect:SetMagnitude(SPARKS_MAGNITUDE * speedPercent) --flings them further? makes them more numerous? unknown
+                sparkEffect:SetRadius(SPARKS_RADIUS * speedPercent) --makes the particle thiccer
+                sparkEffect:SetScale(SPARKS_SCALE * speedPercent) --makes them longer
+
+                util.Effect("Sparks", sparkEffect)
+            end
+
         end )
 
     end,
@@ -80,6 +115,9 @@ CFCUlxCurse.RegisterEffect( {
 
         cursedPly:SetFriction( 1 )
         cursedPly:SprintEnable()
+
+        cursedPly.CFCUlxCurseIceSkateSound:Stop()
+        cursedPly.CFCUlxCurseIceSkateSound = nil
     end,
 
     minDuration = 30,
