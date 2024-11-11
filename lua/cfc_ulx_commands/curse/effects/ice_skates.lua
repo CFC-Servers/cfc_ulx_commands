@@ -43,6 +43,12 @@ CFCUlxCurse.RegisterEffect( {
 
         cursedPly.CFCUlxCurseIceSkateSound = skateSound
 
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "SetFriction", function( ply )
+            if ply ~= cursedPly then return end
+
+            ply:SetFriction( FRICTION_MULT )
+        end)
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "MuteFootsteps", function( ply )
             if ply ~= cursedPly then return end
             return true
