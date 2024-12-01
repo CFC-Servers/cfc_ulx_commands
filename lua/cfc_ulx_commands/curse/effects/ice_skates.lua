@@ -56,7 +56,7 @@ CFCUlxCurse.RegisterEffect( {
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData )
             if ply ~= cursedPly then return end
-            
+
             if not ply:IsOnGround() then
                 if SERVER then
                     cursedPly:SetFriction( 1 )
@@ -64,7 +64,7 @@ CFCUlxCurse.RegisterEffect( {
                     skateSound:ChangeVolume( 0, 0.1 )
                 end
 
-                return 
+                return
             end
 
             if SERVER then
