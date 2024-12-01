@@ -37,11 +37,13 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function( cursedPly )
 
-        local skateSound = CreateSound( cursedPly, SKATE_SOUND )
-        skateSound:Play()
-        skateSound:ChangeVolume( 0 )
+        if SERVER then
+            local skateSound = CreateSound( cursedPly, SKATE_SOUND )
+            skateSound:Play()
+            skateSound:ChangeVolume( 0 )
 
-        cursedPly.CFCUlxCurseIceSkateSound = skateSound
+            cursedPly.CFCUlxCurseIceSkateSound = skateSound
+        end
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerSpawn", "SetFriction", function( ply )
             if ply ~= cursedPly then return end
