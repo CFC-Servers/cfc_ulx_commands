@@ -54,7 +54,7 @@ CFCUlxCurse.RegisterEffect( {
             return true
         end )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData, _ )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData )
             if ply ~= cursedPly then return end
             
             if not ply:IsOnGround() then
@@ -105,7 +105,7 @@ CFCUlxCurse.RegisterEffect( {
             if speedPercent > SPARKS_PERCENT_THRESHOLD then
                 local sparkEffect = EffectData()
                 sparkEffect:SetOrigin( ply:GetPos() )
-                sparkEffect:SetNormal( Vector( 0, 0, 1) )
+                sparkEffect:SetNormal( Vector( 0, 0, 1 ) )
                 sparkEffect:SetMagnitude( SPARKS_MAGNITUDE * speedPercent ) --flings them further? makes them more numerous? unknown
                 sparkEffect:SetRadius( SPARKS_RADIUS * speedPercent ) --makes the particle thiccer
                 sparkEffect:SetScale( SPARKS_SCALE * speedPercent ) --makes them longer
