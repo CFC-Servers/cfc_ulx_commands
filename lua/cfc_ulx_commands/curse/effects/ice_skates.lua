@@ -37,9 +37,9 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function( cursedPly )
 
-        local skateSound = CreateSound(cursedPly, SKATE_SOUND)
+        local skateSound = CreateSound( cursedPly, SKATE_SOUND )
         skateSound:Play()
-        skateSound:ChangeVolume(0)
+        skateSound:ChangeVolume( 0 )
 
         cursedPly.CFCUlxCurseIceSkateSound = skateSound
 
@@ -47,20 +47,21 @@ CFCUlxCurse.RegisterEffect( {
             if ply ~= cursedPly then return end
 
             ply:SetFriction( FRICTION_MULT )
-        end)
+        end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "MuteFootsteps", function( ply )
             if ply ~= cursedPly then return end
             return true
-        end)
+        end )
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "SetupMove", "GetMoveDir", function( ply, moveData, _ )
             if ply ~= cursedPly then return end
+            
             if not ply:IsOnGround() then
                 if SERVER then
                     cursedPly:SetFriction( 1 )
                     cursedPly:SprintEnable()
-                    skateSound:ChangeVolume(0, 0.1)
+                    skateSound:ChangeVolume( 0, 0.1 )
                 end
 
                 return 
@@ -74,18 +75,18 @@ CFCUlxCurse.RegisterEffect( {
             local curVel = moveData:GetVelocity()
             local curSpeedXY = curVel:Length2D()
 
-            local W = moveData:KeyDown(IN_FORWARD)
-            local A = moveData:KeyDown(IN_BACK)
-            local S = moveData:KeyDown(IN_MOVELEFT)
-            local D = moveData:KeyDown(IN_MOVERIGHT)
+            local W = moveData:KeyDown( IN_FORWARD )
+            local A = moveData:KeyDown( IN_BACK )
+            local S = moveData:KeyDown( IN_MOVELEFT )
+            local D = moveData:KeyDown( IN_MOVERIGHT )
 
-            local stopped = not (W or A or S or D)
+            local stopped = not ( W or A or S or D )
             local moveDir
 
             if stopped then
                 moveDir = Vector()
             else
-                moveDir = ply:GetForward() * sign(moveData:GetForwardSpeed()) + ply:GetRight() * sign(moveData:GetSideSpeed())
+                moveDir = ply:GetForward() * sign( moveData:GetForwardSpeed() ) + ply:GetRight() * sign( moveData:GetSideSpeed() )
                 moveDir:Normalize()
             end
 
@@ -93,23 +94,23 @@ CFCUlxCurse.RegisterEffect( {
             local desiredVel = moveDir * speedGoal
 
             -- If they're going over the max speed, deaccelerate them faster (also to help the soft limit keep up with sidestrafing)
-            local deaccelBoost = math.max(curSpeedXY - MAX_SPEED*ply:GetWalkSpeed(), 0)
+            local deaccelBoost = math.max( curSpeedXY - MAX_SPEED * ply:GetWalkSpeed(), 0 )
 
-            moveData:SetVelocity( approachVector( curVel, desiredVel, (MAX_ACCEL*ply:GetMaxSpeed() + deaccelBoost)*FrameTime() ) )
+            moveData:SetVelocity( approachVector( curVel, desiredVel, ( MAX_ACCEL * ply:GetMaxSpeed() + deaccelBoost ) * FrameTime() ) )
 
-            local speedPercent = math.min(curSpeedXY/speedGoal, 1)
-            skateSound:ChangePitch( SPARKS_PITCH + speedPercent*(SPARKS_PITCH_MAX - SPARKS_PITCH) )
-            skateSound:ChangeVolume( SPARKS_VOLUME*speedPercent )
+            local speedPercent = math.min( curSpeedXY / speedGoal, 1 )
+            skateSound:ChangePitch( SPARKS_PITCH + speedPercent * ( SPARKS_PITCH_MAX - SPARKS_PITCH ) )
+            skateSound:ChangeVolume( SPARKS_VOLUME * speedPercent )
 
             if speedPercent > SPARKS_PERCENT_THRESHOLD then
                 local sparkEffect = EffectData()
-                sparkEffect:SetOrigin(ply:GetPos())
-                sparkEffect:SetNormal(Vector(0,0,1))
-                sparkEffect:SetMagnitude(SPARKS_MAGNITUDE * speedPercent) --flings them further? makes them more numerous? unknown
-                sparkEffect:SetRadius(SPARKS_RADIUS * speedPercent) --makes the particle thiccer
-                sparkEffect:SetScale(SPARKS_SCALE * speedPercent) --makes them longer
+                sparkEffect:SetOrigin( ply:GetPos() )
+                sparkEffect:SetNormal( Vector( 0, 0, 1) )
+                sparkEffect:SetMagnitude( SPARKS_MAGNITUDE * speedPercent ) --flings them further? makes them more numerous? unknown
+                sparkEffect:SetRadius( SPARKS_RADIUS * speedPercent ) --makes the particle thiccer
+                sparkEffect:SetScale( SPARKS_SCALE * speedPercent ) --makes them longer
 
-                util.Effect("Sparks", sparkEffect)
+                util.Effect( "Sparks", sparkEffect )
             end
 
         end )

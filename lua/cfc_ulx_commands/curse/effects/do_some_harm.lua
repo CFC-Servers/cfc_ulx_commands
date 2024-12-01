@@ -6,11 +6,11 @@ CFCUlxCurse.RegisterEffect( {
 
     onStart = function( cursedPly )
         if CLIENT then return end
-		
+
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "EntityTakeDamage", "BlockDamage", function( ply, dmgInfo )
-			if dmgInfo:GetAttacker() ~= cursedPly or math.random() > DAMAGE_BLOCK_CHANCE then return end
-			return true
-		end)
+            if dmgInfo:GetAttacker() ~= cursedPly or math.random() > DAMAGE_BLOCK_CHANCE then return end
+            return true
+        end)
     end,
 
     onEnd = function()
