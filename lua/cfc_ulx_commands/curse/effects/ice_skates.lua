@@ -16,7 +16,7 @@ local SPARKS_RADIUS = 4
 local SPARKS_SCALE = 1
 
 
-local function sign(x)
+local function sign( x )
     if x > 0 then return 1 end
     if x < 0 then return -1 end
     return 0
