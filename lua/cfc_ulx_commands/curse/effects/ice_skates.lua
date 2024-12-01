@@ -63,7 +63,7 @@ CFCUlxCurse.RegisterEffect( {
                 if SERVER then
                     cursedPly:SetFriction( 1 )
                     cursedPly:SprintEnable()
-                    skateSound:ChangeVolume( 0, 0.1 )
+                    cursedPly.CFCUlxCurseIceSkateSound:ChangeVolume( 0, 0.1 )
                 end
 
                 return
@@ -101,8 +101,11 @@ CFCUlxCurse.RegisterEffect( {
             moveData:SetVelocity( approachVector( curVel, desiredVel, ( MAX_ACCEL * ply:GetMaxSpeed() + deaccelBoost ) * FrameTime() ) )
 
             local speedPercent = math.min( curSpeedXY / speedGoal, 1 )
-            skateSound:ChangePitch( SPARKS_PITCH + speedPercent * ( SPARKS_PITCH_MAX - SPARKS_PITCH ) )
-            skateSound:ChangeVolume( SPARKS_VOLUME * speedPercent )
+
+            if SERVER then
+                cursedPly.CFCUlxCurseIceSkateSound:ChangePitch( SPARKS_PITCH + speedPercent * ( SPARKS_PITCH_MAX - SPARKS_PITCH ) )
+                cursedPly.CFCUlxCurseIceSkateSound:ChangeVolume( SPARKS_VOLUME * speedPercent )
+            end
 
             if speedPercent > SPARKS_PERCENT_THRESHOLD then
                 local sparkEffect = EffectData()
