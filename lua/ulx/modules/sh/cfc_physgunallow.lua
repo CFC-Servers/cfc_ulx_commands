@@ -9,6 +9,13 @@ hook.Add( "PhysgunPickup", "ULXphysgunallowPlayer", function( _, ent )
     end
 end, HOOK_HIGH )
 
+hook.Add( "PhysgunDrop", "ULXphysgunallowPlayer", function( _, ent )
+    if not ent:IsPlayer() then return end
+    if ent:GetNWBool( "ULXphysgunallow", false ) then
+        ent:SetMoveType( MOVETYPE_WALK )
+    end
+end, HOOK_HIGH )
+
 function cmd.physgunallow( callingPly, targetPlys, shouldUndo )
     for _, ply in ipairs( targetPlys ) do
         ply:SetNWBool( "ULXphysgunallow", not shouldUndo )
