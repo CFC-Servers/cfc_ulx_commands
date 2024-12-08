@@ -203,7 +203,7 @@ CFCUlxCurse.RegisterEffect( {
     minDuration = 60,
     maxDuration = 120,
     onetimeDurationMult = nil,
-    excludeFromOnetime = nil,
+    excludeFromOnetime = true,
     incompatibileEffects = {
         EFFECT_NAME
     },
