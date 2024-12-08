@@ -47,7 +47,7 @@ CFCUlxCurse.RegisterEffect( {
     minDuration = nil,
     maxDuration = nil,
     onetimeDurationMult = nil,
-    excludeFromOnetime = true,
+    excludeFromOnetime = nil,
     incompatibileEffects = {
         "MotionSight",
     },

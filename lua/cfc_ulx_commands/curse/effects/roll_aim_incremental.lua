@@ -47,7 +47,7 @@ CFCUlxCurse.RegisterEffect( {
     minDuration = 20,
     maxDuration = 50,
     onetimeDurationMult = nil,
-    excludeFromOnetime = nil,
+    excludeFromOnetime = true,
     incompatibileEffects = {
         "RollAim",
     },
