@@ -43,6 +43,10 @@ AW.enabledCommands = {
     ["ulx chipban"] = { skipEmptyReason = true },
     ["ulx chipbanid"] = {},
 
+    -- Darkrp
+    ["ulx timeddarkrp"] = { skipEmptyReason = true },
+    ["ulx timeddarkrpid"] = {},
+
     -- Ban
     ["ulx ban"] = {},
     ["ulx banid"] = {},
