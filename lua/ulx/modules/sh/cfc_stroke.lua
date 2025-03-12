@@ -90,7 +90,6 @@ local function transform( sentence )
             for _, additionalWord in ipairs( transformationResult ) do
                 -- Insert additional words at a random position in the original sentence
                 local rand = math.random( 1, #words + 1 )
-                print( rand )
                 table.insert( words, rand, additionalWord )
             end
         else
