@@ -3,13 +3,8 @@ local SPEED_MIN = 0.03
 local SPEED_MAX = 0.06
 
 
-local gameMat
+local gameMatIgnorez = CFCUlxCurse.IncludeEffectUtil( "common_materials" ).gameMatIgnorez
 
-if CLIENT then
-    gameMat = CreateMaterial( "cfc_ulx_commands_curse_game_rt", "UnlitGeneric", {
-        ["$basetexture"] = "_rt_PowerOfTwoFB"
-    } )
-end
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -23,27 +18,31 @@ CFCUlxCurse.RegisterEffect( {
         local speed = math.Rand( SPEED_MIN, SPEED_MAX )
         speed = speed * ( math.random( 0, 1 ) == 0 and -1 or 1 )
 
-        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "HUDPaintBackground", "LBozo", function()
-            surface.SetDrawColor( 255, 255, 255, 255 )
-            surface.SetMaterial( gameMat )
+        CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PreDrawHUD", "LBozo", function()
+            render.UpdateScreenEffectTexture()
 
-            offset = ( offset + speed * FrameTime() ) % 1
+            cam.Start2D()
+                surface.SetDrawColor( 255, 255, 255, 255 )
+                surface.SetMaterial( gameMatIgnorez )
 
-            local w = ScrW()
-            local h = ScrH()
+                offset = ( offset + speed * FrameTime() ) % 1
 
-            if mode == 1 then -- Horizontal
-                surface.DrawTexturedRect( w * ( 0 + offset ), 0, w, h )
-                surface.DrawTexturedRect( w * ( -1 + offset ), 0, w, h )
-            elseif mode == 2 then -- Vertical
-                surface.DrawTexturedRect( 0, h * ( 0 + offset ), w, h )
-                surface.DrawTexturedRect( 0, h * ( -1 + offset ), w, h )
-            else -- Diagonal
-                surface.DrawTexturedRect( w * ( 0 + offset ), h * ( 0 + offset ), w, h )
-                surface.DrawTexturedRect( w * ( -1 + offset ), h * ( 0 + offset ), w, h )
-                surface.DrawTexturedRect( w * ( -1 + offset ), h * ( -1 + offset ), w, h )
-                surface.DrawTexturedRect( w * ( 0 + offset ), h * ( -1 + offset ), w, h )
-            end
+                local w = ScrW()
+                local h = ScrH()
+
+                if mode == 1 then -- Horizontal
+                    surface.DrawTexturedRect( w * ( 0 + offset ), 0, w, h )
+                    surface.DrawTexturedRect( w * ( -1 + offset ), 0, w, h )
+                elseif mode == 2 then -- Vertical
+                    surface.DrawTexturedRect( 0, h * ( 0 + offset ), w, h )
+                    surface.DrawTexturedRect( 0, h * ( -1 + offset ), w, h )
+                else -- Diagonal
+                    surface.DrawTexturedRect( w * ( 0 + offset ), h * ( 0 + offset ), w, h )
+                    surface.DrawTexturedRect( w * ( -1 + offset ), h * ( 0 + offset ), w, h )
+                    surface.DrawTexturedRect( w * ( -1 + offset ), h * ( -1 + offset ), w, h )
+                    surface.DrawTexturedRect( w * ( 0 + offset ), h * ( -1 + offset ), w, h )
+                end
+            cam.End2D()
         end )
     end,
 
@@ -56,14 +55,13 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = 1.5,
     excludeFromOnetime = true,
     incompatibileEffects = {
-        "ScreenMirror",
-        "MirrorWorld",
+        "MotionSight",
     },
     groups = {
         "VisualOnly",
         "ScreenOverlay",
     },
     incompatibleGroups = {
-        "ScreenOverlay",
+        "HaltRenderScene",
     },
 } )

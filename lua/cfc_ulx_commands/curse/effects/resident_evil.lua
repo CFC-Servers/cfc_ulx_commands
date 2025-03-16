@@ -73,6 +73,7 @@ if CLIENT then
 
     traceFilter = function( ent )
         if ent == localPly then return false end
+        if not ent then return false end
         if not ent:IsValid() then return true end
 
         local class = ent:GetClass()
@@ -122,7 +123,7 @@ CFCUlxCurse.RegisterEffect( {
             }
 
             return view
-        end )
+        end, HOOK_HIGH )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "CheckLineOfSight", LOS_DETECTION_INTERVAL, 0, function()
             local startPos = camPos

@@ -3,8 +3,14 @@ local cmd = CFCUlxCommands.clearpac
 local CATEGORY_NAME = "Utility"
 
 function cmd.clearPac( callingPlayer, targetPlayers )
+    if not pace then
+        callingPlayer:PrintMessage( HUD_PRINTTALK, "Pac is not installed on the server!" )
+        return
+    end
+
     for _, ply in ipairs( targetPlayers ) do
-        ply:ConCommand( "pac_clear_parts" )
+        pace.ClearOutfit( ply )
+        pac.emut.RemoveMutationsForPlayer( ply )
     end
 
     ulx.fancyLogAdmin( callingPlayer, "#A cleared #T's pac", targetPlayers )
