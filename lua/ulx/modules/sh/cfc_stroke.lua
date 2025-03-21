@@ -48,7 +48,7 @@ local wordTransformations = {
         -- Repeat word elsewhere in the sentence
         return word, word
     end,
-    function( word )
+    function( _word )
         -- Replace word with "um" or "uh"
         return math.random() < 0.5 and "um" or "uh"
     end,
