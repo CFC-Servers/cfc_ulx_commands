@@ -1,5 +1,4 @@
 CFCUlxCommands.stroke = CFCUlxCommands.stroke or {}
-local cmd = CFCUlxCommands.stroke
 
 local CATEGORY_NAME = "Fun"
 
