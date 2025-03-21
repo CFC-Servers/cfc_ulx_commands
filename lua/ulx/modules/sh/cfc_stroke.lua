@@ -32,7 +32,7 @@ local wordTransformations = {
         word = string.gsub( word, "[AEIOUaeiou]", "" )
         return word
     end,
-    function( word )
+    function( _word )
         -- Remove word
         return ""
     end,
