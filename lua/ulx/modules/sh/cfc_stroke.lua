@@ -98,7 +98,7 @@ local function transform( sentence )
     end
 
     -- Shuffle a random amount of words
-    for i = 1, math.random( 0, math.floor( #transformedWords / 2 ) ) do
+    for _ = 1, math.random( 0, math.floor( #transformedWords / 2 ) ) do
         local ind1 = math.random( 1, #transformedWords )
         local ind2 = math.random( 1, #transformedWords )
 
