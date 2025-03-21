@@ -114,7 +114,7 @@ hook.Add( "PlayerSay", "CFC_StrokeSpeech", function( ply, msg )
     return transform( msg )
 end )
 
-local function setStroke(  caller, targetPlayers, unSet )
+local function setStroke( caller, targetPlayers, unSet )
     local shouldSet = not unSet
 
     for _, ply in ipairs( targetPlayers ) do
