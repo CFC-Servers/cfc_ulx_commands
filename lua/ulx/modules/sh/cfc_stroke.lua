@@ -124,7 +124,7 @@ local function setStroke( caller, targetPlayers, unSet )
         end
     end
 
-    ulx.fancyLogAdmin( caller, shouldSet and "#A gave #T brain damage" or "#A cured #T's stroke", targetPlayers )
+    ulx.fancyLogAdmin( caller, shouldSet and "#A afflicted #T with a stroke" or "#A cured #T's stroke", targetPlayers )
 end
 
 
