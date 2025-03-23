@@ -272,7 +272,7 @@ local function transform( sentence )
 end
 
 local targettedPlayers = {}
-hook.Add( "PlayerSay", "CFC_PoshSpeech", function(ply, msg)
+hook.Add( "PlayerSay", "CFC_PoshSpeech", function( ply, msg )
     if not targettedPlayers[ply] then return end
     return transform( msg )
 end )
