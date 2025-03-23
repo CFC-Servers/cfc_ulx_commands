@@ -248,21 +248,21 @@ local function transform( sentence )
     local replaceCount = 0
 
     for word, replacement in pairs( transformations ) do
-        local currReplaceCount
-        sentence, currReplaceCount = string.gsub( sentence, "%f[%g]" .. word .. "%f[%G]", replacement )
+        local amountFound
+        sentence, amountFound = string.gsub( sentence, "%f[%g]" .. word .. "%f[%G]", replacement )
 
-        replaceCount = replaceCount + currReplaceCount
+        replaceCount = replaceCount + amountFound
     end
 
     local randomAddChance = 0.1
     if replaceCount <= 1 then -- if no replacements were found, add lots of crap
         randomAddChance = 0.5
-
     end
 
     local transformedWords = {}
     for word in sentence:gmatch( "%S+" ) do
         table.insert( transformedWords, word )
+
         if math.random() < randomAddChance then -- Adjust the probability for inserting random phrases
             table.insert( transformedWords, randomPhrases[math.random( #randomPhrases )] )
         end
@@ -271,9 +271,9 @@ local function transform( sentence )
     return table.concat( transformedWords, " " )
 end
 
-local targettedPlayers = {}
+local targetedPlayers = {}
 hook.Add( "PlayerSay", "CFC_PoshSpeech", function( ply, msg )
-    if not targettedPlayers[ply] then return end
+    if not targetedPlayers[ply] then return end
     return transform( msg )
 end )
 
@@ -281,9 +281,9 @@ local function setPosh( caller, targetPlayers, unSet )
     local shouldSet = not unSet
     for _, ply in ipairs( targetPlayers ) do
         if shouldSet then
-            targettedPlayers[ply] = true
+            targetedPlayers[ply] = true
         else
-            targettedPlayers[ply] = nil
+            targetedPlayers[ply] = nil
         end
     end
 
