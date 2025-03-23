@@ -242,14 +242,14 @@ local randomPhrases = {
     "to be perfectly frank", "to put it mildly", "to say the least", "to my utmost delight", "to my great astonishment",
 }
 
-local function transform(sentence)
-    sentence = string.lower(sentence)
+local function transform( sentence )
+    sentence = string.lower( sentence )
 
     local replaceCount = 0
 
-    for word, replacement in pairs(transformations) do
+    for word, replacement in pairs( transformations ) do
         local currReplaceCount
-        sentence, currReplaceCount = string.gsub(sentence, "%f[%g]" .. word .. "%f[%G]", replacement)
+        sentence, currReplaceCount = string.gsub( sentence, "%f[%g]" .. word .. "%f[%G]", replacement )
 
         replaceCount = replaceCount + currReplaceCount
     end
@@ -261,26 +261,25 @@ local function transform(sentence)
     end
 
     local transformedWords = {}
-    for word in sentence:gmatch("%S+") do
-        table.insert(transformedWords, word)
+    for word in sentence:gmatch( "%S+" ) do
+        table.insert( transformedWords, word )
         if math.random() < randomAddChance then -- Adjust the probability for inserting random phrases
-            table.insert(transformedWords, randomPhrases[math.random(#randomPhrases)])
+            table.insert( transformedWords, randomPhrases[math.random( #randomPhrases )] )
         end
     end
 
-    return table.concat(transformedWords, " ")
+    return table.concat( transformedWords, " " )
 end
 
 local targettedPlayers = {}
-hook.Add("PlayerSay", "CFC_PoshSpeech", function(ply, msg)
+hook.Add( "PlayerSay", "CFC_PoshSpeech", function(ply, msg)
     if not targettedPlayers[ply] then return end
-    return transform(msg)
-end)
+    return transform( msg )
+end )
 
-local function setPosh(caller, targetPlayers, unSet)
+local function setPosh( caller, targetPlayers, unSet )
     local shouldSet = not unSet
-    print(targetPlayers, type(targetPlayers))
-    for _, ply in ipairs(targetPlayers) do
+    for _, ply in ipairs( targetPlayers ) do
         if shouldSet then
             targettedPlayers[ply] = true
         else
@@ -290,12 +289,12 @@ local function setPosh(caller, targetPlayers, unSet)
 
     local message = shouldSet and "#A bestowed sophistication upon #T" or "#A returned #T to a more primitive state"
 
-    ulx.fancyLogAdmin(caller, message, targetPlayers)
+    ulx.fancyLogAdmin( caller, message, targetPlayers )
 end
 
-local civilize = ulx.command("Fun", "ulx civilize", setPosh, "!civilize")
-civilize:defaultAccess(ULib.ACCESS_ADMIN)
-civilize:addParam({ type = ULib.cmds.PlayersArg })
-civilize:addParam({ type = ULib.cmds.BoolArg, invisible = true })
-civilize:help("Bestows the affected user with sophistication")
-civilize:setOpposite("ulx uncivilize", { nil, nil, true }, "!uncivilize")
+local civilize = ulx.command( "Fun", "ulx civilize", setPosh, "!civilize" )
+civilize:defaultAccess( ULib.ACCESS_ADMIN )
+civilize:addParam( { type = ULib.cmds.PlayersArg } )
+civilize:addParam( { type = ULib.cmds.BoolArg, invisible = true } )
+civilize:help( "Bestows the affected user with sophistication" )
+civilize:setOpposite( "ulx uncivilize", { nil, nil, true }, "!uncivilize" )
