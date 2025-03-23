@@ -254,6 +254,8 @@ local transformations = {
     ["kys"] = "I urge you to seek professional assistance",
     ["goon"] = "henchman",
     ["sex"] = "reproduction",
+    ["cum"] = "dna transport",
+    ["cumming"] = "transporting dna",
 }
 
 local randomPhrases = {
