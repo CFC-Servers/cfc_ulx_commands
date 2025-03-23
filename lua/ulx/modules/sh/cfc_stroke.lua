@@ -1,4 +1,4 @@
-CFCUlxCommands.stroke = CFCUlxCommands.stroke or {}
+CFCUlxCommands.strokeify = CFCUlxCommands.strokeify or {}
 
 local CATEGORY_NAME = "Fun"
 
@@ -124,13 +124,13 @@ local function setStroke( caller, targetPlayers, unSet )
         end
     end
 
-    ulx.fancyLogAdmin( caller, shouldSet and "#A gave #T a stroke" or "#A cured #T's stroke", targetPlayers )
+    ulx.fancyLogAdmin( caller, shouldSet and "#A afflicted #T with a stroke" or "#A cured #T's stroke", targetPlayers )
 end
 
 
-local stroke = ulx.command( CATEGORY_NAME, "ulx stroke", setStroke, "!stroke" )
-stroke:defaultAccess( ULib.ACCESS_ADMIN )
-stroke:addParam( { type = ULib.cmds.PlayersArg } )
-stroke:addParam( { type = ULib.cmds.BoolArg, invisible = true } )
-stroke:help( "Gives the affected user a stroke" )
-stroke:setOpposite( "ulx unstroke", { nil, nil, true }, "!unstroke" )
+local strokeify = ulx.command( CATEGORY_NAME, "ulx strokeify", setStroke, "!strokeify" )
+strokeify:defaultAccess( ULib.ACCESS_ADMIN )
+strokeify:addParam( { type = ULib.cmds.PlayersArg } )
+strokeify:addParam( { type = ULib.cmds.BoolArg, invisible = true } )
+strokeify:help( "Gives the affected user a stroke" )
+strokeify:setOpposite( "ulx unstrokeify", { nil, nil, true }, "!unstrokeify" )
