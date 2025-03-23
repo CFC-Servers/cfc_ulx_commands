@@ -188,13 +188,22 @@ local transformations = {
     ["help"] = "provide assistance",
     ["like"] = "as it were",
     ["sucks"] = "is rather dissapointing",
-    ["literally"] = "relatively",
+    ["literally"] = "quite exactly",
     ["well"] = "it has come to my attention",
     ["can't"] = "am unable to",
     ["talk"] = "communicate",
     ["speak"] = "express thyself",
     ["1984"] = "George Orwell's Ninteen Eighty-Four",
     ["abuse"] = "quite overreaching",
+    ["guys"] = "fellows",
+    ["kidding"] = "pulling letgs",
+    ["chat"] = "speaking method",
+    ["die"] = "ceace your continued existence",
+    ["admin"] = "person of elevated privilieges",
+    ["admins"] = "persons of elevated privilieges",
+    ["demote"] = "reduce to lower priviliges",
+    ["demoted"] = "reduced to lower priviliges",
+    ["staff"] = "persons of elevated priviliges",
     -- Savage insults and vulgarities
     ["hell"] = "brimstone",
     ["idiot"] = "intellectually challenged individual",
@@ -222,6 +231,7 @@ local transformations = {
     ["nigger"] = "person of African descent",
     ["niggers"] = "people of African descent",
     ["retard"] = "person with developmental challenges",
+    ["retarded"] = "of developmental challenges",
     ["ugly"] = "aesthetically unremarkable",
     ["fat"] = "gravitationally gifted",
     ["skinny"] = "svelte",
@@ -231,6 +241,7 @@ local transformations = {
     ["kys"] = "I urge you to seek professional assistance",
     ["stfu"] = "please cease your endless rabble",
     ["goon"] = "henchman",
+    ["sex"] = "reproduction",
 }
 
 local randomPhrases = {
@@ -240,6 +251,7 @@ local randomPhrases = {
     "I dare say", "I must confess", "if I may be so bold", "if you would be so kind", "as it were", "as one might expect",
     "as the saying goes", "in any case", "in point of fact", "in all likelihood", "in the grand scheme of things",
     "to be perfectly frank", "to put it mildly", "to say the least", "to my utmost delight", "to my great astonishment",
+    "my dear watson", "it seems to be", "quite assuredly", "undoubtably", "yes, of course", "but!", "unexpectedly",
 }
 
 local function transform( sentence )
@@ -254,16 +266,20 @@ local function transform( sentence )
         replaceCount = replaceCount + amountFound
     end
 
+    local minAddCount = 0
     local randomAddChance = 0.1
     if replaceCount <= 1 then -- if no replacements were found, add lots of crap
         randomAddChance = 0.5
+        minAddCount = 1 -- always add ONE thing
     end
 
+    local addCount = 0
     local transformedWords = {}
     for word in sentence:gmatch( "%S+" ) do
         table.insert( transformedWords, word )
 
-        if math.random() < randomAddChance then -- Adjust the probability for inserting random phrases
+        if math.random() < randomAddChance or addCount < minAddCount then
+            addCount = addCount + 1
             table.insert( transformedWords, randomPhrases[math.random( #randomPhrases )] )
         end
     end
