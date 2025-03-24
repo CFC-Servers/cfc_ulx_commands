@@ -241,6 +241,7 @@ local transformations = {
     ["wanker"] = "self-indulgent individual",
     ["cunt"] = "person of disagreeable demeanor",
     ["fag"] = "individual of alternative persuasion",
+    ["faggot"] = "individual of alternative persuasion",
     ["nigger"] = "person of African descent",
     ["niggers"] = "people of African descent",
     ["retard"] = "person with developmental challenges",
