@@ -20,6 +20,11 @@ local transformations = {
     ["okay"] = "acceptable",
     ["fine"] = "satisfactory",
     ["toilet"] = "lavatory",
+    ["skibidi"] = "lavatory creature",
+    ["ohio"] = "the US state of Ohio",
+    ["sigma"] = "person of elevated charisma",
+    ["rizz"] = "charisma",
+    ["gyatt"] = "posterior",
     ["bathroom"] = "powder room",
     ["beautiful"] = "ravishing",
     ["pretty"] = "comely",
@@ -204,8 +209,48 @@ local transformations = {
     ["demote"] = "reduce to lower priviliges",
     ["demoted"] = "reduced to lower priviliges",
     ["staff"] = "persons of elevated priviliges",
+    ["stop"] = "cease at once",
+    ["kill"] = "bring upon the end of",
+    ["killing"] = "bringing upon the end of one's existance",
+    ["bruh"] = "my good fellow",
+    ["bro"] = "my brother",
+    ["dude"] = "my fellow individual",
+    -- credit r_surrected
+    ["mod"] = "professional babysitter",
+    ["moderator"] = "professional babysitter",
+    ["moderators"] = "professional babysitters",
+    ["mods"] = "professional babysitters",
+    ["physgun"] = "gravity-defying nonsense stick",
+    ["nextbot"] = "jpeg with homicidal intent",
+    ["brother"] = "sibling of the testosterone order",
+    ["sister"] = "sibling of the estrogen order",
+    ["mom"] = "maternal figure",
+    ["dad"] = "paternal figure",
+    ["short"] = "vertically efficient",
+    ["friend"] = "companion",
+    ["toolgun"] = "magical multitool apparatus",
+    ["sure"] = "certain",
+    ["phatso"] = "our overlord",
+    ["orb"] = "anomalous object of unfathomable dread",
+    ["scary"] = "dread-inducing",
+    ["jesus christ"] = "most holy lord and savior, blessed redeemer, I humbly beseech thee, pour forth thy infinite grace upon me",
+    ["e2"] = "sentient sand construct",
+    ["expression 2"] = "sentient sand construct",
+    ["sf"] = "sentient heavenly silicon",
+    ["starfall"] = "sentient heavenly silicon",
+    ["acf"] = "latency depreciation framework",
+    ["wheel"] = "rotational apparatus",
+    ["glitch"] = "systemic anomaly",
+    ["hacker"] = "exploiter of the system",
+    ["aimbot"] = "artificial aiming mechanism",
+    ["aimbotter"] = "exploiter utilizing artificial aiming mechanism",
+    ["aimbotting"] = "utilizing artificial aiming mechanism",
+    ["devotee"] = "individual of devotion",
+    ["ardent"] = "person of thousandfold commitment",
+    ["exalted"] = "transcendent veteran of veneration",
     -- Savage insults and vulgarities
     ["hell"] = "brimstone",
+    ["balls"] = "round spheroids",
     ["idiot"] = "intellectually challenged individual",
     ["stupid"] = "lacking in cognitive fortitude",
     ["dumb"] = "mentally unencumbered",
@@ -214,6 +259,7 @@ local transformations = {
     ["kill yourself"] = "I suggest you reconsider your life choices",
     ["stfu"] = "kindly cease your verbal emissions",
     ["shut up"] = "I humbly request your silence",
+    ["tf"] = "the fumpernickle",
     ["fuck"] = "fornicate",
     ["shit"] = "excrement",
     ["damn"] = "drat",
@@ -228,6 +274,7 @@ local transformations = {
     ["wanker"] = "self-indulgent individual",
     ["cunt"] = "person of disagreeable demeanor",
     ["fag"] = "individual of alternative persuasion",
+    ["faggot"] = "individual of alternative persuasion",
     ["nigger"] = "person of African descent",
     ["niggers"] = "people of African descent",
     ["retard"] = "person with developmental challenges",
@@ -239,9 +286,10 @@ local transformations = {
     ["lesbian"] = "same-gender loving individual",
     ["tranny"] = "transgender individual",
     ["kys"] = "I urge you to seek professional assistance",
-    ["stfu"] = "please cease your endless rabble",
     ["goon"] = "henchman",
     ["sex"] = "reproduction",
+    ["cum"] = "dna transport",
+    ["cumming"] = "transporting dna",
 }
 
 local randomPhrases = {
@@ -251,7 +299,7 @@ local randomPhrases = {
     "I dare say", "I must confess", "if I may be so bold", "if you would be so kind", "as it were", "as one might expect",
     "as the saying goes", "in any case", "in point of fact", "in all likelihood", "in the grand scheme of things",
     "to be perfectly frank", "to put it mildly", "to say the least", "to my utmost delight", "to my great astonishment",
-    "my dear watson", "it seems to be", "quite assuredly", "undoubtably", "yes, of course", "but!", "unexpectedly",
+    "it seems to be", "quite assuredly", "undoubtably", "yes, of course", "unexpectedly",
 }
 
 local function transform( sentence )
@@ -267,7 +315,7 @@ local function transform( sentence )
     end
 
     local minAddCount = 0
-    local randomAddChance = 0.1
+    local randomAddChance = 0.05
     if replaceCount <= 1 then -- if no replacements were found, add lots of crap
         randomAddChance = 0.5
         minAddCount = 1 -- always add ONE thing
