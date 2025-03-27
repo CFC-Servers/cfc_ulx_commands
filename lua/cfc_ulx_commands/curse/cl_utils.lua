@@ -83,6 +83,8 @@ net.Receive( "CFC_ULXCommands_Curse_StartEffect", function()
     ProtectedCall( function()
         effectData.onStart( ply, startTime, duration )
     end )
+
+    hook.Run( "CFC_ULXCommands_Curse_StartEffect", ply, effectName, startTime, duration )
 end )
 
 net.Receive( "CFC_ULXCommands_Curse_EndEffect", function()
@@ -101,4 +103,6 @@ net.Receive( "CFC_ULXCommands_Curse_EndEffect", function()
 
     CFCUlxCurse.RemoveEffectHooks( ply, effectName )
     CFCUlxCurse.RemoveEffectTimers( ply, effectName )
+
+    hook.Run( "CFC_ULXCommands_Curse_EndEffect", ply, effectName )
 end )
