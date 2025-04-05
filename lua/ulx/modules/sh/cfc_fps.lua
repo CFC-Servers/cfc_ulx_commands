@@ -26,7 +26,6 @@ if CLIENT then
 
         end
         return color
-
     end
 
     net.Receive( "CFC_ULX_FPSCheck_ConsoleResults", function()
