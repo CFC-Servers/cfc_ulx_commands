@@ -72,7 +72,7 @@ if CLIENT then
 
     local timerName = "cfc_ulx_fps_tracker"
     local function trackFpsFor( trackTime )
-        print( "!fps; tracking fps for " .. trackTime .. " seconds")
+        print( "!fps; tracking fps for " .. trackTime .. " seconds" )
 
         local allDoneTime = CurTime() + trackTime
         local allTheFPS = {}
