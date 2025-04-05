@@ -5,7 +5,7 @@ local CATEGORY_NAME = "Utility"
 
 if SERVER then
     util.AddNetworkString( "CFC_ULX_CheckFriendsSend" )
-    util.Addtring( "CFC_ULX_CheckFriendsReceive" )
+    util.AddNetworkString( "CFC_ULX_CheckFriendsReceive" )
 end
 
 local awaitingResponse = {}
