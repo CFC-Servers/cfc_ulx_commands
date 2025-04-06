@@ -12,7 +12,6 @@ if SERVER then
 end
 
 if CLIENT then
-
     local color_white, color_red, color_green = Color( 255, 255, 255 ), Color( 255, 0, 0 ), Color( 0, 255, 0 )
     local header = "------------------------------------------------------------"
 
