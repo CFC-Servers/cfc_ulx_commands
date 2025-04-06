@@ -140,7 +140,10 @@ if SERVER then
     end
 
     function cmd.checkFPS( caller, targetPlys, duration )
-        if nextFpsCall > CurTime() then return end
+        if nextFpsCall > CurTime() then
+            caller:ChatPrint( "Please wait for the current !fps to finish." )
+            return
+        end
         nextFpsCall = CurTime() + duration + ( wiggleRoom * 1.25 )
 
         duration = duration or DEFAULT_DURATION
