@@ -33,13 +33,13 @@ if CLIENT then
         MsgC( color_white, header, "\n" )
         for ply, data in pairs( results ) do
             local plyColor = team.GetColor( ply:Team() )
-            MsgC( plyColor, ply:Name(), color_white, "  Average FPS: ", colorForFPS( data.average ), data.average, color_white, "  Max: ", colorForFPS( data.best ), data.best, color_white, "  Worst: ", colorForFPS( data.worst ), data.worst, "\n" )
+            MsgC( plyColor, ply:Name(), color_white, "\nAverage FPS: ", colorForFPS( data.average ), data.average, color_white, "  Max: ", colorForFPS( data.best ), data.best, color_white, "  Worst: ", colorForFPS( data.worst ), data.worst, "\n" )
         end
         MsgC( color_white, header, "\n" )
     end )
 
     local function processAndSendBackFPS( allTheFPS )
-        if table.Count( allTheFPS ) <= 0 then return end
+        if table.Count( allTheFPS ) <= 0 then return end -- :(
 
         local count = 0
         local averageFPS = 0
@@ -65,6 +65,7 @@ if CLIENT then
             net.WriteInt( worstFPS, 16 )
         net.SendToServer()
 
+        -- debug print, also tells power users what's happening
         print( "!fps; sent tracked fps. Average " .. averageFPS .. ". Best " .. bestFPS .. ". Worst " .. worstFPS )
 
         allTheFPS = nil
@@ -105,7 +106,7 @@ if CLIENT then
 end
 
 if SERVER then
-    local wiggleRoom = 2
+    local wiggleRoom = 1
 
     local nextFpsCall = 0
     local recievedFpsData
@@ -135,8 +136,6 @@ if SERVER then
 
         timer.Simple( duration + wiggleRoom, function()
             cmd.assembleAndYapFPSData( caller, targetPlys )
-            recievedFpsData = nil
-            expectingRecievers = {}
         end )
     end
 
@@ -179,12 +178,16 @@ if SERVER then
             return a.average > b.average
         end )
 
-        net.Start( "CFC_ULX_FPSCheck_ConsoleResults" )
-            net.WriteTable( recievedFpsData )
-        net.Send( caller )
-
         timer.Simple( 0, function()
-            caller:ChatPrint( "Open your console to see extended results." )
+            if IsValid( caller ) then
+                caller:ChatPrint( "Open your console to see extended results." )
+                net.Start( "CFC_ULX_FPSCheck_ConsoleResults" )
+                    net.WriteTable( recievedFpsData )
+                net.Send( caller )
+            end
+
+            recievedFpsData = nil
+            expectingRecievers = {}
         end )
     end
 end
