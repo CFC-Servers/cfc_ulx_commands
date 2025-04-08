@@ -32,7 +32,7 @@ if CLIENT then
         MsgC( color_white, header, "\n" )
         MsgC( color_white, "Extended !fps results visible only to you.", "\n" ) -- make it clear
         MsgC( color_white, header, "\n" )
-        for ply, data in pairs( results ) do
+        for ply, data in SortedPairsByMemberValue( results, "average" ) do
             local plyColor = team.GetColor( ply:Team() )
             MsgC( plyColor, ply:Name(), color_white, "\nAverage FPS: ", colorForFPS( data.average ), data.average, color_white, "  Max: ", colorForFPS( data.best ), data.best, color_white, "  Worst: ", colorForFPS( data.worst ), data.worst, "\n" )
         end
@@ -98,8 +98,10 @@ end
 
 if SERVER then
     local wiggleRoom = 1
+    local userFpsCallInterval = MAX_DURATION -- this command's results can get rather wordy, dont let non-admins do it all the time
 
     local nextFpsCall = 0
+    local nextUserFPSCall = 0
     local recievedFpsData
     local expectingRecievers = {}
 
@@ -126,35 +128,51 @@ if SERVER then
         net.Send( targetPlys )
 
         timer.Simple( duration + wiggleRoom, function()
-            cmd.assembleAndYapFPSData( caller, targetPlys )
+            cmd.assembleAndYapFPSData( caller, duration, targetPlys )
         end )
     end
 
     function cmd.checkFPS( caller, targetPlys, duration )
+        local cur = CurTime()
         if nextFpsCall > CurTime() then
-            ULib.tsayError( caller, "Please wait for the current !fps to finish.", true )
+            ULib.tsayError( caller, "Please wait " .. math.ceil( math.abs( cur - nextFpsCall ) ) .. " seconds for the current !fps to finish.", true )
             return
         end
+        if not caller:IsAdmin() and nextUserFPSCall > CurTime() then
+            ULib.tsayError( caller, "The !fps command was just ran! Wait " .. math.ceil( math.abs( cur - nextUserFPSCall ) ) .. " seconds!", true )
+            return
+        end
+
         nextFpsCall = CurTime() + duration + ( wiggleRoom * 1.25 )
+        nextUserFPSCall = cur + userFpsCallInterval
 
         duration = duration or DEFAULT_DURATION
 
         cmd.startFPSCheck( caller, targetPlys, duration )
 
-        ulx.fancyLogAdmin( caller, "#A started an FPS check for #T", targetPlys )
+        ulx.fancyLogAdmin( caller, "#A started a #s second FPS check for #T", duration, targetPlys )
     end
 
-    function cmd.assembleAndYapFPSData( caller, targetPlys )
+    function cmd.assembleAndYapFPSData( caller, duration, targetPlys )
         if not recievedFpsData then return end
         if table.Count( recievedFpsData ) <= 0 then return end
 
         local count = 0
         local everyonesAverage = 0
+        local bestAverageFPS
+        local worstAverageFPS
         local bestFPS
         local worstFPS
         for _, data in pairs( recievedFpsData ) do
             count = count + 1
-            everyonesAverage = everyonesAverage + data.average
+            local currAverage = data.average
+            everyonesAverage = everyonesAverage + currAverage
+            if not bestAverageFPS or currAverage > bestAverageFPS.average then
+                bestAverageFPS = data
+            end
+            if not worstAverageFPS or currAverage < worstAverageFPS.average then
+                worstAverageFPS = data
+            end
             if not bestFPS or data.best > bestFPS.best then
                 bestFPS = data
             end
@@ -162,15 +180,26 @@ if SERVER then
                 worstFPS = data
             end
         end
-        everyonesAverage = everyonesAverage / count
 
-        ulx.fancyLogAdmin( caller, "#A's FPS check of #T completed!\nAverage FPS was: #s\nBest was: #s And worst: #s", targetPlys, everyonesAverage, bestFPS.best, worstFPS.worst, targetPlys )
+        everyonesAverage = everyonesAverage / count
+        everyonesAverage = math.Round( everyonesAverage, 2 )
+
+        local msg = "#A's #s second FPS check of #T completed!\nAverage FPS was: #s"
+        local best
+        local worst
+        if count > 1 then -- this is how people expect it to work, show best/worst averages when targeting multiple people
+            best = bestAverageFPS.average
+            worst = worstAverageFPS.average
+            msg = msg .. "\nBest average was: #s And worst average: #s"
+        else -- show best/worst ever if just on one person
+            best = bestFPS.best
+            worst = worstFPS.worst
+            msg = msg .. "\nBest was: #s And worst: #s"
+        end
+
+        ulx.fancyLogAdmin( caller, msg, duration, targetPlys, everyonesAverage, best, worst, targetPlys )
 
         if not caller:IsAdmin() then return end -- dont let users see the deets, someone is gonna harass people with trash pcs eventually lol
-
-        table.sort( recievedFpsData, function( a, b )
-            return a.average > b.average
-        end )
 
         timer.Simple( 0.01, function() -- needs to be 0.01 to be in right order
             if IsValid( caller ) then
