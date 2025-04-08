@@ -30,6 +30,8 @@ if CLIENT then
     net.Receive( "CFC_ULX_FPSCheck_ConsoleResults", function()
         local results = net.ReadTable()
         MsgC( color_white, header, "\n" )
+        MsgC( color_white, "Extended !fps results visible only to you.", "\n" ) -- make it clear
+        MsgC( color_white, header, "\n" )
         for ply, data in pairs( results ) do
             local plyColor = team.GetColor( ply:Team() )
             MsgC( plyColor, ply:Name(), color_white, "\nAverage FPS: ", colorForFPS( data.average ), data.average, color_white, "  Max: ", colorForFPS( data.best ), data.best, color_white, "  Worst: ", colorForFPS( data.worst ), data.worst, "\n" )
@@ -37,53 +39,37 @@ if CLIENT then
         MsgC( color_white, header, "\n" )
     end )
 
-    local function processAndSendBackFPS( allTheFPS )
-        if table.Count( allTheFPS ) <= 0 then return end -- :(
-
-        local count = 0
-        local averageFPS = 0
-        local bestFPS = 0
-        local worstFPS = math.huge
-
-        for _, currentFps in ipairs( allTheFPS ) do
-            count = count + 1
-            averageFPS = averageFPS + currentFps
-            bestFPS = currentFps > bestFPS and currentFps or bestFPS
-            worstFPS = currentFps < worstFPS and currentFps or worstFPS
-        end
-
-        averageFPS = averageFPS / count
-
-        averageFPS = math.Round( averageFPS, 2 )
-        bestFPS = math.Round( bestFPS, 2 )
-        worstFPS = math.Round( worstFPS, 2 )
-
-        net.Start( "CFC_ULX_FPSCheck" )
-            net.WriteInt( averageFPS, 16 )
-            net.WriteInt( bestFPS, 16 )
-            net.WriteInt( worstFPS, 16 )
-        net.SendToServer()
-
-        -- debug print, also tells power users what's happening
-        print( "!fps; sent tracked fps. Average " .. averageFPS .. ". Best " .. bestFPS .. ". Worst " .. worstFPS )
-
-        allTheFPS = nil
-    end
-
     local timerName = "cfc_ulx_fps_tracker"
     local function trackFpsFor( trackTime )
         print( "!fps; tracking fps for " .. trackTime .. " seconds" )
 
         local allDoneTime = CurTime() + trackTime
-        local allTheFPS = {}
         local gotData
+
+        local runningSum = 0
+        local addCount = 0
+        local bestFPS = 0
+        local worstFPS = math.huge
 
         timer.Create( timerName, 0.1, 0, function()
             if allDoneTime < CurTime() then
-                if gotData then
-                    processAndSendBackFPS( allTheFPS )
+                if not gotData then
+                    print( "!fps; got no fps data, client was probably tabbed out" )
                 else
-                    print( "!fps; got no fps data, client was tabbed out" )
+                    local averageFPS = runningSum / addCount
+
+                    averageFPS = math.Round( averageFPS, 2 )
+                    bestFPS = math.Round( bestFPS, 2 )
+                    worstFPS = math.Round( worstFPS, 2 )
+
+                    net.Start( "CFC_ULX_FPSCheck" )
+                        net.WriteInt( averageFPS, 16 )
+                        net.WriteInt( bestFPS, 16 )
+                        net.WriteInt( worstFPS, 16 )
+                    net.SendToServer()
+
+                    -- debug print, also tells power users what's happening
+                    print( "!fps; sent tracked fps. Average " .. averageFPS .. ". Best " .. bestFPS .. ". Worst " .. worstFPS )
                 end
 
                 timer.Remove( timerName )
@@ -92,8 +78,14 @@ if CLIENT then
 
             if not system.HasFocus() then return end -- junk data
 
-            local fps = 1 / RealFrameTime()
-            table.insert( allTheFPS, fps )
+            local fpsRightNow = 1 / RealFrameTime()
+
+            runningSum = runningSum + fpsRightNow
+            addCount = addCount + 1
+
+            if fpsRightNow > bestFPS then bestFPS = fpsRightNow end
+            if fpsRightNow < worstFPS then worstFPS = fpsRightNow end
+
             gotData = true
         end )
     end
@@ -140,7 +132,7 @@ if SERVER then
 
     function cmd.checkFPS( caller, targetPlys, duration )
         if nextFpsCall > CurTime() then
-            caller:ChatPrint( "Please wait for the current !fps to finish." )
+            ULib.tsayError( caller, "Please wait for the current !fps to finish.", true )
             return
         end
         nextFpsCall = CurTime() + duration + ( wiggleRoom * 1.25 )
@@ -172,17 +164,17 @@ if SERVER then
         end
         everyonesAverage = everyonesAverage / count
 
-        ulx.fancyLogAdmin( caller, "#A's FPS check completed. \nAverage: " .. everyonesAverage .. "\nBest: " .. bestFPS.best .. "\nWorst: " .. worstFPS.worst, targetPlys )
+        ulx.fancyLogAdmin( caller, "#A's FPS check of #T completed!\nAverage FPS was: #s\nBest was: #s And worst: #s", targetPlys, everyonesAverage, bestFPS.best, worstFPS.worst, targetPlys )
 
-        if not caller:IsAdmin() then return end
+        if not caller:IsAdmin() then return end -- dont let users see the deets, someone is gonna harass people with trash pcs eventually lol
 
         table.sort( recievedFpsData, function( a, b )
             return a.average > b.average
         end )
 
-        timer.Simple( 0, function()
+        timer.Simple( 0.01, function() -- needs to be 0.01 to be in right order
             if IsValid( caller ) then
-                caller:ChatPrint( "Open your console to see extended results." )
+                caller:ChatPrint( "(Open your console to see extended results.)" )
                 net.Start( "CFC_ULX_FPSCheck_ConsoleResults" )
                     net.WriteTable( recievedFpsData )
                 net.Send( caller )
@@ -198,5 +190,5 @@ end
 local fpsCommand = ulx.command( CATEGORY_NAME, "ulx fps", cmd.checkFPS, "!fps" )
 fpsCommand:addParam{ type = ULib.cmds.PlayersArg }
 fpsCommand:addParam{ type = ULib.cmds.NumArg, default = DEFAULT_DURATION, min = 1, max = MAX_DURATION, ULib.cmds.optional, ULib.cmds.allowTimeString }
-fpsCommand:defaultAccess( ULib.ACCESS_ADMIN )
+fpsCommand:defaultAccess( ULib.ACCESS_ALL )
 fpsCommand:help( "Gets and prints the FPS of everyone" )
