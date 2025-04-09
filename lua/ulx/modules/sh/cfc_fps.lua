@@ -134,16 +134,17 @@ if SERVER then
 
     function cmd.checkFPS( caller, targetPlys, duration )
         local cur = CurTime()
-        if nextFpsCall > CurTime() then
-            ULib.tsayError( caller, "Please wait " .. math.ceil( math.abs( cur - nextFpsCall ) ) .. " seconds for the current !fps to finish.", true )
+        if nextFpsCall > cur then
+            local waitSeconds = math.ceil( math.abs( cur - nextFpsCall ) )
+            ULib.tsayError( caller, "Please wait " .. waitSeconds .. " seconds for the current !fps to finish.", true )
             return
         end
-        if not caller:IsAdmin() and nextUserFPSCall > CurTime() then
-            ULib.tsayError( caller, "The !fps command was just ran! Wait " .. math.ceil( math.abs( cur - nextUserFPSCall ) ) .. " seconds!", true )
+            local waitSeconds = math.ceil( math.abs( cur - nextUserFPSCall ) )
+            ULib.tsayError( caller, "The !fps command was just ran! Wait " .. waitSeconds .. " seconds!", true )
             return
         end
 
-        nextFpsCall = CurTime() + duration + ( wiggleRoom * 1.25 )
+        nextFpsCall = cur + duration + ( wiggleRoom * 1.25 )
         nextUserFPSCall = cur + userFpsCallInterval
 
         duration = duration or DEFAULT_DURATION
