@@ -139,7 +139,7 @@ if SERVER then
             ULib.tsayError( caller, "Please wait " .. waitSeconds .. " seconds for the current !fps to finish.", true )
             return
         end
-        if not caller:IsAdmin() and nextUserFPSCall > CurTime() then
+        if not caller:IsAdmin() and nextUserFPSCall > cur then
             local waitSeconds = math.ceil( math.abs( cur - nextUserFPSCall ) )
             ULib.tsayError( caller, "The !fps command was just ran! Wait " .. waitSeconds .. " seconds!", true )
             return
