@@ -32,7 +32,7 @@ if CLIENT then
         MsgC( color_white, header, "\n" )
         MsgC( color_white, "Extended !fps results visible only to you.", "\n" ) -- make it clear
         MsgC( color_white, header, "\n" )
-        for ply, data in SortedPairsByMemberValue( results, "average" ) do
+        for ply, data in SortedPairsByMemberValue( results, "average", true ) do
             local plyColor = team.GetColor( ply:Team() )
             MsgC( plyColor, ply:Name(), color_white, "\nAverage FPS: ", colorForFPS( data.average ), data.average, color_white, "  Max: ", colorForFPS( data.best ), data.best, color_white, "  Worst: ", colorForFPS( data.worst ), data.worst, "\n" )
         end
