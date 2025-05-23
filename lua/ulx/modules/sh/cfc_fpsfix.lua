@@ -12,12 +12,27 @@ if CLIENT then
     local FIX_CHECK_INTERVAL = 15
     local fixes = { -- applied top-to-bottom
         {
-            prettyName = "Disabling PAC3.",
+            prettyDescription = "Disabling PAC3.", -- becomes, Fixing FPS by... Disabling PAC3.
             cmd = "pac_enable",
             fixedState = "0",
         },
         {
-            prettyName = "Disabling the skybox.",
+            prettyDescription = "Disabling Outfitter.",
+            cmd = "outfitter_enabled",
+            fixedState = "0",
+        },
+        {
+            prettyDescription = "Disabling water reflections.",
+            cmd = "r_WaterDrawReflection",
+            fixedState = "0",
+        },
+        {
+            prettyDescription = "Disabling Tank Tracks.",
+            cmd = "tanktracktool_autotracks_disable",
+            fixedState = "1",
+        },
+        {
+            prettyDescription = "Disabling the skybox.",
             cmd = "r_3dsky",
             fixedState = "0",
         }
@@ -68,12 +83,11 @@ if CLIENT then
     local function applyAFix()
         local fix = findNewFix()
         if not fix then
-            return
+            return -- :(
         end
         timer.Simple( 0.05, function()
             RunConsoleCommand( fix.cmd, fix.fixedState )
-            yap( "Fixing FPS by... " .. fix.prettyName )
-
+            yap( "Fixing FPS by... " .. fix.prettyDescription )
         end )
         return true
     end
@@ -100,7 +114,7 @@ if CLIENT then
 
         timer.Create( timerName, 0.1, 0, function()
             if nextCheck < CurTime() then
-                if not gotData then
+                if not gotData or addCount <= 10 then
                     print( "!lag; got no fps data, probably tabbed out, waiting..." )
                     nextCheck = CurTime() + FIX_CHECK_INTERVAL
 
@@ -130,7 +144,7 @@ if CLIENT then
                 end
 
                 if stop then -- all done!
-                    timer.Remove( timerName )
+                    allDone()
                 end
                 return
             end
@@ -179,4 +193,3 @@ fpsCommand:addParam{ type = ULib.cmds.PlayerArg, target = "^", default = "^", UL
 fpsCommand:addParam{ type = ULib.cmds.NumArg, default = DEFAULT_TARGET, min = MIN_TARGET, max = MAX_TARGET, ULib.cmds.optional }
 fpsCommand:defaultAccess( ULib.ACCESS_ALL )
 fpsCommand:help( "Runs clientside console commands until the target FPS is achieved" )
-
