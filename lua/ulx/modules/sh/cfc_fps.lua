@@ -139,7 +139,7 @@ if SERVER then
             ULib.tsayError( caller, "Please wait " .. waitSeconds .. " seconds for the current !fps to finish.", true )
             return
         end
-        if not caller:IsAdmin() and nextUserFPSCall > cur then
+        if IsValid( caller ) and not caller:IsAdmin() and nextUserFPSCall > cur then
             local waitSeconds = math.ceil( math.abs( cur - nextUserFPSCall ) )
             ULib.tsayError( caller, "The !fps command was just ran! Wait " .. waitSeconds .. " seconds!", true )
             return
@@ -201,7 +201,7 @@ if SERVER then
 
         ulx.fancyLogAdmin( caller, msg, duration, targetPlys, everyonesAverage, best, worst, targetPlys )
 
-        if not caller:IsAdmin() then return end -- dont let users see the deets, someone is gonna harass people with trash pcs eventually lol
+        if not IsValid( caller ) or not caller:IsAdmin() then return end -- dont let users see the deets, someone is gonna harass people with trash pcs eventually lol
 
         timer.Simple( 0.01, function() -- needs to be 0.01 to be in right order
             if IsValid( caller ) then
@@ -219,7 +219,7 @@ end
 
 
 local fpsCommand = ulx.command( CATEGORY_NAME, "ulx fps", cmd.checkFPS, "!fps" )
-fpsCommand:addParam{ type = ULib.cmds.PlayersArg }
+fpsCommand:addParam{ type = ULib.cmds.PlayersArg, ULib.cmds.optional }
 fpsCommand:addParam{ type = ULib.cmds.NumArg, default = DEFAULT_DURATION, min = 1, max = MAX_DURATION, ULib.cmds.optional, ULib.cmds.allowTimeString }
 fpsCommand:defaultAccess( ULib.ACCESS_ALL )
-fpsCommand:help( "Gets and prints the FPS of everyone" )
+fpsCommand:help( "Gets and prints the FPS of everyone targeted" )
