@@ -103,7 +103,7 @@ if CLIENT then
         local maxFps = fps_max:GetInt()
         if maxFps > 0 and maxFps < targetFPS then
             targetFPS = maxFps + -5 -- make this actually achievable
-            print( "!fps; max fps limited by fps_max cvar")
+            print( "!fps; max fps limited by fps_max cvar" )
         end
 
         local nextCheck = CurTime() + FIX_CHECK_INTERVAL
