@@ -34,38 +34,22 @@ TimedPunishments.MakeULXCommands( PUNISHMENT, action, inverseAction, CATEGORY_NA
 if SERVER then
     local function setupE2()
         if not WireAddon then return end
-        local e2Meta = scripted_ents.GetStored( "gmod_wire_expression2" ).t
-        e2Meta._ChipBan_Setup = e2Meta._ChipBan_Setup or e2Meta.Setup
 
-        e2Meta.Setup = function( chip, ... )
-            local ply = chip.player
+        hook.Add( "Expression2_CanCompile", "CFC_ULXCommands_ChipBan", function( ply )
+            if not ply.isChipBanned then return end
 
-            if ply.isChipBanned then
-                ply:ChatPrint( "You can't spawn E2s while Chip Banned!" )
-                chip:Remove()
-                return false
-            end
-
-            return e2Meta._ChipBan_Setup( chip, ... )
-        end
+            ply:ChatPrint( "You can't spawn E2 chips while Chip Banned!" )
+            return false
+        end )
     end
 
     local function setupStarfall()
-        if not istable( SF ) then return end
-        local starfall = scripted_ents.GetStored( "starfall_processor" ).t
-        starfall._ChipBan_SetupFiles = starfall._ChipBan_SetupFiles or starfall.SetupFiles
+        hook.Add( "StarfallCanCompile", "CFC_ULXCommands_ChipBan", function( _, _, ply )
+            if not ply.isChipBanned then return end
 
-        starfall.SetupFiles = function( chip, sfdata )
-            local ply = sfdata.owner
-
-            if ply.isChipBanned then
-                ply:ChatPrint( "You can't spawn Starfalls while Chip Banned!" )
-                chip:Remove()
-                return false
-            end
-
-            return starfall._ChipBan_SetupFiles( chip, sfdata )
-        end
+            ply:ChatPrint( "You can't spawn Starfall chips while Chip Banned!" )
+            return false
+        end )
     end
 
     local function setup()
