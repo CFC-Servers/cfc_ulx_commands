@@ -130,7 +130,7 @@ function AW.shouldWarn( cmd, duration, reason )
         if reason == "No reason specified" then return false end
     end
 
-    if duration and duration < (cmd.minDuration or 0) then return false end
+    if duration and duration < ( cmd.minDuration or 0 ) then return false end
 
     return true
 end
