@@ -88,12 +88,19 @@ function AW.warn( commandName, caller, target, reason )
     end
 
 
+
+    local actorUID
+    if IsValid( caller ) then
+        actorUID = caller:SteamID64()
+    else
+        actorUID = "console"
+    end
     if GMAudit then
         GMAudit.Public.CreateRecord( {
             type = commandName,
             reason = reason,
             realm = GMAudit:GetRealm(),
-            actorUID = caller:SteamID64(),
+            actorUID = actorUID,
             affectedUID = target,
         }, function( _, err )
             if err then
