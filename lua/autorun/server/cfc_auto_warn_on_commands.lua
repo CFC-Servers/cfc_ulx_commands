@@ -80,14 +80,36 @@ function AW.buildReason( reason, commandName, duration )
     return reason
 end
 
-function AW.warn( caller, target, reason )
+function AW.warn( commandName, caller, target, reason )
     if isentity( target ) then
         target = target:SteamID64()
     else
         target = util.SteamIDTo64( target )
     end
 
-    awarn_warnplayerid( caller, target, reason )
+
+
+    local actorUID
+    if IsValid( caller ) then
+        actorUID = caller:SteamID64()
+    else
+        actorUID = "console"
+    end
+    if GMAudit then
+        GMAudit.Public.CreateRecord( {
+            type = commandName,
+            reason = reason,
+            realm = GMAudit:GetRealm(),
+            actorUID = actorUID,
+            affectedUID = target,
+        }, function( _, err )
+            if err then
+                print( "Error creating GMAudit record: " .. err )
+            end
+        end )
+    else
+        awarn_warnplayerid( caller, target, reason )
+    end
 end
 
 function AW.getTargets( indices, args )
@@ -138,7 +160,7 @@ function AW.CommandWatcher( caller, commandName, args )
 
     local warnReason = AW.buildReason( reason, commandName, duration )
     for _, target in ipairs( targets ) do
-        AW.warn( caller, target, warnReason )
+        AW.warn( commandName, caller, target, warnReason )
     end
 end
 
