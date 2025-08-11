@@ -47,7 +47,7 @@ return {
                     expect( target ).to.equal( steamID64 )
                 end )
 
-                warn("ulx ban", nil, ent, nil )
+                warn( "ulx ban", nil, ent, nil )
             end
         },
         {
@@ -62,7 +62,7 @@ return {
                     expect( target ).to.equal( steamID64 )
                 end )
 
-                warn("ulx ban", nil, steamID, nil )
+                warn( "ulx ban", nil, steamID, nil )
             end
         },
 
