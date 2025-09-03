@@ -153,8 +153,6 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overri
                 ULib.tsayError( caller, ulx.getExclusive( ply, caller ), true )
             elseif not ply:Alive() then
                 ULib.tsayError( caller, ply:Nick() .. " is dead and cannot be propified!", true )
-            elseif ( ply.IsInPvp and ply:IsInPvp() ) and not caller:IsAdmin() then
-                ULib.tsayError( caller, "You cannot propify yourself in PvP mode!", true )
             else
                 local err, prop = propifyPlayer( caller, ply, modelPath, overrideHopPress, overrideHopCooldown )
 
