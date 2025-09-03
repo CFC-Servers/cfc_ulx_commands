@@ -142,6 +142,8 @@ end
         overrideHopCooldown (optional): - NUMBER or function( ply, key, state, cvCooldown )
             - Determines how long to put the hop function on cooldown, if the cooldown is currently getting applied
             - cvCooldown = HOP_COOLDOWN:GetFloat() - Useful for having something based off the cooldown convar, like a multiplier or clamp
+        printSilent (optional): - BOOLEAN
+            - If true, ulx.fancyLogAdmin will not be callsed.
 --]]
 function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown, printSilent )
     local affectedPlys = {}
