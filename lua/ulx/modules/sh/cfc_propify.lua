@@ -189,11 +189,10 @@ propifyCommand:help( "Turns the target(s) into a prop with the given model." )
 propifyCommand:setOpposite( "ulx unpropify", { _, _, _, true }, "!unpropify" )
 
 local function silentPropifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown )
-    if not shouldUnpropify then
-        if ( caller.IsInPvp and caller:IsInPvp() ) and not caller:IsAdmin() then
-            ULib.tsayError( caller, "You cannot use propify in PvP mode!", true )
-            return
-        end
+    local cantPropify = ( caller.IsInPvp and caller:IsInPvp() ) and not caller:IsAdmin()
+    if cantPropify and not shouldUnpropify then
+        ULib.tsayError( caller, "You cannot use propify in PvP mode!", true )
+        return
     end
 
     cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown, true )
