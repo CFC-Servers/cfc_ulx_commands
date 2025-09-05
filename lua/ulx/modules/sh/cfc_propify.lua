@@ -84,6 +84,8 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
     prop:DisallowDeleting( true, _, true )
     ply:DisallowSpawning( true )
 
+    prop:CPPISetOwner( caller )
+
     ply.ragdoll = prop
     ply.propifyHopPress = overrideHopPress or cmd.propHopDefault
     ply.propifyHopCooldown = overrideHopCooldown or cmd.propHopCooldownDefault
@@ -204,10 +206,6 @@ local function silentPropifyTargets( caller, targets, modelPath, shouldUnpropify
     end
 
     cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown, true )
-
-    for _, ply in pairs( targets ) do
-        if ply.ragdoll then ply.ragdoll:CPPISetOwner( ply ) end
-    end
 end
 
 local silentPropifyCommand = ulx.command( CATEGORY_NAME, "ulx spropify", silentPropifyTargets, "!spropify" )
