@@ -81,7 +81,6 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
     ply:SpectateEntity( prop )
     ply:StripWeapons()
 
-    prop:DisallowDeleting( true, _, true )
     ply:DisallowSpawning( true )
 
     prop:CPPISetOwner( caller )
@@ -122,7 +121,6 @@ function cmd.unpropifyPlayer( ply )
         ply:SetAngles( Angle( 0, prop:GetAngles().yaw, 0 ) )
         prop.ragdolledPly = nil
         prop.propifyStruggle = nil
-        prop:DisallowDeleting( false )
         prop:Remove()
     end
 
@@ -218,7 +216,6 @@ silentPropifyCommand:setOpposite( "ulx unspropify", { _, _, _, true }, "!unsprop
 
 local function propDisconnectedCheck( ply )
     if not ply.ragdoll then return end
-    ply.ragdoll:DisallowDeleting( false )
     ply.ragdoll:Remove()
 end
 hook.Add( "PlayerDisconnected", "CFC_ULX_RemovePropifyRagdoll", propDisconnectedCheck, HOOK_MONITOR_HIGH )
