@@ -81,8 +81,9 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
     ply:SpectateEntity( prop )
     ply:StripWeapons()
 
-    prop:DisallowDeleting( true, _, true )
     ply:DisallowSpawning( true )
+
+    prop:CPPISetOwner( caller )
 
     ply.ragdoll = prop
     ply.propifyHopPress = overrideHopPress or cmd.propHopDefault
@@ -120,7 +121,6 @@ function cmd.unpropifyPlayer( ply )
         ply:SetAngles( Angle( 0, prop:GetAngles().yaw, 0 ) )
         prop.ragdolledPly = nil
         prop.propifyStruggle = nil
-        prop:DisallowDeleting( false )
         prop:Remove()
     end
 
@@ -142,8 +142,10 @@ end
         overrideHopCooldown (optional): - NUMBER or function( ply, key, state, cvCooldown )
             - Determines how long to put the hop function on cooldown, if the cooldown is currently getting applied
             - cvCooldown = HOP_COOLDOWN:GetFloat() - Useful for having something based off the cooldown convar, like a multiplier or clamp
+        printSilent (optional): - BOOLEAN
+            - If true, ulx.fancyLogAdmin will not be callsed.
 --]]
-function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown )
+function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown, printSilent )
     local affectedPlys = {}
     local props = {}
 
@@ -173,7 +175,7 @@ function cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overri
 
     local printStr = ( overridePrint or cmd.printDefault )( shouldUnpropify )
 
-    ulx.fancyLogAdmin( caller, printStr, affectedPlys )
+    if not printSilent then ulx.fancyLogAdmin( caller, printStr, affectedPlys ) end
 
     return props
 end
@@ -186,9 +188,34 @@ propifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
 propifyCommand:help( "Turns the target(s) into a prop with the given model." )
 propifyCommand:setOpposite( "ulx unpropify", { _, _, _, true }, "!unpropify" )
 
+local function silentPropifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown )
+    local validTargets = targets
+
+    if not caller:IsAdmin() and not shouldUnpropify then
+        for i, target in pairs( targets ) do
+            if target.IsInPvp and target:IsInPvp() then
+                local message = ( target == caller ) and "You can not run propify on yourself in PvP mode!"
+                    or target:GetName() .. " can not be propified because they are in PvP mode!"
+
+                validTargets[i] = nil
+                ULib.tsayError( caller, message, true )
+            end
+        end
+    end
+
+    cmd.propifyTargets( caller, targets, modelPath, shouldUnpropify, overridePrint, overrideHopPress, overrideHopCooldown, true )
+end
+
+local silentPropifyCommand = ulx.command( CATEGORY_NAME, "ulx spropify", silentPropifyTargets, "!spropify" )
+silentPropifyCommand:addParam{ type = ULib.cmds.PlayersArg }
+silentPropifyCommand:addParam{ type = ULib.cmds.StringArg, default = "random", ULib.cmds.optional }
+silentPropifyCommand:addParam{ type = ULib.cmds.BoolArg, invisible = true }
+silentPropifyCommand:defaultAccess( ULib.ACCESS_ADMIN )
+silentPropifyCommand:help( "Silently turns the target(s) into a prop with the given model." )
+silentPropifyCommand:setOpposite( "ulx unspropify", { _, _, _, true }, "!unspropify" )
+
 local function propDisconnectedCheck( ply )
     if not ply.ragdoll then return end
-    ply.ragdoll:DisallowDeleting( false )
     ply.ragdoll:Remove()
 end
 hook.Add( "PlayerDisconnected", "CFC_ULX_RemovePropifyRagdoll", propDisconnectedCheck, HOOK_MONITOR_HIGH )
