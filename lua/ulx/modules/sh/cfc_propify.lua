@@ -121,6 +121,7 @@ function cmd.unpropifyPlayer( ply )
         ply:SetAngles( Angle( 0, prop:GetAngles().yaw, 0 ) )
         prop.ragdolledPly = nil
         prop.propifyStruggle = nil
+        prop:DisallowDeleting( false )
         prop:Remove()
     end
 
