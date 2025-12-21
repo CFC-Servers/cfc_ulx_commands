@@ -316,6 +316,7 @@ local randomPhrases = {
 
 local function transform( sentence )
     sentence = string.lower( sentence )
+    sentence = string.Trim( sentence )
 
     local replaceCount = 0
 
