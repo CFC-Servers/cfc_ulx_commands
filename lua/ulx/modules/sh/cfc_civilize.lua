@@ -316,6 +316,7 @@ local randomPhrases = {
 
 local function transform( sentence )
     sentence = string.lower( sentence )
+    sentence = string.Trim( sentence ) -- can bypass with a leading space??? eg, ` i love propspamming`
 
     local replaceCount = 0
 
