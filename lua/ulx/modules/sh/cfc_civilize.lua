@@ -247,6 +247,20 @@ local transformations = {
     ["devotee"] = "individual of devotion",
     ["ardent"] = "person of thousandfold commitment",
     ["exalted"] = "transcendent veteran of veneration",
+
+    -- Rather degenerate phrases depending on circumstance
+    ["uwu"] = "most certainly",
+    ["owo"] = "indeed",
+    ["nya"] = "quite so",
+    [";;w;;"] = "without a doubt",
+    ["^w^"] = "undoubtedly",
+    ["rawr"] = "greetings",
+    [":3"] = "of course",
+    ["x3"] = "naturally",
+    ["nyaa"] = "most assuredly",
+    ["hewwo"] = "good day",
+    ["furry"] = "individual with anthropomorphic affinities",
+
     -- Savage insults and vulgarities
     ["hell"] = "brimstone",
     ["balls"] = "round spheroids",
@@ -262,7 +276,6 @@ local transformations = {
     ["asshole"] = "posterior orifice",
     ["bald"] = "follicly challenged",
     ["loser"] = "individual of diminished success",
-    ["furry"] = "individual with anthropomorphic affinities",
     ["idiot"] = "intellectually challenged individual",
     ["stupid"] = "lacking in cognitive fortitude",
     ["dumb"] = "mentally unencumbered",
@@ -314,9 +327,24 @@ local randomPhrases = {
     "it seems to be", "quite assuredly", "undoubtably", "yes, of course", "unexpectedly",
 }
 
+-- all normal keyboard chars except ~
+local validChars = " abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>/?`|'\"\\\n"
+
+local function filterInvalidChars( str )
+    local result = {}
+    for i = 1, #str do
+        local sub = str:sub( i, i )
+        if string.find( validChars, sub, 1, true ) then
+            result[#result + 1] = sub
+        end
+    end
+    return table.concat( result )
+end
+
 local function transform( sentence )
     sentence = string.lower( sentence )
-    sentence = string.Trim( sentence ) -- can bypass with a leading space??? eg, ` i love propspamming`
+    sentence = string.Trim( sentence ) -- can bypass with a leading space??? eg, ' i love propspamming'
+    sentence = filterInvalidChars( sentence )
 
     local replaceCount = 0
 
@@ -328,7 +356,7 @@ local function transform( sentence )
     end
 
     local minAddCount = 0
-    local randomAddChance = 0.05
+    local randomAddChance = 0.08
     if replaceCount <= 1 then -- if no replacements were found, add lots of crap
         randomAddChance = 0.5
         minAddCount = 1 -- always add ONE thing
@@ -339,7 +367,7 @@ local function transform( sentence )
     for word in sentence:gmatch( "%S+" ) do
         table.insert( transformedWords, word )
 
-        if math.random() < randomAddChance or addCount < minAddCount then
+        if math.Rand( 0, 1 ) < randomAddChance or addCount < minAddCount then
             addCount = addCount + 1
             table.insert( transformedWords, randomPhrases[math.random( #randomPhrases )] )
         end
@@ -348,23 +376,53 @@ local function transform( sentence )
     return table.concat( transformedWords, " " )
 end
 
-local targetedPlayers = {}
+CFCUlxCommands.civilize = CFCUlxCommands.civilize or {}
+local civilizeModule = CFCUlxCommands.civilize
+
+civilizeModule.timedCivilizedPlayers = civilizeModule.timedCivilizedPlayers or {}
+local timedCivilizedPlayers = civilizeModule.timedCivilizedPlayers
+
+civilizeModule.targetedPlayers = civilizeModule.targetedPlayers or {}
+local targetedPlayers = civilizeModule.targetedPlayers
+
 hook.Add( "PlayerSay", "CFC_PoshSpeech", function( ply, msg )
     if not targetedPlayers[ply] then return end
     return transform( msg )
 end )
 
+function civilizeModule.enable( ply )
+    targetedPlayers[ply] = true
+end
+
+function civilizeModule.disable( ply )
+    targetedPlayers[ply] = nil
+end
+
 local function setPosh( caller, targetPlayers, unSet )
-    local shouldSet = not unSet
-    for _, ply in ipairs( targetPlayers ) do
-        if shouldSet then
-            targetedPlayers[ply] = true
+    for i, ply in ipairs( targetPlayers ) do -- don't let ulx uncivilize override timed civilize
+        if not targetedPlayers[ply] then continue end
+        if not timedCivilizedPlayers[ply] then continue end
+
+        if ply == caller then
+            ULib.tsayError( caller, "Your civil situation seems to be of a more timed variety!", true )
         else
-            targetedPlayers[ply] = nil
+            ULib.tsayError( caller, ply:Nick() .. " is timed-civilized!", true )
+        end
+
+        table.remove( targetPlayers, i )
+        continue
+    end
+    for _, ply in ipairs( targetPlayers ) do
+        if not unSet then
+            civilizeModule.enable( ply )
+        elseif unSet then
+            civilizeModule.disable( ply )
         end
     end
 
-    local message = shouldSet and "#A bestowed sophistication upon #T" or "#A returned #T to a more primitive state"
+    if #targetPlayers <= 0 then return end
+
+    local message = not unSet and "#A bestowed sophistication upon #T" or "#A returned #T to a more primitive state"
 
     ulx.fancyLogAdmin( caller, message, targetPlayers )
 end
