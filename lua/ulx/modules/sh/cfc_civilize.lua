@@ -252,13 +252,15 @@ local transformations = {
     ["uwu"] = "most certainly",
     ["owo"] = "indeed",
     ["nya"] = "quite so",
+    ["nyaa"] = "most assuredly",
     [";;w;;"] = "without a doubt",
     ["^w^"] = "undoubtedly",
     ["rawr"] = "greetings",
     [":3"] = "of course",
     ["x3"] = "naturally",
-    ["nyaa"] = "most assuredly",
+    ["hewo"] = "why, greetings!",
     ["hewwo"] = "good day",
+    ["meow"] = "a sound of feline origin",
     ["furry"] = "individual with anthropomorphic affinities",
 
     -- Savage insults and vulgarities
