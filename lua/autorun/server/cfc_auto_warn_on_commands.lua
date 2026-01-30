@@ -31,6 +31,10 @@ AW.enabledCommands = {
     ["ulx timemute"] = { skipEmptyReason = true },
     ["ulx timemuteid"] = {},
 
+    -- Timed Civilize
+    ["ulx timedcivilize"] = { skipEmptyReason = true },
+    ["ulx timedcivilizeid"] = {},
+
     -- PvPBan
     ["ulx pvpban"] = { skipEmptyReason = true },
     ["ulx pvpbanid"] = {},
@@ -46,10 +50,6 @@ AW.enabledCommands = {
     -- Darkrp
     ["ulx timeddarkrp"] = { skipEmptyReason = true },
     ["ulx timeddarkrpid"] = {},
-
-    -- Timed Civilize
-    ["ulx timedcivilize"] = { skipEmptyReason = true },
-    ["ulx timedcivilizeid"] = {},
 
     -- Ban
     ["ulx ban"] = {},
