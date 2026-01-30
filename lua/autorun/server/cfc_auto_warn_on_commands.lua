@@ -31,6 +31,10 @@ AW.enabledCommands = {
     ["ulx timemute"] = { skipEmptyReason = true },
     ["ulx timemuteid"] = {},
 
+    -- Timed Civilize
+    ["ulx timedcivilize"] = { skipEmptyReason = true },
+    ["ulx timedcivilizeid"] = {},
+
     -- PvPBan
     ["ulx pvpban"] = { skipEmptyReason = true },
     ["ulx pvpbanid"] = {},
