@@ -47,6 +47,10 @@ AW.enabledCommands = {
     ["ulx timeddarkrp"] = { skipEmptyReason = true },
     ["ulx timeddarkrpid"] = {},
 
+    -- Timed Civilize
+    ["ulx timedcivilize"] = { skipEmptyReason = true },
+    ["ulx timedcivilizeid"] = {},
+
     -- Ban
     ["ulx ban"] = {},
     ["ulx banid"] = {},
