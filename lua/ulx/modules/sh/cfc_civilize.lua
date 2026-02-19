@@ -314,6 +314,7 @@ local transformations = {
     ["tranny"] = "transgender individual",
     ["kys"] = "I urge you to seek professional assistance",
     ["goon"] = "henchman",
+    ["gooning"] = "engaging in henchman-like activities",
     ["sex"] = "reproduction",
     ["cum"] = "dna transport",
     ["cumming"] = "transporting dna",
