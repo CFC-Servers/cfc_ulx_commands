@@ -157,6 +157,7 @@ CFCUlxCurse.RegisterEffect( {
 
         -- String Functions
         globals.surfaceDrawText = globals.surfaceDrawText or surface.DrawText
+        globals.surfaceGetTextSize = globals.surfaceGetTextSize or surface.GetTextSize
 
         -- Chat/Console Functions
         globals.Msg = globals.Msg or Msg
@@ -212,6 +213,10 @@ CFCUlxCurse.RegisterEffect( {
             -- String Wraps
             surface.DrawText = function( text, ... )
                 globals.surfaceDrawText( fishifyText( text ), ... )
+            end
+
+            surface.GetTextSize = function( text, ... )
+                return globals.surfaceGetTextSize( fishifyText( text ), ... )
             end
 
 
@@ -274,6 +279,7 @@ CFCUlxCurse.RegisterEffect( {
 
         -- String Unwrap
         surface.DrawText = globals.surfaceDrawText
+        surface.GetTextSize = globals.surfaceGetTextSize
 
         -- Chat/Console Unwrap
         Msg = globals.Msg
