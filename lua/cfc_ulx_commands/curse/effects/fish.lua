@@ -16,12 +16,14 @@ CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local nextSpecialSoundTime = 0
-local wordLookup = { [""] = false, ["s"] = false, ["S"] = false, }
+local wordLookup = { [""] = "", ["s"] = "s", ["S"] = "S", }
 local entityMeta = FindMetaTable( "Entity" )
 
 local CurTime = CurTime
 local mathRand = math.Rand
 local stringGmatch = string.gmatch
+local stringSub = string.sub
+local stringUpper = string.upper
 local tableConcat = table.concat
 
 
@@ -37,14 +39,32 @@ local function getSound( _snd )
     return MAIN_SOUND
 end
 
-local function shouldReplaceWord( word )
-    local shouldReplace = wordLookup[word]
-    if shouldReplace ~= nil then return shouldReplace end
+local function replaceWord( word )
+    local replacement = wordLookup[word]
+    if replacement ~= nil then return replacement end
 
-    shouldReplace = mathRand( 0, 1 ) < WORD_REPLACE_CHANCE
-    wordLookup[word] = shouldReplace
+    if mathRand( 0, 1 ) < WORD_REPLACE_CHANCE then
+        local firstChar = stringSub( word, 1, 1 )
 
-    return shouldReplace
+        -- Maintain capitalization of first letter, and use full caps if the first two are uppercase.
+        if firstChar == stringUpper( firstChar ) then
+            local lastChar = stringSub( word, #word, #word )
+
+            if lastChar == stringUpper( lastChar ) then
+                replacement = "FISH"
+            else
+                replacement = "Fish"
+            end
+        else
+            replacement = "fish"
+        end
+    else
+        replacement = word
+    end
+
+    wordLookup[word] = replacement
+
+    return replacement
 end
 
 local function fishifyText( str )
@@ -58,12 +78,8 @@ local function fishifyText( str )
             fragments[count] = nonword
         end
 
-        if shouldReplaceWord( word ) then
-            word = "fish"
-        end
-
         count = count + 1
-        fragments[count] = word
+        fragments[count] = replaceWord( word )
     end
 
     return tableConcat( fragments ) -- At scale, table.concat produces considerably less garbage than manual concatenation.
@@ -156,7 +172,7 @@ CFCUlxCurse.RegisterEffect( {
 
         RunConsoleCommand( "stopsound" )
 
-        wordLookup = { [""] = false, ["s"] = false, ["S"] = false, } -- Discard the old table so gc can clean it.
+        wordLookup = { [""] = "", ["s"] = "s", ["S"] = "S", } -- Discard the old table so gc can clean it.
     end,
 
     minDuration = nil,
