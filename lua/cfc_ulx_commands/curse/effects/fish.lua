@@ -51,8 +51,11 @@ local function fishifyText( str )
     local words = stringSplit( str, " " )
 
     for i, word in ipairs( words ) do
-        if shouldReplaceWord( word ) then
-            words[i] = "fish"
+        local prepend, postpend -- Set aside any trailing or leading newlines or punctuation
+        prepend, word, postpend = stringMatch( word, "([%c%p]*)([^%c%p]*[%g%c]*[^%c%p]+)([%c%p]*)" )
+
+        if prepend and shouldReplaceWord( word ) then
+            words[i] = prepend .. "fish" .. postpend
         end
     end
 
