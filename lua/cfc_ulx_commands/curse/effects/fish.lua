@@ -14,11 +14,14 @@ local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 local nextSpecialSoundTime = 0
 local entityMeta = FindMetaTable( "Entity" )
 
+local CurTime = CurTime
+local mathRand = math.Rand
+
 
 local function getSound( _snd )
     local now = CurTime()
 
-    if now > nextSpecialSoundTime and math.Rand( 0, 1 ) < SPECIAL_SOUND_CHANCE then
+    if now > nextSpecialSoundTime and mathRand( 0, 1 ) < SPECIAL_SOUND_CHANCE then
         nextSpecialSoundTime = now + SPECIAL_SOUND_COOLDOWN
 
         return SPECIAL_SOUND
