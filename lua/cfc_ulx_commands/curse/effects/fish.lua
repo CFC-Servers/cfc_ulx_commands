@@ -18,6 +18,7 @@ local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 local nextSpecialSoundTime = 0
 local wordLookup = { [""] = "", ["s"] = "s", ["S"] = "S", }
 local entityMeta = FindMetaTable( "Entity" )
+local playerMeta = FindMetaTable( "Player" )
 
 local CurTime = CurTime
 local mathRand = math.Rand
@@ -27,6 +28,41 @@ local stringFind = string.find
 local stringUpper = string.upper
 local tableConcat = table.concat
 local languageGetPhrase = CLIENT and language.GetPhrase
+
+local fishifyText
+local fishifyTextAny = function( arg ) return fishifyText( tostring( arg ) ) end
+
+local consoleWrappers = { -- true to leave arg unmodified, otherwise uses a function.
+    Msg = {
+        default = fishifyTextAny,
+        string = fishifyText,
+    },
+    MsgN = {
+        default = fishifyTextAny,
+        string = fishifyText,
+    },
+    MsgC = {
+        default = fishifyTextAny,
+        string = fishifyText,
+        table = true,
+    },
+    MsgAll = {
+        default = fishifyTextAny,
+        string = fishifyText,
+    },
+    print = {
+        default = fishifyTextAny,
+        string = fishifyText,
+    },
+    AddText = {
+        default = fishifyTextAny,
+        string = fishifyText,
+        table = true,
+        Player = true,
+
+        _container = "chat",
+    },
+}
 
 
 local function getSound( _snd )
@@ -69,7 +105,7 @@ local function replaceWord( word )
     return replacement
 end
 
-local function fishifyText( str, isRecursing )
+fishifyText = function( str, isRecursing )
     local fragments = {}
     local count = 0
 
@@ -122,6 +158,19 @@ CFCUlxCurse.RegisterEffect( {
         -- String Functions
         globals.surfaceDrawText = globals.surfaceDrawText or surface.DrawText
 
+        -- Chat/Console Functions
+        globals.Msg = globals.Msg or Msg
+        globals.MsgN = globals.MsgN or MsgN
+        globals.MsgC = globals.MsgC or MsgC
+        globals.MsgAll = globals.MsgAll or MsgAll
+        globals.print = globals.print or print
+        globals.chatAddText = globals.chatAddText or chat.AddText
+
+        globals.PrintMessage = globals.PrintMessage or PrintMessage
+        globals.playerChatPrint = globals.playerChatPrint or playerMeta.ChatPrint
+        globals.playerPrintMessage = globals.playerPrintMessage or playerMeta.PrintMessage
+
+
         -- Stop everything and play the special sound first
         RunConsoleCommand( "stopsound" )
         timer.Simple( 0.1, function() -- Account for concmd delay
@@ -159,10 +208,48 @@ CFCUlxCurse.RegisterEffect( {
                 globals.surfacePlaySound( getSound() )
             end
 
+
             -- String Wraps
             surface.DrawText = function( text, ... )
                 globals.surfaceDrawText( fishifyText( text ), ... )
             end
+
+
+            -- Chat/Console Wraps
+            for funcName, wrapsByType in pairs( consoleWrappers ) do
+                local containerName = wrapsByType._container
+                local container = containerName and _G[containerName] or _G
+                local ogFunc = globals[( containerName or "" ) .. funcName]
+                local defaultFunc = wrapsByType.default
+
+                container[funcName] = function( ... )
+                    local args = { ... }
+
+                    for i = 1, #args do
+                        local arg = args[i]
+                        local wrapFunc = wrapsByType[type( arg )] or defaultFunc
+
+                        if wrapFunc ~= true then
+                            args[i] = wrapFunc( arg )
+                        end
+                    end
+
+                    return ogFunc( unpack( args ) )
+                end
+            end
+
+            PrintMessage = function( msgType, msg, ... )
+                return globals.PrintMessage( msgType, fishifyText( msg ), ... )
+            end
+
+            playerMeta.ChatPrint = function( self, msg, ... )
+                return globals.playerChatPrint( self, fishifyText( msg ), ... )
+            end
+
+            playerMeta.PrintMessage = function( self, msgType, msg, ... )
+                return globals.playerPrintMessage( self, msgType, fishifyText( msg, ... ) )
+            end
+
 
             -- Footsteps are played at the engine level, need to block them and call from lua for the wrap to apply.
             CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "OverrideSound", function( ply, _, _, snd, volume )
@@ -188,8 +275,20 @@ CFCUlxCurse.RegisterEffect( {
         -- String Unwrap
         surface.DrawText = globals.surfaceDrawText
 
-        RunConsoleCommand( "stopsound" )
+        -- Chat/Console Unwrap
+        Msg = globals.Msg
+        MsgN = globals.MsgN
+        MsgC = globals.MsgC
+        MsgAll = globals.MsgAll
+        print = globals.print
+        chat.AddText = globals.chatAddText
 
+        PrintMessage = globals.PrintMessage
+        playerMeta.ChatPrint = globals.playerChatPrint
+        playerMeta.PrintMessage = globals.playerPrintMessage
+
+        -- Cleanup
+        RunConsoleCommand( "stopsound" )
         wordLookup = { [""] = "", ["s"] = "s", ["S"] = "S", } -- Discard the old table so gc can clean it.
     end,
 
