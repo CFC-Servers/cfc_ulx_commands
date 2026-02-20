@@ -23,8 +23,10 @@ local CurTime = CurTime
 local mathRand = math.Rand
 local stringGmatch = string.gmatch
 local stringSub = string.sub
+local stringFind = string.find
 local stringUpper = string.upper
 local tableConcat = table.concat
+local languageGetPhrase = CLIENT and language.GetPhrase
 
 
 local function getSound( _snd )
@@ -67,9 +69,25 @@ local function replaceWord( word )
     return replacement
 end
 
-local function fishifyText( str )
+local function fishifyText( str, isRecursing )
     local fragments = {}
     local count = 0
+
+    -- Respect language phrases.
+    if not isRecursing then
+        local hashInd = stringFind( str, "#", 1, true )
+        local endInd
+
+        while hashInd do
+            hashInd, endInd = stringFind( str, "#[^%s%c]*", hashInd, false )
+            if not hashInd then break end
+
+            local internalPhrase = stringSub( str, hashInd + 1, endInd )
+            local newPhrase = fishifyText( languageGetPhrase( internalPhrase ), true )
+
+            str = stringSub( str, 1, hashInd - 1 ) .. newPhrase .. stringSub( str, endInd + 1 )
+        end
+    end
 
     -- Replace words separated by punctuation, spaces, and/or control characters.
     for nonword, word in stringGmatch( str, "([%c%p%s]*)([^%c%p%s]*)" ) do
