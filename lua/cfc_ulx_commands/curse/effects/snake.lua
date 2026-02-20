@@ -1,4 +1,4 @@
-local EFFECT_NAME = "Crab"
+local EFFECT_NAME = "Snake"
 
 
 CFCUlxCurse.RegisterEffect( {
@@ -8,7 +8,7 @@ CFCUlxCurse.RegisterEffect( {
         if SERVER then return end
 
         CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "CreateMove", "LBozo", function( cmd )
-            cmd:SetForwardMove( 0 )
+            cmd:SetSideMove( 0 )
         end )
     end,
 
@@ -21,14 +21,13 @@ CFCUlxCurse.RegisterEffect( {
     onetimeDurationMult = nil,
     excludeFromOnetime = nil,
     incompatibileEffects = {
-        "TheseBootsAreMadeForWalking",
-        "Snake",
+        "Crab",
     },
     groups = {
         "Input",
-        "WS",
+        "AD",
     },
     incompatibleGroups = {
-        "WS",
+        "AD",
     },
 } )
