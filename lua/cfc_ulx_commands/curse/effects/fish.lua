@@ -16,12 +16,12 @@ CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local nextSpecialSoundTime = 0
-local wordLookup = { [""] = false, ["\n"] = false, }
+local wordLookup = { [""] = false, ["s"] = false, ["S"] = false, }
 local entityMeta = FindMetaTable( "Entity" )
 
 local CurTime = CurTime
 local mathRand = math.Rand
-local stringSplit = string.Split
+local stringGmatch = string.gmatch
 local tableConcat = table.concat
 
 
@@ -48,18 +48,25 @@ local function shouldReplaceWord( word )
 end
 
 local function fishifyText( str )
-    local words = stringSplit( str, " " )
+    local fragments = {}
+    local count = 0
 
-    for i, word in ipairs( words ) do
-        local prepend, postpend -- Set aside any trailing or leading newlines or punctuation
-        prepend, word, postpend = stringMatch( word, "([%c%p]*)([^%c%p]*[%g%c]*[^%c%p]+)([%c%p]*)" )
-
-        if prepend and shouldReplaceWord( word ) then
-            words[i] = prepend .. "fish" .. postpend
+    -- Replace words separated by punctuation, spaces, and/or control characters.
+    for nonword, word in stringGmatch( str, "([%c%p%s]*)([^%c%p%s]*)" ) do
+        if nonword ~= "" then
+            count = count + 1
+            fragments[count] = nonword
         end
+
+        if shouldReplaceWord( word ) then
+            word = "fish"
+        end
+
+        count = count + 1
+        fragments[count] = word
     end
 
-    return tableConcat( words, " " )
+    return tableConcat( fragments ) -- At scale, table.concat produces considerably less garbage than manual concatenation.
 end
 
 
@@ -149,7 +156,7 @@ CFCUlxCurse.RegisterEffect( {
 
         RunConsoleCommand( "stopsound" )
 
-        wordLookup = { [""] = false, ["\n"] = false, } -- Discard the old table so gc can clean it.
+        wordLookup = { [""] = false, ["s"] = false, ["S"] = false, } -- Discard the old table so gc can clean it.
     end,
 
     minDuration = nil,
