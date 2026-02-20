@@ -1,9 +1,13 @@
 local EFFECT_NAME = "Fish"
+
+local START_DELAY = 1.5
+
 local MAIN_SOUND = "cfc_ulx_commands/curse/fish/fish.ogg"
 local SPECIAL_SOUND = "cfc_ulx_commands/curse/fish/you_know_what_that_means.ogg"
 local SPECIAL_SOUND_CHANCE = 0.01
 local SPECIAL_SOUND_COOLDOWN = 10
-local START_DELAY = 1.5
+
+local WORD_REPLACE_CHANCE = 0.1
 
 
 -- Create global table
@@ -12,10 +16,13 @@ CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER] = CFCUlxCurse.EffectGlobals[EFFECT_
 local globals = CFCUlxCurse.EffectGlobals[EFFECT_NAME_LOWER]
 
 local nextSpecialSoundTime = 0
+local wordLookup = { [""] = false, ["\n"] = false, }
 local entityMeta = FindMetaTable( "Entity" )
 
 local CurTime = CurTime
 local mathRand = math.Rand
+local stringSplit = string.Split
+local tableConcat = table.concat
 
 
 local function getSound( _snd )
@@ -30,6 +37,28 @@ local function getSound( _snd )
     return MAIN_SOUND
 end
 
+local function shouldReplaceWord( word )
+    local shouldReplace = wordLookup[word]
+    if shouldReplace ~= nil then return shouldReplace end
+
+    shouldReplace = mathRand( 0, 1 ) < WORD_REPLACE_CHANCE
+    wordLookup[word] = shouldReplace
+
+    return shouldReplace
+end
+
+local function fishifyText( str )
+    local words = stringSplit( str, " " )
+
+    for i, word in ipairs( words ) do
+        if shouldReplaceWord( word ) then
+            words[i] = "fish"
+        end
+    end
+
+    return tableConcat( words, " " )
+end
+
 
 CFCUlxCurse.RegisterEffect( {
     name = EFFECT_NAME,
@@ -37,6 +66,7 @@ CFCUlxCurse.RegisterEffect( {
     onStart = function( cursedPly )
         if SERVER then return end
 
+        -- Sound Functions
         globals.CreateSound = globals.CreateSound or CreateSound
         globals.EmitSound = globals.EmitSound or EmitSound
         globals.SoundDuration = globals.SoundDuration or SoundDuration
@@ -45,6 +75,9 @@ CFCUlxCurse.RegisterEffect( {
         globals.soundPlayFile = globals.soundPlayFile or sound.PlayFile
         globals.surfacePlaySound = globals.surfacePlaySound or surface.PlaySound
 
+        -- String Functions
+        globals.surfaceDrawText = globals.surfaceDrawText or surface.DrawText
+
         -- Stop everything and play the special sound first
         RunConsoleCommand( "stopsound" )
         timer.Simple( 0.1, function() -- Account for concmd delay
@@ -52,6 +85,7 @@ CFCUlxCurse.RegisterEffect( {
         end )
 
         CFCUlxCurse.CreateEffectTimer( cursedPly, EFFECT_NAME, "DelayTheFishening", START_DELAY, 0, function()
+            -- Sound Wraps
             CreateSound = function( ent, _snd, ... )
                 return globals.CreateSound( ent, getSound(), ... )
             end
@@ -81,6 +115,11 @@ CFCUlxCurse.RegisterEffect( {
                 globals.surfacePlaySound( getSound() )
             end
 
+            -- String Wraps
+            surface.DrawText = function( text, ... )
+                globals.surfaceDrawText( fishifyText( text ), ... )
+            end
+
             -- Footsteps are played at the engine level, need to block them and call from lua for the wrap to apply.
             CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "PlayerFootstep", "OverrideSound", function( ply, _, _, snd, volume )
                 ply:EmitSound( snd, nil, nil, volume )
@@ -93,6 +132,7 @@ CFCUlxCurse.RegisterEffect( {
     onEnd = function()
         if SERVER then return end
 
+        -- Sound Unwrap
         CreateSound = globals.CreateSound
         EmitSound = globals.EmitSound
         SoundDuration = globals.SoundDuration
@@ -101,7 +141,12 @@ CFCUlxCurse.RegisterEffect( {
         sound.PlayFile = globals.soundPlayFile
         surface.PlaySound = globals.surfacePlaySound
 
+        -- String Unwrap
+        surface.DrawText = globals.surfaceDrawText
+
         RunConsoleCommand( "stopsound" )
+
+        wordLookup = { [""] = false, ["\n"] = false, } -- Discard the old table so gc can clean it.
     end,
 
     minDuration = nil,
