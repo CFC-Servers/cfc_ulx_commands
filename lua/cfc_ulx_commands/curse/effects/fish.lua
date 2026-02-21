@@ -115,9 +115,12 @@ fishifyText = function( str, isRecursing )
         local endInd
 
         while hashInd do
+            -- Find the next # and the index of the last non-space, non-control character following it.
+            -- (i.e. the start and end of the next untranslated language phrase)
             hashInd, endInd = stringFind( str, "#[^%s%c]*", hashInd, false )
             if not hashInd then break end
 
+            -- Translate, fishify, and reinsert the phrase.
             local internalPhrase = stringSub( str, hashInd + 1, endInd )
             local newPhrase = fishifyText( languageGetPhrase( internalPhrase ), true )
 
