@@ -265,6 +265,13 @@ CFCUlxCurse.RegisterEffect( {
 
                 return true
             end )
+
+            -- Covers a lot of cases that ENTITY:EmitSound() doesn't.
+            CFCUlxCurse.AddEffectHook( cursedPly, EFFECT_NAME, "EntityEmitSound", "OverrideSound", function( data )
+                data.SoundName = getSound( data.SoundName )
+
+                return true
+            end )
         end )
     end,
 
