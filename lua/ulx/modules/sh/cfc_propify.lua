@@ -83,7 +83,9 @@ local function propifyPlayer( caller, ply, modelPath, overrideHopPress, override
 
     ply:DisallowSpawning( true )
 
-    prop:CPPISetOwner( caller )
+    if CPPI then
+        prop:CPPISetOwner( caller )
+    end
 
     ply.ragdoll = prop
     ply.propifyHopPress = overrideHopPress or cmd.propHopDefault
