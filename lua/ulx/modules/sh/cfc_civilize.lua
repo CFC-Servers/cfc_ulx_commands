@@ -1,3 +1,6 @@
+local MODIFIER_NAME = "civilize"
+local MODIFIER_PRIORITY = 1500
+
 local transformations = {
     ["hello"] = "greetings",
     ["hi"] = "salutations",
@@ -344,7 +347,7 @@ local function filterInvalidChars( str )
     return table.concat( result )
 end
 
-local function transform( sentence )
+local function transform( sentence, _ply )
     sentence = string.lower( sentence )
     sentence = string.Trim( sentence ) -- can bypass with a leading space??? eg, ' i love propspamming'
     sentence = filterInvalidChars( sentence )
@@ -379,31 +382,31 @@ local function transform( sentence )
     return table.concat( transformedWords, " " )
 end
 
+if SERVER then
+    CFCUlxCommands.chatmodifiers.register( MODIFIER_NAME, MODIFIER_PRIORITY, transform )
+end
+
+
 CFCUlxCommands.civilize = CFCUlxCommands.civilize or {}
 local civilizeModule = CFCUlxCommands.civilize
 
 civilizeModule.timedCivilizedPlayers = civilizeModule.timedCivilizedPlayers or {}
 local timedCivilizedPlayers = civilizeModule.timedCivilizedPlayers
 
-civilizeModule.targetedPlayers = civilizeModule.targetedPlayers or {}
-local targetedPlayers = civilizeModule.targetedPlayers
+local chatModifModule = SERVER and CFCUlxCommands.chatmodifiers
 
-hook.Add( "PlayerSay", "CFC_PoshSpeech", function( ply, msg )
-    if not targetedPlayers[ply] then return end
-    return transform( msg )
-end )
 
 function civilizeModule.enable( ply )
-    targetedPlayers[ply] = true
+    chatModifModule.apply( ply, MODIFIER_NAME )
 end
 
 function civilizeModule.disable( ply )
-    targetedPlayers[ply] = nil
+    chatModifModule.remove( ply, MODIFIER_NAME )
 end
 
 local function setPosh( caller, targetPlayers, unSet )
     for i, ply in ipairs( targetPlayers ) do -- don't let ulx uncivilize override timed civilize
-        if not targetedPlayers[ply] then continue end
+        if not chatModifModule.hasModifier( ply, MODIFIER_NAME ) then continue end
         if not timedCivilizedPlayers[ply] then continue end
 
         if ply == caller then
@@ -416,10 +419,10 @@ local function setPosh( caller, targetPlayers, unSet )
         continue
     end
     for _, ply in ipairs( targetPlayers ) do
-        if not unSet then
-            civilizeModule.enable( ply )
-        elseif unSet then
+        if unSet then
             civilizeModule.disable( ply )
+        else
+            civilizeModule.enable( ply )
         end
     end
 
