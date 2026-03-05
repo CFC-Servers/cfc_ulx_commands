@@ -4,6 +4,8 @@ local chatModifModule = CFCUlxCommands.chatmodifiers
 chatModifModule.modifiers = chatModifModule.modifiers or {}
 local modifiers = chatModifModule.modifiers
 
+local CVAR_RERUN_PLAYERSAY = CreateConVar( "cfc_ulx_chat_modifiers_rerun_playersay", 1, FCVAR_ARCHIVE, "Causes chat messages modified by ulx to send the unmodified message back into the PlayerSay hook. Disable this if the server has incompatible custom chat addons.", 0, 1 )
+
 local ID_GIMP = 1
 local ID_MUTE = 2
 
@@ -122,11 +124,13 @@ hook.Add( "PlayerSay", "CFCUlxCommands_ChatModifiers", function( ply, msg, ... )
     -- Run the rest of the PlayerSay hook with the old message, and mute the message if the result says to.
     -- This allows profanity loggers, Starfall/E2 chat commands, and other addon chat commands to work unimpeded.
     -- To log/relay/view the final modified result, addons can still use the player_say gamevent.
-    recursing = true
-    local result = hook.Run( "PlayerSay", ply, oldMsg, ... )
-    recursing = false
+    if CVAR_RERUN_PLAYERSAY:GetBool() then
+        recursing = true
+        local result = hook.Run( "PlayerSay", ply, oldMsg, ... )
+        recursing = false
 
-    if result == "" then return "" end
+        if result == "" then return "" end
+    end
 
     return msg
 end, HOOK_HIGH )
