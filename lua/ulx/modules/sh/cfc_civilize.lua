@@ -405,18 +405,19 @@ function civilizeModule.disable( ply )
 end
 
 local function setPosh( caller, targetPlayers, unSet )
-    for i = #targetPlayers, 1, -1 do -- don't let ulx uncivilize override timed civilize
-        local ply = targetPlayers[i]
-        if not chatModifModule.hasModifier( ply, MODIFIER_NAME ) then continue end
-        if not timedCivilizedPlayers[ply] then continue end
+    if unSet then -- don't let ulx uncivilize override timed civilize
+        for i = #targetPlayers, 1, -1 do
+            local ply = targetPlayers[i]
+            if not timedCivilizedPlayers[ply] then continue end
 
-        if ply == caller then
-            ULib.tsayError( caller, "Your civil situation seems to be of a more timed variety!", true )
-        else
-            ULib.tsayError( caller, ply:Nick() .. " is timed-civilized!", true )
+            if ply == caller then
+                ULib.tsayError( caller, "Your civil situation seems to be of a more timed variety!", true )
+            else
+                ULib.tsayError( caller, ply:Nick() .. " is timed-civilized!", true )
+            end
+
+            table.remove( targetPlayers, i )
         end
-
-        table.remove( targetPlayers, i )
     end
 
     for _, ply in ipairs( targetPlayers ) do
