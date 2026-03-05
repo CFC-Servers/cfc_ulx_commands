@@ -74,6 +74,10 @@ function chatModifModule.hasModifier( ply, modifierName )
 end
 
 
+local recursing = false
+local ulibCommandListener = chatModifModule._ulibCommandListener or nil
+
+
 local function gimpCheck( ply )
     local gimpID = ply.gimp
     if gimpID == ID_MUTE then return "" end
@@ -87,7 +91,17 @@ local function gimpCheck( ply )
 end
 
 
-hook.Add( "PlayerSay", "CFCUlxCommands_ChatModifiers", function( ply, msg )
+hook.Add( "PlayerSay", "CFCUlxCommands_ChatModifiers", function( ply, msg, ... )
+    if recursing then return end
+
+    -- Manually run ULib's command listener first so chat-based ulx commands always go unblocked and unmodified.
+    if ulibCommandListener then
+        local result = ulibCommandListener( ply, msg, ... )
+        if result then return result end
+    end
+
+    local oldMsg = msg
+
     -- Check gimp/mute. If muted, mute the message; otherwise, replace message with the gimp and check modifiers.
     local gimp = gimpCheck( msg )
     if gimp then
@@ -96,17 +110,32 @@ hook.Add( "PlayerSay", "CFCUlxCommands_ChatModifiers", function( ply, msg )
     end
 
     local modifs = ply.cfcUlxChatModifiers
-    if not modifs then return gimp end
+    if not modifs and not gimp then return end
 
+    -- Apply modifiers.
     for _, modifier in ipairs( modifiers ) do
         if modifs[modifier.name] then
             msg = modifier.func( msg, ply )
         end
     end
 
+    -- Run the rest of the PlayerSay hook with the old message, and mute the message if the result says to.
+    -- This allows profanity loggers, Starfall/E2 chat commands, and other addon chat commands to work unimpeded.
+    -- To log/relay/view the final modified result, addons can still use the player_say gamevent.
+    recursing = true
+    local result = hook.Run( "PlayerSay", ply, oldMsg, ... )
+    recursing = false
+
+    if result == "" then return "" end
+
     return msg
-end, HOOK_LOW )
+end, HOOK_HIGH )
 
 hook.Add( "Initialize", "CFCUlxCommands_ChatModifiers", function()
     hook.Remove( "PlayerSay", "ULXGimpCheck" ) -- Remove ulx gimp/mute hook, we replace it.
+
+    -- Remove ULib's command hook and call it manually to guarantee correct order and to avoid duplication.
+    ulibCommandListener = ulibCommandListener or hook.GetTable().PlayerSay.ULib_saycmd
+    chatModifModule._ulibCommandListener = ulibCommandListener
+    hook.Remove( "PlayerSay", "ULib_saycmd" )
 end )
