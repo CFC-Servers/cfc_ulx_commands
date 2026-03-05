@@ -70,7 +70,7 @@ local chatModifModule = SERVER and CFCUlxCommands.chatmodifiers
 
 local function setZoomer( caller, targetPlayers, unSet )
     local shouldSet = not unSet
-    print( targetPlayers, type( targetPlayers ) )
+
     for _, ply in ipairs( targetPlayers ) do
         if shouldSet then
             chatModifModule.apply( ply, MODIFIER_NAME )

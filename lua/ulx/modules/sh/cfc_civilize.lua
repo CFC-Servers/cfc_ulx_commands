@@ -417,8 +417,8 @@ local function setPosh( caller, targetPlayers, unSet )
         end
 
         table.remove( targetPlayers, i )
-        continue
     end
+
     for _, ply in ipairs( targetPlayers ) do
         if unSet then
             civilizeModule.disable( ply )
