@@ -405,7 +405,8 @@ function civilizeModule.disable( ply )
 end
 
 local function setPosh( caller, targetPlayers, unSet )
-    for i, ply in ipairs( targetPlayers ) do -- don't let ulx uncivilize override timed civilize
+    for i = #targetPlayers, 1, -1 do -- don't let ulx uncivilize override timed civilize
+        local ply = targetPlayers[i]
         if not chatModifModule.hasModifier( ply, MODIFIER_NAME ) then continue end
         if not timedCivilizedPlayers[ply] then continue end
 
