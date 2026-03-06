@@ -16,3 +16,7 @@ Repo for CFC's custom ULX commands (that aren't separate)
 A serverside config for curse effects can be made by creating `cfc_ulx_commands/curse/sv_config.json` in the server's `data/` folder.
 Default/example settings can be found [here](/lua/cfc_ulx_commands/curse/sv_config_default.json).
 Any live edits made to the config will apply after a changelevel (e.g. using the `ulx map` command).
+
+## Disclaimer:
+Chat-modifying commands such as `ulx civilize` may cause unintended behavior when the server has a custom chat addon such as [Sam's BetterChat](https://github.com/samuelWilliams99/BetterChat).
+If your server is experiencing said issues, use `cfc_ulx_chat_modifiers_rerun_playersay 0` to disable double-calls from chat modifiers.
