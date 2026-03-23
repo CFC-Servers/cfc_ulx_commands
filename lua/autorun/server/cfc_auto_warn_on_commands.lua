@@ -55,6 +55,9 @@ AW.enabledCommands = {
     ["ulx ban"] = {},
     ["ulx banid"] = {},
 
+    ["ulx timedproxyvoice"] =  { skipEmptyReason = true },
+    ["ulx timedproxyvoiceid"] = {},
+
     -- Kick
     ["ulx kick"] = {
         skipEmptyReason = true,
