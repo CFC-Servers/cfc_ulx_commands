@@ -328,7 +328,7 @@ local transformations = {
     ["old"] = "archaic",
     ["new"] = "recently produced",
     ["fell"] = "descended unceremoniously",
-    ["fall"] = "descend abruptly", 
+    ["fall"] = "descend abruptly",
     ["burning"] = "spectacularly ablaze",
     ["won't"] = "outright abject to",
     ["argue"] = "firmly propose the idea",
@@ -352,7 +352,7 @@ local transformations = {
     ["rage"] = "stark raving mad",
     ["ragebait"] = "a misdeed towards which anger accrues",
     ["ragebaited"] = "deceived into elevating thyne blood pressure",
-  
+
   -- credit r_surrected
     ["mod"] = "professional babysitter",
     ["moderator"] = "professional babysitter",
@@ -510,7 +510,7 @@ local transformations = {
     ["stalker"] = "inhabitant of the zone",
     ["creepy"] = "unnerving and unsightly",
     ["creep"] = "individual of disturbing demeaner",
-    ["faggy"] = "relatively flamboyant", 
+    ["faggy"] = "relatively flamboyant",
     ["shitty"] = "pertaining the properties of excrement",
 }
 
