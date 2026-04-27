@@ -437,6 +437,7 @@ local transformations = {
     ["damn"] = "drat",
     ["crap"] = "unfortunate circumstance",
     ["ass"] = "posterior",
+    ["anus"] = "posterior orifice",
     ["bitch"] = "unpleasant individual",
     ["bastard"] = "person of questionable lineage",
     ["whore"] = "individual of negotiable affection",
@@ -543,13 +544,14 @@ end
 
 local function transform( sentence )
     sentence = string.lower( sentence )
-    sentence = string.Trim( sentence ) -- can bypass with a leading space??? eg, ' i love propspamming'
     sentence = filterInvalidChars( sentence )
 
     local replaceCount = 0
 
     for word, replacement in pairs( transformations ) do
         local amountFound
+        -- %f[%g]/%f[%G] are frontier patterns: match at transitions between whitespace and any printable char.
+        -- This means only fully whitespace-isolated tokens match; "tf!" will NOT match "tf" since "!" is printable (%g).
         sentence, amountFound = string.gsub( sentence, "%f[%g]" .. word .. "%f[%G]", replacement )
 
         replaceCount = replaceCount + amountFound
