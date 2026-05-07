@@ -117,8 +117,6 @@ function AW.warn( commandName, caller, target, reason )
     elseif awarn_warnplayerid then
         awarn_warnplayerid( caller, target, reason )
     end
-
-    hook.Run( "CFC_UlxCommands_AutoWarner", caller, target, reason )
 end
 
 function AW.getTargets( indices, args )
