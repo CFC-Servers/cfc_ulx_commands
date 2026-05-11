@@ -1,3 +1,6 @@
+local MODIFIER_NAME = "zoomer"
+local MODIFIER_PRIORITY = 1067
+
 local transformations = {
     ["hello"] = "yo",
     ["hi"] = "sup",
@@ -36,7 +39,7 @@ local randomPhrases = {
     "vibe check", "frfr", "bet", "slaps", "drip", "cap", "fire", "savage", "lowkey", "highkey"
 }
 
-local function transform( sentence )
+local function transform( sentence, _ply )
     sentence = string.lower( sentence )
 
     for word, replacement in pairs( transformations ) do
@@ -58,20 +61,21 @@ local function transform( sentence )
     return table.concat( transformedWords, " " )
 end
 
-local targettedPlayers = {}
-hook.Add( "PlayerSay", "CFC_ZoomerSpeech", function( ply, msg )
-    if not targettedPlayers[ply] then return end
-    return transform( msg )
-end )
+if SERVER then
+    CFCUlxCommands.chatmodifiers.register( MODIFIER_NAME, MODIFIER_PRIORITY, transform )
+end
+
+
+local chatModifModule = SERVER and CFCUlxCommands.chatmodifiers
 
 local function setZoomer( caller, targetPlayers, unSet )
     local shouldSet = not unSet
-    print( targetPlayers, type( targetPlayers ) )
+
     for _, ply in ipairs( targetPlayers ) do
         if shouldSet then
-            targettedPlayers[ply] = true
+            chatModifModule.apply( ply, MODIFIER_NAME )
         else
-            targettedPlayers[ply] = nil
+            chatModifModule.remove( ply, MODIFIER_NAME )
         end
     end
 
