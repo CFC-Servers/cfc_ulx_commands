@@ -95,13 +95,13 @@ function AW.warn( commandName, caller, target, reason )
     end
 
 
-
     local actorUID
     if IsValid( caller ) then
         actorUID = caller:SteamID64()
     else
         actorUID = "console"
     end
+
     if GMAudit then
         GMAudit.Public.CreateRecord( {
             type = commandName,
@@ -114,7 +114,7 @@ function AW.warn( commandName, caller, target, reason )
                 print( "Error creating GMAudit record: " .. err )
             end
         end )
-    else
+    elseif awarn_warnplayerid then
         awarn_warnplayerid( caller, target, reason )
     end
 end
