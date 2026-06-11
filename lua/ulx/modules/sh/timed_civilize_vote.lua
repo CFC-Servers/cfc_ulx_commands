@@ -6,10 +6,11 @@ local PERMANENT_EXPIRATION = -1
 if SERVER then
     local function voteCivilizeDone( t, targetNick, targetSteamID, minutes, callingPly )
         local voteYesCount = t.results[1] or 0
+        local voteNoCount = t.results[2] or 0
         local shouldCivilize = voteYesCount > 0
 
         if not shouldCivilize then
-            ulx.fancyLogAdmin( callingPly, "#A's vote to civilize #s did not pass", targetNick )
+            ulx.fancyLogAdmin( callingPly, "The populace has deemed the refinement of #s unworthy. Motion dismissed: #i in favor, #i opposed", targetNick, voteYesCount, voteNoCount )
             return
         end
 
@@ -17,7 +18,7 @@ if SERVER then
         local targetPly = player.GetBySteamID64( targetSteamID )
         local targetStillOnServer = IsValid( targetPly )
         if not targetStillOnServer then
-            ulx.fancyLogAdmin( callingPly, "#A's vote to civilize #s passed, but the player has left", targetNick )
+            ulx.fancyLogAdmin( callingPly, "Though the populace voted to refine #s, the target has departed before civility could be imposed", targetNick )
             return
         end
 
@@ -34,7 +35,7 @@ if SERVER then
 
         -- Log the result
         local durationStr = isPermanent and "permanently" or ULib.secondsToStringTime( minutes * 60 )
-        ulx.fancyLogAdmin( callingPly, "#A's vote to civilize #s for #s passed", targetNick, durationStr )
+        ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced for #s. Vote: #i in favor, #i opposed", targetNick, durationStr, voteYesCount, voteNoCount )
     end
 
     function ulx.votetimedcivilize( callingPly, targetPly, minutes )
