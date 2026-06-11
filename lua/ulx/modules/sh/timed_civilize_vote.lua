@@ -5,20 +5,20 @@ local PERMANENT_EXPIRATION = -1
 
 if SERVER then
     local function voteCivilizeDone( t, targetNick, targetSteamID, minutes, callingPly )
-        local voteYesCount = t.results[1] or 0
-        local voteNoCount = t.results[2] or 0
-        local shouldCivilize = voteYesCount > voteNoCount
-
-        if not shouldCivilize then
-            ulx.fancyLogAdmin( callingPly, "The populace has deemed the refinement of #s unworthy. Motion dismissed: #i in favor, #i opposed", targetNick, voteYesCount, voteNoCount )
-            return
-        end
-
         -- Check if player is still on server
         local targetPly = player.GetBySteamID64( targetSteamID )
         local targetStillOnServer = IsValid( targetPly )
         if not targetStillOnServer then
             ulx.fancyLogAdmin( callingPly, "Though the populace voted to refine #s, the target has departed before civility could be imposed", targetNick )
+            return
+        end
+
+        local voteYesCount = t.results[1] or 0
+        local voteNoCount = t.results[2] or 0
+        local shouldCivilize = voteYesCount > voteNoCount
+
+        if not shouldCivilize then
+            ulx.fancyLogAdmin( callingPly, "The populace has deemed the refinement of #T unworthy. Motion dismissed: #i in favor, #i opposed", targetPly, voteYesCount, voteNoCount )
             return
         end
 
@@ -35,10 +35,10 @@ if SERVER then
 
         -- Log the result
         if isPermanent then
-            ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced permanently. Vote: #i in favor, #i opposed", targetNick, voteYesCount, voteNoCount )
+            ulx.fancyLogAdmin( callingPly, "#T has been refined by democratic decree! Civility shall be enforced permanently. Vote: #i in favor, #i opposed", targetPly, voteYesCount, voteNoCount )
         else
             local durationStr = ULib.secondsToStringTime( minutes * 60 )
-            ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced for #s. Vote: #i in favor, #i opposed", targetNick, durationStr, voteYesCount, voteNoCount )
+            ulx.fancyLogAdmin( callingPly, "#T has been refined by democratic decree! Civility shall be enforced for #s. Vote: #i in favor, #i opposed", targetPly, durationStr, voteYesCount, voteNoCount )
         end
     end
 
@@ -70,6 +70,7 @@ if SERVER then
         else
             ulx.fancyLogAdmin( callingPly, "#A started a vote to civilize #T for #s", targetPly, durationStr )
         end
+    end
 end
 
 -- Create the ULX command
