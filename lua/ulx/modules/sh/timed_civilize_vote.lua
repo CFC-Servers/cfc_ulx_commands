@@ -34,8 +34,12 @@ if SERVER then
         TimedPunishments.Punish( targetSteamID, PUNISHMENT, expirationTime, issuerSteamID, "Voted civilized by players" )
 
         -- Log the result
-        local durationStr = isPermanent and "permanently" or ULib.secondsToStringTime( minutes * 60 )
-        ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced for #s. Vote: #i in favor, #i opposed", targetNick, durationStr, voteYesCount, voteNoCount )
+        if isPermanent then
+            ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced permanently. Vote: #i in favor, #i opposed", targetNick, voteYesCount, voteNoCount )
+        else
+            local durationStr = ULib.secondsToStringTime( minutes * 60 )
+            ulx.fancyLogAdmin( callingPly, "#s has been refined by democratic decree! Civility shall be enforced for #s. Vote: #i in favor, #i opposed", targetNick, durationStr, voteYesCount, voteNoCount )
+        end
     end
 
     function ulx.votetimedcivilize( callingPly, targetPly, minutes )
@@ -52,18 +56,26 @@ if SERVER then
 
         -- Build the vote title
         local targetName = targetPly:Nick()
-        local voteTitle = "Civilize " .. targetName .. " for " .. durationStr .. "?"
+        local voteTitle = isPermanent
+            and ( "Civilize " .. targetName .. " permanently?" )
+            or ( "Civilize " .. targetName .. " for " .. durationStr .. "?" )
 
         -- Start the vote
         local targetSteamID = targetPly:SteamID64()
         ulx.doVote( voteTitle, { "Yes", "No" }, voteCivilizeDone, _, _, _, targetName, targetSteamID, minutes, callingPly )
 
         -- Log the vote initiation
-        ulx.fancyLogAdmin( callingPly, "#A started a vote to civilize #T for #s", targetPly, durationStr )
-    end
+        if isPermanent then
+            ulx.fancyLogAdmin( callingPly, "#A started a vote to civilize #T permanently", targetPly )
+        else
+            ulx.fancyLogAdmin( callingPly, "#A started a vote to civilize #T for #s", targetPly, durationStr )
+        end
 end
 
 -- Create the ULX command
+if CLIENT and ulx.votetimedcivilize == nil then
+    function ulx.votetimedcivilize() end
+end
 local voteCmd = ulx.command( CATEGORY, "ulx votetimedcivilize", ulx.votetimedcivilize, "!votetimedcivilize" )
 
 -- Add parameters
