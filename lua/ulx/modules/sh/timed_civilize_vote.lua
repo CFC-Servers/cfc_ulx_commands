@@ -7,7 +7,7 @@ if SERVER then
     local function voteCivilizeDone( t, targetNick, targetSteamID, minutes, callingPly )
         local voteYesCount = t.results[1] or 0
         local voteNoCount = t.results[2] or 0
-        local shouldCivilize = voteYesCount > 0
+        local shouldCivilize = voteYesCount > voteNoCount
 
         if not shouldCivilize then
             ulx.fancyLogAdmin( callingPly, "The populace has deemed the refinement of #s unworthy. Motion dismissed: #i in favor, #i opposed", targetNick, voteYesCount, voteNoCount )
