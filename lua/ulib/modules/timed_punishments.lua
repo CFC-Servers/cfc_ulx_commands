@@ -30,6 +30,7 @@ end
 
 function TP.Punish( steamID64, punishment, expiration, issuer, reason )
     Data:createPunishment( punishment, steamID64, expiration, issuer, reason )
+    hook.Run( "CFC_TimedPunishments_Punished", steamID64, punishment, expiration, issuer, reason )
 
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
@@ -45,6 +46,7 @@ end
 
 function TP.Unpunish( steamID64, punishment )
     Data:removePunishment( punishment, steamID64 )
+    hook.Run( "CFC_TimedPunishments_Unpunished", steamID64, punishment )
 
     local ply = player.GetBySteamID64( steamID64 )
     if not IsValid( ply ) then return end
