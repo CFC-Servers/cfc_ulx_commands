@@ -33,7 +33,6 @@ if SERVER then
     hook.Add( "PlayerSpawnVehicle", "CFC_ULX_DarkRP_blockActioning", blockAction )
     hook.Add( "PlayerSpawnRagdoll", "CFC_ULX_DarkRP_blockActioning", blockAction )
     hook.Add( "PlayerSpawnSENT", "CFC_ULX_DarkRP_blockActioning", blockAction )
-    hook.Add( "PlayerGiveSWEP", "CFC_ULX_DarkRP_blockActioning", blockAction )
 end
 
 local action = "forced ## into DarkRP Mode"
