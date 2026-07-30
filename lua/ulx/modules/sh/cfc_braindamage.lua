@@ -1,4 +1,4 @@
-CFCUlxCommands.strokeify = CFCUlxCommands.strokeify or {}
+CFCUlxCommands.braindamage = CFCUlxCommands.braindamage or {}
 
 local CATEGORY_NAME = "Fun"
 
@@ -63,7 +63,7 @@ local wordTransformations = {
     end,
 }
 
-local wordStrokeChance = 0.5
+local wordBrainDamageChance = 0.5
 
 
 local function getWordTransformation()
@@ -76,9 +76,9 @@ local function transform( sentence )
 
     while #words ~= 0 do
         local word = table.remove( words, 1 )
-        local shouldStroke = math.random() < wordStrokeChance
+        local shouldBrainDamage = math.random() < wordBrainDamageChance
 
-        if shouldStroke then
+        if shouldBrainDamage then
             local transformationResult = { getWordTransformation()( word, transformedWords ) }
             local transformedWord = table.remove( transformationResult, 1 )
 
@@ -108,12 +108,12 @@ local function transform( sentence )
 end
 
 local targetedPlayers = {}
-hook.Add( "PlayerSay", "CFC_StrokeSpeech", function( ply, msg )
+hook.Add( "PlayerSay", "CFC_BrainDamageSpeech", function( ply, msg )
     if not targetedPlayers[ply] then return end
     return transform( msg )
 end )
 
-local function setStroke( caller, targetPlayers, unSet )
+local function setBrainDamage( caller, targetPlayers, unSet )
     local shouldSet = not unSet
 
     for _, ply in ipairs( targetPlayers ) do
@@ -124,13 +124,13 @@ local function setStroke( caller, targetPlayers, unSet )
         end
     end
 
-    ulx.fancyLogAdmin( caller, shouldSet and "#A afflicted #T with a stroke" or "#A cured #T's stroke", targetPlayers )
+    ulx.fancyLogAdmin( caller, shouldSet and "#A afflicted #T with brain damage" or "#A cured #T's brain damage", targetPlayers )
 end
 
 
-local strokeify = ulx.command( CATEGORY_NAME, "ulx strokeify", setStroke, "!strokeify" )
-strokeify:defaultAccess( ULib.ACCESS_ADMIN )
-strokeify:addParam( { type = ULib.cmds.PlayersArg } )
-strokeify:addParam( { type = ULib.cmds.BoolArg, invisible = true } )
-strokeify:help( "Gives the affected user a stroke" )
-strokeify:setOpposite( "ulx unstrokeify", { nil, nil, true }, "!unstrokeify" )
+local braindamage = ulx.command( CATEGORY_NAME, "ulx braindamage", setBrainDamage, "!braindamage" )
+braindamage:defaultAccess( ULib.ACCESS_ADMIN )
+braindamage:addParam( { type = ULib.cmds.PlayersArg } )
+braindamage:addParam( { type = ULib.cmds.BoolArg, invisible = true } )
+braindamage:help( "Gives the affected user brain damage" )
+braindamage:setOpposite( "ulx unbraindamage", { nil, nil, true }, "!unbraindamage" )
