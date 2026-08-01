@@ -1,5 +1,8 @@
 CFCUlxCommands.strokeify = CFCUlxCommands.strokeify or {}
 
+local MODIFIER_NAME = "stroke"
+local MODIFIER_PRIORITY = 3500
+
 local CATEGORY_NAME = "Fun"
 
 local wordTransformations = {
@@ -70,7 +73,7 @@ local function getWordTransformation()
     return wordTransformations[math.random( 1, #wordTransformations )]
 end
 
-local function transform( sentence )
+local function transform( sentence, _ply )
     local transformedWords = {}
     local words = string.Split( sentence, " " )
 
@@ -107,20 +110,21 @@ local function transform( sentence )
     return table.concat(  transformedWords, " " )
 end
 
-local targetedPlayers = {}
-hook.Add( "PlayerSay", "CFC_StrokeSpeech", function( ply, msg )
-    if not targetedPlayers[ply] then return end
-    return transform( msg )
-end )
+if SERVER then
+    CFCUlxCommands.chatmodifiers.register( MODIFIER_NAME, MODIFIER_PRIORITY, transform )
+end
+
+
+local chatModifModule = SERVER and CFCUlxCommands.chatmodifiers
 
 local function setStroke( caller, targetPlayers, unSet )
     local shouldSet = not unSet
 
     for _, ply in ipairs( targetPlayers ) do
         if shouldSet then
-            targetedPlayers[ply] = true
+            chatModifModule.apply( ply, MODIFIER_NAME )
         else
-            targetedPlayers[ply] = nil
+            chatModifModule.remove( ply, MODIFIER_NAME )
         end
     end
 
